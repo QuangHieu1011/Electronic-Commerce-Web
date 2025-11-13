@@ -64,9 +64,30 @@ const loginUser = async (req, res) => {
         });
     }
 };
+const updateUser = async (req, res) => {
+    try {
+        const UserId = req.params.id;
+        console.log('UserId', UserId)
+        const data = req.body;
+        if(!UserId){
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'The UserId is required'
+            });
+        }
+
+        const response = await UserService.updateUser(UserId, data);
+        return res.status(200).json(response);
+    } catch (e) {
+        return res.status(404).json({
+            message: e
+        });
+    }
+};
 
 
 module.exports = {
     createUser,
-    loginUser
+    loginUser,
+    updateUser
 };
