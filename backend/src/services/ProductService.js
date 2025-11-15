@@ -86,21 +86,54 @@ const deleteProduct = (id) => {
         }
     });
 };
-const getAllProduct = (limit = 8, page = 0) => {
+const getAllProduct = (limit, page, sort, filter) => {
     return new Promise(async (resolve, reject) => {
         try {
             const totalProduct = await Product.countDocuments()
+
+            if (filter){
+                const label = filter[0];
+                const allObjectFilter = await Product
+                    .find({ [label] : {'$regex': filter[1]}})
+                    .limit(limit)
+                    .skip(limit * page)
+                resolve({ 
+                    status: 'OK',
+                    message: 'Get all product success',
+                    data: allObjectFilter,
+                    total: totalProduct,
+                    pageCurrent: Number(page) + 1,
+                    totalPage: Math.ceil(totalProduct / limit)
+                });
+
+            }
+           
+            if (sort){
+                const objectSort = {}
+                objectSort[sort[1]] = sort[0]
+                const allProductSort = await Product.find().limit(limit).skip(limit * page).sort(objectSort)
+                resolve({
+                    status: 'OK',
+                    message: 'Get  product success',
+                    data: allProductSort,
+                    total: totalProduct,
+                    pageCurrent: Number(page) + 1,
+                    totalPage: Math.ceil(totalProduct / limit)
+                });
+
+            }
+            
             const allProduct = await Product.find().limit(limit).skip(limit * page)
             resolve({
                 status: 'OK',
                 message: 'Get all product success',
-                data: allProduct,
+                data: allProduct, 
                 total: totalProduct,
                 pageCurrent: Number(page) + 1,
                 totalPage: Math.ceil(totalProduct / limit)
             });
         } catch (e) {
-             reject(e);
+            reject(e);
         } 
     });
 };
