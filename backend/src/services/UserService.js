@@ -6,16 +6,13 @@ const createUser = (newUser = {}) => {
     return new Promise(async (resolve, reject) => {
         const { name, email, password, confirmPassword, phone } = newUser || {};
 
-        if (!name || !email || !password || !confirmPassword || !phone) {
-            return reject(new Error('Missing required fields'));
-        }
         try {
             const CheckUser= await User.findOne({
                  email: email
             });
             if (CheckUser != null) {
                 resolve({
-                    status: 'OK',
+                    status: 'ERR',
                     message: 'The email is already '
                 });
             }
@@ -44,7 +41,7 @@ const createUser = (newUser = {}) => {
 };
 const loginUser = (Userlogin = {}) => {
     return new Promise(async (resolve, reject) => {
-        const { name, email, password, confirmPassword, phone } = Userlogin || {};
+        const {  email, password} = Userlogin || {};
 
         try {
             const CheckUser= await User.findOne({
@@ -52,7 +49,7 @@ const loginUser = (Userlogin = {}) => {
             });
             if (CheckUser === null) {
                 resolve({
-                    status: 'OK',
+                    status: 'ERR',
                     message: 'The user is not defined'
                 });
             }
