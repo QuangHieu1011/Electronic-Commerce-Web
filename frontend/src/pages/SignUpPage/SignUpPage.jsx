@@ -1,10 +1,14 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { EyeFilled, EyeInvisibleFilled } from '@ant-design/icons';
 import { WrapperContainerLeft, WrapperContainerRight, WrapperH1, WrapperH4, WrapperP, WrapperTextLight } from './style'
 import InputForm from '../../components/InputForm/InputForm'
 import { Button, Image } from 'antd'
 import imageLogo from '../../assets/images/Logo_Login.png'
 import { useNavigate } from 'react-router-dom'
+import * as UserService from '../../service/UserService'
+import { useMutationHooks } from '../../hooks/useMutationHook';
+import Loading from '../../components/LoadingComponent/Loading';
+import * as message from '../../components/Message/Message'
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -12,6 +16,23 @@ const SignUpPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+
+  
+  const mutation = useMutationHooks(
+      data => UserService.signupUser(data)
+  )
+  const {data, isPending, isSuccess, isError} = mutation
+  console.log('mutation', mutation)
+
+  useEffect(() => {
+    if (isSuccess) {
+        message.success()
+    } else if (isError) {
+        message.error()
+    }
+
+  }, [isSuccess, isError])
 
 
   const handleOnchangeEmail = (value) => {
@@ -27,6 +48,7 @@ const SignUpPage = () => {
 
   }
   const handleSignUp = () => {
+    mutation.mutate({ email, password, confirmPassword });
     console.log('sign-up', email, password, confirmPassword);
   }
 
@@ -82,23 +104,30 @@ const SignUpPage = () => {
                 {showConfirm ? <EyeFilled /> : <EyeInvisibleFilled />}
               </span>
             </div>
-            <Button
-                  disabled={!email.length || !password.length || !confirmPassword.length}
-                  onClick={handleSignUp}
-                  style={{
-                    backgroundColor: (!email.length || !password.length || !confirmPassword.length) ? '#ccc' : 'rgb(255, 57, 69)',
-                    height: '48px',
-                    width: '100%',
-                    border: 'none',
-                    borderRadius: '4px',
-                    color: '#fff', 
-                    fontSize: '15px', 
-                    fontWeight: '700',
-                    margin:'26px 0 10px'
-                  }}
-                >
-                  Đăng ký
-            </Button>
+              {data?.status === 'ERR' && (
+                <span style={{ color: 'red', fontSize: 12, marginTop: 8 }}>
+                {data?.message}
+            </span>
+            )}
+            <Loading isLoading={isPending}>
+                  <Button
+                        disabled={!email.length || !password.length || !confirmPassword.length}
+                        onClick={handleSignUp}
+                        style={{
+                          backgroundColor: (!email.length || !password.length || !confirmPassword.length) ? '#ccc' : 'rgb(255, 57, 69)',
+                          height: '48px',
+                          width: '100%',
+                          border: 'none',
+                          borderRadius: '4px',
+                          color: '#fff', 
+                          fontSize: '15px', 
+                          fontWeight: '700',
+                          margin:'26px 0 10px'
+                        }}
+                      >
+                        Đăng ký
+                  </Button>
+            </Loading>
             <WrapperP> Bạn đã có tài khoản? <WrapperTextLight onClick={handleNavigateSignin} style ={{ cursor: 'pointer'}}> Đăng nhập </WrapperTextLight></WrapperP>
           </WrapperContainerLeft>
           <WrapperContainerRight>

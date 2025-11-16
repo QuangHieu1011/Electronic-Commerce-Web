@@ -5,6 +5,10 @@ import { Button, Image } from 'antd'
 import imageLogo from '../../assets/images/Logo_Login.png'
 import { useNavigate } from 'react-router-dom'
 import { EyeFilled, EyeInvisibleFilled } from '@ant-design/icons';
+import * as UserService from '../../service/UserService'
+import { useMutationHooks } from '../../hooks/useMutationHook'
+import Loading from '../../components/LoadingComponent/Loading'
+
 
 
 
@@ -13,6 +17,17 @@ const SignInPage = () => {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
 
+  const navigate = useNavigate();
+  const handleNavigateSignup = () => {
+      navigate('/sign-up')
+  } 
+
+  const mutation = useMutationHooks(
+    data => UserService.loginUser(data)
+  )
+  console.log('mutation', mutation)
+  const {data, isPending } = mutation
+ 
    const handleOnchangeEmail = (value) => {
         setEmail(value);
 
@@ -22,13 +37,11 @@ const SignInPage = () => {
 
   }
   const handleSignIn = () => {
+    mutation.mutate({ email, password });
     console.log('sign-in', email, password)
   }
 
-  const navigate = useNavigate();
-  const handleNavigateSignup = () => {
-      navigate('/sign-up')
-  } 
+  
   return (
     <div style={{display:'flex', alignItems:'center',justifyContent:'center',background:'rgba(0,0,0,0.53)', height:'100vh'}}>
         <div style={{width:'800px', height:'445px',borderRadius:'8px',background:'#fff', display:'flex'}}>
@@ -57,6 +70,12 @@ const SignInPage = () => {
                 {showPassword ? <EyeFilled /> : <EyeInvisibleFilled />}
               </span>
             </div>
+                {data?.status === 'ERR' && (
+                <span style={{ color: 'red', fontSize: 12, marginTop: 8 }}>
+                {data?.message}
+            </span>
+            )}
+            <Loading isLoading={isPending && email.length > 0 && password.length > 0}>
             <Button
                   disabled={!email.length || !password.length }
                   onClick={handleSignIn}
@@ -74,6 +93,8 @@ const SignInPage = () => {
                 >
                   Đăng nhập
             </Button>
+            </Loading>
+
             <WrapperTextLight> Quên mật khẩu?</WrapperTextLight>
             <WrapperP> Chưa có tài khoản? <WrapperTextLight onClick={handleNavigateSignup} style ={{ cursor: 'pointer'}}> Tạo tài khoản </WrapperTextLight></WrapperP>
           </WrapperContainerLeft>
