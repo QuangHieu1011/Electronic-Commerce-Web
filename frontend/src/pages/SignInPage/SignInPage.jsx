@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { WrapperContainerLeft, WrapperContainerRight, WrapperH1, WrapperH4, WrapperP, WrapperTextLight } from './style'
 import InputForm from '../../components/InputForm/InputForm'
 import { Button, Image } from 'antd'
@@ -8,6 +8,10 @@ import { EyeFilled, EyeInvisibleFilled } from '@ant-design/icons';
 import * as UserService from '../../service/UserService'
 import { useMutationHooks } from '../../hooks/useMutationHook'
 import Loading from '../../components/LoadingComponent/Loading'
+import { jwtDecode } from 'jwt-decode';
+import {useDispatch} from 'react-redux'
+import { updateUser } from '../../redux/slides/userSlide'
+
 
 
 
@@ -16,6 +20,7 @@ const SignInPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
+  const dispatch = useDispatch();
 
   const navigate = useNavigate();
   const handleNavigateSignup = () => {
@@ -26,13 +31,34 @@ const SignInPage = () => {
     data => UserService.loginUser(data)
   )
   console.log('mutation', mutation)
-  const {data, isPending } = mutation
+  const {data, isPending ,isSuccess,} = mutation
+
+  useEffect(() => {
+    if (isSuccess) {
+      if (data?.access_token) {
+        localStorage.setItem('access_token', JSON.stringify(data.access_token));
+        const decoded = jwtDecode(data.access_token);
+        if (decoded?.id) {
+          dispatch(updateUser({ ...decoded, access_token: data.access_token }));
+          handleGetDetailsUser(decoded.id, data.access_token);
+        }
+        navigate('/');
+      }
+    }
+
+  },[isSuccess])
+
+  const handleGetDetailsUser = async (id, token) => {
+    const res =await UserService.getDetailsUser(id, token)
+    dispatch(updateUser({ ...res?.data, access_token: token }))
+  }
+
  
-   const handleOnchangeEmail = (value) => {
+  const handleOnchangeEmail = (value) => {
         setEmail(value);
 
   }
-   const handleOnchangePassword = (value) => {
+  const handleOnchangePassword = (value) => {
         setPassword(value);
 
   }

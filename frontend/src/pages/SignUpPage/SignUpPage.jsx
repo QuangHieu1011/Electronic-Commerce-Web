@@ -17,6 +17,11 @@ const SignUpPage = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
+  const navigate = useNavigate()
+
+  const handleNavigateSignin = () => {
+      navigate('/sign-in')
+  }
 
   
   const mutation = useMutationHooks(
@@ -26,13 +31,17 @@ const SignUpPage = () => {
   console.log('mutation', mutation)
 
   useEffect(() => {
-    if (isSuccess) {
-        message.success()
-    } else if (isError) {
-        message.error()
+  if (isSuccess) {
+    if (data?.status === 'OK') {
+      message.success(data?.message || 'Success');
+      handleNavigateSignin();
+    } else {
+      message.error(data?.message || 'Error');
     }
-
-  }, [isSuccess, isError])
+  } else if (isError) {
+    message.error(data?.message || 'Error');
+  }
+}, [isSuccess, isError, handleNavigateSignin]);
 
 
   const handleOnchangeEmail = (value) => {
@@ -53,10 +62,7 @@ const SignUpPage = () => {
   }
 
 
-  const navigate = useNavigate();
-  const handleNavigateSignin = () => {
-      navigate('/sign-in')
-  }
+ 
   return (
     <div style={{display:'flex', alignItems:'center',justifyContent:'center',background:'rgba(0,0,0,0.53)', height:'100vh'}}>
         <div style={{width:'800px', height:'445px',borderRadius:'8px',background:'#fff', display:'flex'}}>
