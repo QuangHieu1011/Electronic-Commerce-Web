@@ -9,38 +9,62 @@ import CardComponent from '../../components/CardComponent/CardComponent'
 
 
 const HomePage = () => {
-  const arr = ['TV','Laptop','Tủ Lạnh']
+  const arr = ['TV','Laptop','Tủ Lạnh', 'Điện Thoại', 'Máy Ảnh', 'Tai Nghe', 'Đồng Hồ']
   return (
     <>
-    <div style={{padding: '0 120px', fontSize: '16px'}}>
-      <WrapperTypeProduct>  
-        {arr.map((item) => {
-          return(
-            <TypeProduct name={item} key ={item}/>
-          )
-        })}
-      </WrapperTypeProduct>
-    </div>
+    <div style={{backgroundColor: '#f5f5f5', minHeight: '100vh', paddingBottom: '40px'}}>
+      <div style={{padding: '20px 120px 0', fontSize: '16px'}}>
+        <WrapperTypeProduct>  
+          {arr.map((item) => {
+            return(
+              <TypeProduct name={item} key ={item}/>
+            )
+          })}
+        </WrapperTypeProduct>
+      </div>
 
-    <div id="container" style={{ backgroundColor: '#efefef', padding:'0 120px',height: '1000px'}}>
-        <SliderComponent arrImages={[slider1, slider2, slider3]} />
-        <WrapperProducts>
-          <CardComponent />
-          <CardComponent />
-          <CardComponent />
-          <CardComponent />
-          <CardComponent />
-          <CardComponent />
-          <CardComponent />
-          <CardComponent />
-          <CardComponent />
-          <CardComponent />
-        </WrapperProducts>
-        <div style={{ display: 'flex', width: '100%', justifyContent: 'center', marginTop: '20px'}}>
-         <WrapperButtonMore type="default">
-           Xem thêm
-        </WrapperButtonMore>
-        </div>
+      <div id="container" style={{ padding:'0 120px'}}>
+          <SliderComponent arrImages={[slider1, slider2, slider3]} />
+          
+          <div style={{ marginTop: '24px' }}>
+            <div style={{ 
+              backgroundColor: '#fff', 
+              borderRadius: '12px', 
+              padding: '20px', 
+              marginBottom: '20px',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.08)'
+            }}>
+              <div style={{ 
+                fontSize: '24px', 
+                fontWeight: '700', 
+                color: '#333', 
+                marginBottom: '20px',
+                paddingLeft: '12px',
+                borderLeft: '4px solid #d70018'
+              }}>
+                Sản Phẩm Nổi Bật
+              </div>
+              <WrapperProducts>
+                <CardComponent />
+                <CardComponent />
+                <CardComponent />
+                <CardComponent />
+                <CardComponent />
+                <CardComponent />
+                <CardComponent />
+                <CardComponent />
+                <CardComponent />
+                <CardComponent />
+              </WrapperProducts>
+            </div>
+          </div>
+          
+          <div style={{ display: 'flex', width: '100%', justifyContent: 'center', marginTop: '32px'}}>
+           <WrapperButtonMore type="default">
+             Xem thêm sản phẩm
+          </WrapperButtonMore>
+          </div>
+      </div>
     </div>
     </>
     

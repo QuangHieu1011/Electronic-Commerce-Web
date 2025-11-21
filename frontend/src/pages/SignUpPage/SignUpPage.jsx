@@ -120,15 +120,30 @@ const SignUpPage = () => {
                         disabled={!email.length || !password.length || !confirmPassword.length}
                         onClick={handleSignUp}
                         style={{
-                          backgroundColor: (!email.length || !password.length || !confirmPassword.length) ? '#ccc' : 'rgb(255, 57, 69)',
-                          height: '48px',
+                          backgroundColor: (!email.length || !password.length || !confirmPassword.length) ? '#ccc' : '#d70018',
+                          height: '52px',
                           width: '100%',
                           border: 'none',
-                          borderRadius: '4px',
+                          borderRadius: '8px',
                           color: '#fff', 
-                          fontSize: '15px', 
+                          fontSize: '16px', 
                           fontWeight: '700',
-                          margin:'26px 0 10px'
+                          margin:'26px 0 10px',
+                          cursor: (!email.length || !password.length || !confirmPassword.length) ? 'not-allowed' : 'pointer',
+                          transition: 'all 0.3s ease',
+                          boxShadow: (!email.length || !password.length || !confirmPassword.length) ? 'none' : '0 4px 12px rgba(215, 0, 24, 0.3)'
+                        }}
+                        onMouseEnter={(e) => {
+                          if (email.length && password.length && confirmPassword.length) {
+                            e.currentTarget.style.backgroundColor = '#b8001a'
+                            e.currentTarget.style.transform = 'translateY(-2px)'
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (email.length && password.length && confirmPassword.length) {
+                            e.currentTarget.style.backgroundColor = '#d70018'
+                            e.currentTarget.style.transform = 'translateY(0)'
+                          }
                         }}
                       >
                         Đăng ký

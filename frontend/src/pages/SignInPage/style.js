@@ -9,7 +9,7 @@ export const WrapperContainerLeft = styled.div`
 
 export const WrapperContainerRight = styled.div`
     width:300px;
-    background: linear-gradient(136deg, rgb(240, 248, 255) -1%, rgb(219, 238, 255) 85%);
+    background: linear-gradient(136deg, #fff0f0 -1%, #ffe6e6 85%);
     display: flex;
     justify-content: center;
     flex-direction: column;
@@ -17,8 +17,15 @@ export const WrapperContainerRight = styled.div`
     gap: 4px;
 `
 export const WrapperTextLight= styled.span`
-    color: rgb(13,92,182);
+    color: #d70018;
     font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    
+    &:hover {
+        color: #b8001a;
+        text-decoration: underline;
+    }
 `
 export const WrapperH1 = styled.h1`
     font-size: 28px;

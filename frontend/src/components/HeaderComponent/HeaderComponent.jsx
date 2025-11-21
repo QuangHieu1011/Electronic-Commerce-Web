@@ -56,48 +56,52 @@ const HeaderComponent = () => {
   );
   
   return (
-    <div style={{width: '100%', background: 'rgb(26,148,255)',display:'flex'}}>
+    <div style={{width: '100%', background: 'linear-gradient(135deg, #d70018 0%, #e02027 100%)', display:'flex', position: 'sticky', top: 0, zIndex: 1000}}>
       <WrapperHeader>
         <Col span={5}>
-          <WrapperTextHeader>TECHSTORE</WrapperTextHeader>
+          <WrapperTextHeader onClick={() => navigate('/')}>⚡ TECHSTORE</WrapperTextHeader>
         </Col>
         <Col span={13}>
           <ButtonInputSearch
             size="large"
-            placeholder="Input search text" 
-            textButton="Search"
+            placeholder="Bạn cần tìm gì hôm nay?" 
+            textButton="Tìm kiếm"
           />
         </Col>
         <Col span={6}>
-          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%'}}>
+          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', gap: '12px'}}>
             <Loading isLoading={loading}>
             <WrapperHeaderAccount> 
               {userAvatar ? (
-                <img src={userAvatar} alt="avatar" style={{ height:'30px', width: '30px', borderRadius: '50%', objectFit: 'cover' }}/>
+                <img src={userAvatar} alt="avatar" style={{ height:'32px', width: '32px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.5)' }}/>
               ) : (
-              <UserOutlined style ={{ fontSize : '30px' }}/>)}
+              <UserOutlined style ={{ fontSize : '28px' }}/>)}
               {user?.access_token ? (
               <>
-                <Popover content={content} trigger="click">
-                    <div style ={{ cursor: 'pointer'}}> {userName?.length ? userName : user?.email } </div>
+                <Popover content={content} trigger="click" placement="bottomRight">
+                    <div style ={{ cursor: 'pointer', fontSize: '13px', fontWeight: '500'}}> {userName?.length ? userName : user?.email } </div>
                 </Popover>
               </>
               ): (
                 <div onClick={handleNavigatedLogin} style ={{ cursor: 'pointer'}}>
-                  <WrapperText>Đăng nhập / Đăng ký</WrapperText>
-                  <div>
-                    <WrapperText>Tài Khoản</WrapperText>
-                    <CaretDownOutlined />
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                    <WrapperText style={{ fontSize: '12px', opacity: 0.9 }}>Đăng nhập / Đăng ký</WrapperText>
+                    <WrapperText style={{ fontSize: '13px', fontWeight: '600' }}>Tài Khoản <CaretDownOutlined style={{ fontSize: '10px' }}/></WrapperText>
                   </div>
                 </div>
               )}
             </WrapperHeaderAccount>
             </Loading>
-            <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-              <Badge count={5} size="small">
-                <ShoppingCartOutlined style ={{ fontSize : '30px', color :'#fff' }}/>
+            <div style={{display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', borderRadius: '8px', cursor: 'pointer', transition: 'all 0.3s ease'}} 
+                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.15)'}
+                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+              <Badge count={5} size="small" style={{ backgroundColor: '#ff9900' }}>
+                <ShoppingCartOutlined style ={{ fontSize : '28px', color :'#fff' }}/>
               </Badge>
-              <WrapperText>Giỏ Hàng</WrapperText>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                <WrapperText style={{ fontSize: '12px', opacity: 0.9 }}>Giỏ hàng</WrapperText>
+                <WrapperText style={{ fontSize: '13px', fontWeight: '600' }}>của tôi</WrapperText>
+              </div>
             </div>
           </div>
         </Col>

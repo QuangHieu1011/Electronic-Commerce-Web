@@ -4,9 +4,9 @@ import { WrapperH5 } from './style'
 
 const ProductDetailsPage = () => {
   return (
-    <div style={{padding: '0 120px', background:'#efefef',fontSize: '16px',height: '1000px'}}>
+    <div style={{padding: '20px 120px', background:'#f5f5f5',fontSize: '16px', minHeight: '100vh'}}>
         <WrapperH5>Trang chủ</WrapperH5>
-        <div>
+        <div style={{ marginTop: '20px' }}>
             <ProductDetailsComponent />
         </div>
     </div>

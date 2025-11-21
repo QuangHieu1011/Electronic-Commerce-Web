@@ -21,7 +21,7 @@ import {
 const ProductDetailsComponent = () => {
   const onChange = () => { }
   return (
-    <Row style={{ padding: '16px', background: '#fff', borderRadius: '4px' }}>
+    <Row style={{ padding: '24px', background: '#fff', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
 
       <Col span={10} style={{ borderRight: '1px solid #e5e5e5', paddingRight: '10px' }}>
         <WrapperContainerImage>
@@ -79,15 +79,26 @@ const ProductDetailsComponent = () => {
           <div style ={{ display:'flex', alignItems:'center', gap: '16px'}}>
             <Button
                   style={{
-                    backgroundColor: 'rgb(255, 57, 69)',
-                    height: '48px',
+                    backgroundColor: '#d70018',
+                    height: '52px',
                     width: '220px',
                     border: 'none',
-                    borderRadius: '4px',
+                    borderRadius: '8px',
                     color: '#fff', 
-                    fontSize: '15px', 
+                    fontSize: '16px', 
                     fontWeight: '700',
-                    margin:'26px 0 10px'
+                    margin:'26px 0 10px',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    boxShadow: '0 4px 12px rgba(215, 0, 24, 0.3)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#b8001a'
+                    e.currentTarget.style.transform = 'translateY(-2px)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#d70018'
+                    e.currentTarget.style.transform = 'translateY(0)'
                   }}
                 >
                   Chọn mua
@@ -96,14 +107,22 @@ const ProductDetailsComponent = () => {
             <Button
                   style={{
                     backgroundColor: '#fff',
-                    height: '48px',
+                    height: '52px',
                     width: '220px',
-                    border: '1px solid rgb(13, 92, 182)',
-                    borderRadius: '4px',
-                    color: 'rgb(13, 92, 182)', 
-                    fontSize: '15px', 
-                    fontWeight: '500',
-                    margin:'26px 0 10px'
+                    border: '2px solid #d70018',
+                    borderRadius: '8px',
+                    color: '#d70018', 
+                    fontSize: '16px', 
+                    fontWeight: '600',
+                    margin:'26px 0 10px',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#fff5f5'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#fff'
                   }}
                 >
                   Mua trả sau
