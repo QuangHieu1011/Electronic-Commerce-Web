@@ -1,12 +1,12 @@
 
-import React, { Fragment, useEffect } from 'react'
+import React, { Fragment, use, useEffect, useState } from 'react'
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 import { routes } from './routes'
 import DefaultComponent from './components/DefaultComponent/DefaultComponent'
 import { isJsonString } from './utils'
 import { jwtDecode } from 'jwt-decode'
 import * as UserService from './service/UserService'
-import {useDispatch} from 'react-redux'
+import {useDispatch, useSelector} from 'react-redux'
 import { updateUser } from './redux/slides/userSlide'
 import axios from 'axios'
 import Loading from './components/LoadingComponent/Loading'
@@ -17,6 +17,7 @@ import Loading from './components/LoadingComponent/Loading'
 function App() {
     const dispatch = useDispatch();
     const [isLoadingUser, setIsLoadingUser] = React.useState(true);
+    const user = useSelector((state) => state.user);
 
     const handleGetDetailsUser = async (id, token) => {
         setIsLoadingUser(true);
@@ -91,15 +92,17 @@ function App() {
         <Router>
           <Routes>
             {routes.map((route) => {
-              const Page = route.page
-              const Layout = route.isShowHeader ? DefaultComponent: Fragment
-              return(
+              const ischeckAuth = !route.isPrivate || user.isAdmin;
+              if (typeof route.path !== 'string' || !ischeckAuth) return null;
+              const Page = route.page;
+              const Layout = route.isShowHeader ? DefaultComponent : Fragment;
+              return (
                 <Route key={route.path} path={route.path} element={
-                <Layout>
-                  <Page />
-                </Layout>
+                  <Layout>
+                    <Page />
+                  </Layout>
                 } />
-              )
+              );
             })}
           </Routes>
         </Router>

@@ -17,7 +17,7 @@ import Loading from '../LoadingComponent/Loading';
 
 
 
-const HeaderComponent = () => {
+const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
   const navigate = useNavigate();
   const user =useSelector((state) => state.user);
   const dispatch = useDispatch();
@@ -50,24 +50,30 @@ const HeaderComponent = () => {
 
   const content = (
   <div>
-    <WrapperContentPopup onClick={handleLogout}>Đăng xuất</WrapperContentPopup>
     <WrapperContentPopup onClick={() => navigate('/profile-user')}>Thông tin người dùng</WrapperContentPopup>
+    {user.isAdmin && (
+      <WrapperContentPopup onClick={() => navigate('/system/admin')}>Quản lí hệ thống</WrapperContentPopup>
+    )}
+    <WrapperContentPopup onClick={handleLogout}>Đăng xuất</WrapperContentPopup>
   </div>
   );
   
   return (
     <div style={{width: '100%', background: 'rgb(26,148,255)',display:'flex'}}>
-      <WrapperHeader>
+      <WrapperHeader style ={{ justifyContent: isHiddenSearch && isHiddenSearch ? 'space-between' : 'unset'}}>
         <Col span={5}>
           <WrapperTextHeader>TECHSTORE</WrapperTextHeader>
         </Col>
-        <Col span={13}>
+        {!isHiddenSearch && (
+          <Col span={13}>
           <ButtonInputSearch
             size="large"
             placeholder="Input search text" 
             textButton="Search"
           />
-        </Col>
+          </Col>
+        )}
+        
         <Col span={6}>
           <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%'}}>
             <Loading isLoading={loading}>
@@ -93,12 +99,14 @@ const HeaderComponent = () => {
               )}
             </WrapperHeaderAccount>
             </Loading>
-            <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-              <Badge count={5} size="small">
-                <ShoppingCartOutlined style ={{ fontSize : '30px', color :'#fff' }}/>
-              </Badge>
-              <WrapperText>Giỏ Hàng</WrapperText>
-            </div>
+            {!isHiddenCart && (
+              <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                <Badge count={5} size="small">
+                  <ShoppingCartOutlined style ={{ fontSize : '30px', color :'#fff' }}/>
+                </Badge>
+                <WrapperText>Giỏ Hàng</WrapperText>
+              </div>
+            )}
           </div>
         </Col>
       </WrapperHeader>

@@ -6,10 +6,25 @@ import slider1 from '../../assets/images/Slider 1.png'
 import slider2 from '../../assets/images/Slider 2.png'
 import slider3 from '../../assets/images/Slider 3.png'
 import CardComponent from '../../components/CardComponent/CardComponent'
+import { useQuery } from '@tanstack/react-query'
+import * as ProductService from '../../service/ProductService'
 
 
 const HomePage = () => {
   const arr = ['TV','Laptop','Tủ Lạnh']
+  
+  const fetchProductAll=  async () => {
+      const res = await ProductService.getAllProduct()
+      console.log('res', res)
+      return res
+  }
+  const { isLoading, data: products } = useQuery({
+    queryKey: ['products'],
+    queryFn: fetchProductAll,
+    retry: 3,
+    retryDelay: 1000,
+  })
+  console.log('data', products)
   return (
     <>
     <div style={{padding: '0 120px', fontSize: '16px'}}>
@@ -25,16 +40,23 @@ const HomePage = () => {
     <div id="container" style={{ backgroundColor: '#efefef', padding:'0 120px',height: '1000px'}}>
         <SliderComponent arrImages={[slider1, slider2, slider3]} />
         <WrapperProducts>
-          <CardComponent />
-          <CardComponent />
-          <CardComponent />
-          <CardComponent />
-          <CardComponent />
-          <CardComponent />
-          <CardComponent />
-          <CardComponent />
-          <CardComponent />
-          <CardComponent />
+          {products?.data?.map((product) => {
+            return(
+              <CardComponent
+                key={product._id} 
+                countInStock={product.countInStock} 
+                description={product.description} 
+                image={product.image} 
+                name={product.name} 
+                price ={product.price}
+                rating={product.rating}
+                type={product.type}
+                selled={product.selled}
+                discount={product.discount}
+               />
+            )
+          })}
+       
         </WrapperProducts>
         <div style={{ display: 'flex', width: '100%', justifyContent: 'center', marginTop: '20px'}}>
          <WrapperButtonMore type="default">
