@@ -8,7 +8,7 @@ const createUser = async (req, res) => {
         const reg = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
         const isCheckEmail = email ? reg.test(email) : false;
 
-        if ( !email || !password || !confirmPassword ) {
+        if (!email || !password || !confirmPassword) {
             return res.status(400).json({
                 status: 'ERR',
                 message: 'The input is required'
@@ -37,11 +37,11 @@ const createUser = async (req, res) => {
 const loginUser = async (req, res) => {
     try {
         const body = req.body || {};
-        const {email, password } = body;
+        const { email, password } = body;
         const reg = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
         const isCheckEmail = email ? reg.test(email) : false;
 
-        if ( !email || !password ) {
+        if (!email || !password) {
             return res.status(400).json({
                 status: 'ERR',
                 message: 'The input is required'
@@ -51,11 +51,11 @@ const loginUser = async (req, res) => {
                 status: 'ERR',
                 message: 'The input must be a valid email'
             });
-        } 
+        }
         const response = await UserService.loginUser(body);
         const { refresh_token, ...newResponse } = response;
         // console.log("response:", response)
-        res.cookie('refresh_token', refresh_token,{
+        res.cookie('refresh_token', refresh_token, {
             httpOnly: true,
             secure: false,
             samesite: 'strict'
@@ -71,7 +71,7 @@ const updateUser = async (req, res) => {
     try {
         const UserId = req.params.id;
         const data = req.body;
-        if(!UserId){
+        if (!UserId) {
             return res.status(200).json({
                 status: 'ERR',
                 message: 'The UserId is required'
@@ -89,7 +89,7 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
     try {
         const UserId = req.params.id;
-        if(!UserId){
+        if (!UserId) {
             return res.status(200).json({
                 status: 'ERR',
                 message: 'The UserId is required'
@@ -117,7 +117,7 @@ const getAllUser = async (req, res) => {
 const getDetailsUser = async (req, res) => {
     try {
         const UserId = req.params.id;
-        if(!UserId){
+        if (!UserId) {
             return res.status(200).json({
                 status: 'ERR',
                 message: 'The UserId is required'
@@ -136,7 +136,7 @@ const refreshToken = async (req, res) => {
     console.log("req.cookies:", req.cookies)
     try {
         const token = req.cookies.refresh_token
-        if(!token){
+        if (!token) {
             return res.status(200).json({
                 status: 'ERR',
                 message: 'The token is required'
@@ -153,14 +153,30 @@ const refreshToken = async (req, res) => {
     }
 };
 const logoutUser = async (req, res) => {
-    console.log("req.cookies:", req.cookies)
     try {
         res.clearCookie('refresh_token')
-        const response = await JwtService.RefreshTokenJwtService(token)
         return res.status(200).json({
             status: 'OK',
             message: 'Logout successfully'
         });
+    } catch (e) {
+        return res.status(404).json({
+            message: e
+        });
+    }
+};
+const deleteMany = async (req, res) => {
+    try {
+        const { ids } = req.body;
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'The ids is required and must be an array'
+            });
+        }
+
+        const response = await UserService.deleteManyUser(ids);
+        return res.status(200).json(response);
     } catch (e) {
         return res.status(404).json({
             message: e
@@ -175,5 +191,6 @@ module.exports = {
     getAllUser,
     getDetailsUser,
     refreshToken,
-    logoutUser
+    logoutUser,
+    deleteMany
 };

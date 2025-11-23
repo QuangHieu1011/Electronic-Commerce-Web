@@ -4,9 +4,14 @@ import Meta from 'antd/lib/card/Meta'
 import { StyleNameProduct, WrapperCardStyle, WrapperDiscountText, WrapperPriceText, WrapperReporText } from './style'
 import { StarFilled } from '@ant-design/icons'
 import Logo from '../../assets/images/Logo.png'
+import { useNavigate } from 'react-router-dom'
 
 const CardComponent = (props) => {
-  const { countInStock, description, image, name, price, rating, type, selled, discount } = props
+  const { countInStock, description, image, name, price, rating, type, selled, discount, id } = props
+  const navigate = useNavigate();
+  const handleDetailProduct = (id) => {
+    navigate(`/product-details/${id}`);
+  }
 
   return (
     <WrapperCardStyle
@@ -20,9 +25,10 @@ const CardComponent = (props) => {
         <img
             draggable={false}
             alt="example"
-            src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"
+            src={image}
         />
-        }   
+        } 
+        onClick={() => handleDetailProduct(id)}  
         >
 
         <img 
@@ -41,8 +47,8 @@ const CardComponent = (props) => {
           <span>| Đã bán {selled || 1000}+</span>
         </WrapperReporText>
          <WrapperPriceText>
-              <span style={{marginRight:'8px'}}> {price} </span>
-            <WrapperDiscountText> {discount || 10}% </WrapperDiscountText>
+              <span style={{marginRight:'8px'}}> {price?.toLocaleString()} </span>
+            <WrapperDiscountText> - {discount || 10}% </WrapperDiscountText>
          </WrapperPriceText>
     </WrapperCardStyle>
   )

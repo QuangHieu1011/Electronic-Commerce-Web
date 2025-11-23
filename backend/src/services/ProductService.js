@@ -158,11 +158,41 @@ const getDetailsProduct = (id) => {
         }
     });
 };
+const deleteManyProduct = (ids) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            await Product.deleteMany({ _id: ids});
+            
+            resolve({
+                status: 'OK',
+                message: 'Delete Product successfully',
+            });
+        } catch (e) {
+             reject(e);
+        }
+    });
+};
+const getAllType = () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const allType = await Product.distinct('type')
+            resolve({
+                status: 'OK',
+                message: 'Get all product success',
+                data: allType, 
+            });
+        } catch (e) {
+            reject(e);
+        } 
+    });
+};
 
 module.exports = {
     createProduct,
     updateProduct,
     getDetailsProduct,
     deleteProduct,
-    getAllProduct
+    getAllProduct,
+    deleteManyProduct,
+    getAllType
 };
