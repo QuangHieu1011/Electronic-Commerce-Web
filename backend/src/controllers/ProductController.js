@@ -4,15 +4,15 @@ const ProductService = require('../services/ProductService')
 const createProduct = async (req, res) => {
     try {
         const body = req.body || {};
-        const { name, image, type, price, countInStock, rating, description} = body;
-        
+        const { name, image, type, price, countInStock, rating, description } = body;
 
-        if (!name || !image|| !type || !price || !countInStock || !rating) {
+
+        if (!name || !image || !type || !price || !countInStock || !rating) {
             return res.status(400).json({
                 status: 'ERR',
                 message: 'The input is required'
             });
-        } 
+        }
         const response = await ProductService.createProduct(body);
         return res.status(200).json(response);
     } catch (e) {
@@ -26,7 +26,7 @@ const updateProduct = async (req, res) => {
     try {
         const ProductId = req.params.id;
         const data = req.body;
-        if(!ProductId){
+        if (!ProductId) {
             return res.status(200).json({
                 status: 'ERR',
                 message: 'The ProductId is required'
@@ -44,7 +44,7 @@ const updateProduct = async (req, res) => {
 const getDetailsProduct = async (req, res) => {
     try {
         const ProductId = req.params.id;
-        if(!ProductId){
+        if (!ProductId) {
             return res.status(200).json({
                 status: 'ERR',
                 message: 'The ProductId is required'
@@ -62,7 +62,7 @@ const getDetailsProduct = async (req, res) => {
 const deleteProduct = async (req, res) => {
     try {
         const ProductId = req.params.id;
-        if(!ProductId){
+        if (!ProductId) {
             return res.status(200).json({
                 status: 'ERR',
                 message: 'The ProductId is required'
@@ -79,8 +79,12 @@ const deleteProduct = async (req, res) => {
 };
 const getAllProduct = async (req, res) => {
     try {
-        const {limit, page, sort,filter} =req.query
-        const response = await ProductService.getAllProduct(Number(limit) ||8, Number(page) ||0, sort, filter)
+        const { search, limit, page, sort, filter } = req.query;
+        console.log('=== GET ALL PRODUCTS REQUEST ===');
+        console.log('Query params:', req.query);
+        console.log('Parsed - search:', search, 'limit:', Number(limit) || 8, 'page:', Number(page) || 0, 'sort:', sort, 'filter:', filter);
+
+        const response = await ProductService.getAllProduct(search, Number(limit) || 8, Number(page) || 0, sort, filter);
         return res.status(200).json(response);
     } catch (e) {
         return res.status(404).json({
@@ -90,8 +94,8 @@ const getAllProduct = async (req, res) => {
 };
 const deleteMany = async (req, res) => {
     try {
-        const ids =req.body.ids
-        if(!ids){
+        const ids = req.body.ids
+        if (!ids) {
             return res.status(200).json({
                 status: 'ERR',
                 message: 'The ids is required'

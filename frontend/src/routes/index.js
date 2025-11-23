@@ -11,53 +11,53 @@ import TypeProductPage from "../pages/TypeProductPage/TypeProductPage";
 
 export const routes = [
     {
-        path:  "/",
+        path: "/",
         page: HomePage,
-        isShowHeader : true
+        isShowHeader: true
     },
-     {
-        path:  "/order",
+    {
+        path: "/order",
         page: OrderPage,
-        isShowHeader : true
+        isShowHeader: true
     },
-     {
-        path:  "/products",
+    {
+        path: "/products",
         page: ProductsPage,
-        isShowHeader : true
+        isShowHeader: true
     },
-     {
-        path:  "/:type",
+    {
+        path: "/product/:type",
         page: TypeProductPage,
-        isShowHeader : true
+        isShowHeader: true
     },
     {
-        path:  "/sign-in",
+        path: "/sign-in",
         page: SignInPage,
-        isShowHeader : false
+        isShowHeader: false
     },
     {
-        path:  "/sign-up",
+        path: "/sign-up",
         page: SignUpPage,
-        isShowHeader : false
+        isShowHeader: false
     },
     {
-        path:  "/product-details/:id",
+        path: "/product-details/:id",
         page: ProductDetailsPage,
-        isShowHeader : true
+        isShowHeader: true
     },
     {
-        path:  "/profile-user",
+        path: "/profile-user",
         page: ProfilePage,
-        isShowHeader : true
+        isShowHeader: true
     },
-     {
-        path:  "/system/admin",
+    {
+        path: "/system/admin",
         page: AdminPage,
-        isShowHeader : false,
+        isShowHeader: false,
         isPrivate: true
     },
-     {
-        path:  "*",
+    {
+        path: "*",
         page: NotFoundPage
     },
 

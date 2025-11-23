@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   WrapperContainer,
   WrapperHeader,
@@ -10,42 +10,26 @@ import {
 } from './style'
 import { Button, Checkbox, Empty, Image, message } from 'antd'
 import { MinusOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-
-// Mock data giỏ hàng
-const mockCartItems = [
-  {
-    _id: '1',
-    name: 'iPhone 15 Pro Max 256GB',
-    image: 'https://cdn.tgdd.vn/Products/Images/42/305658/iphone-15-pro-max-blue-thumbnew-600x600.jpg',
-    price: 29990000,
-    quantity: 1,
-    selected: true
-  },
-  {
-    _id: '2',
-    name: 'Samsung Galaxy S24 Ultra 512GB',
-    image: 'https://cdn.tgdd.vn/Products/Images/42/307174/samsung-galaxy-s24-yellow-thumbnew-600x600.jpg',
-    price: 32990000,
-    quantity: 2,
-    selected: true
-  },
-  {
-    _id: '3',
-    name: 'MacBook Air M2 13 inch 256GB',
-    image: 'https://cdn.tgdd.vn/Products/Images/44/282828/macbook-air-13-inch-m2-2022-silver-600x600.jpg',
-    price: 28990000,
-    quantity: 1,
-    selected: false
-  }
-];
+import { updateQuantity, removeFromCart } from '../../redux/slides/cartSlice'
 
 const OrderPage = () => {
-  const [cartItems, setCartItems] = useState(mockCartItems);
+  const [selectedItems, setSelectedItems] = useState({});
   const [selectAll, setSelectAll] = useState(false);
+  const cart = useSelector((state) => state.cart);
   const user = useSelector((state) => state?.user);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  // Khởi tạo selected items khi cart thay đổi
+  useEffect(() => {
+    const initialSelected = {};
+    cart.cartItems.forEach(item => {
+      initialSelected[item.product._id] = true; // Mặc định chọn tất cả
+    });
+    setSelectedItems(initialSelected);
+  }, [cart.cartItems]);
 
   // Format giá tiền
   const formatPrice = (price) => {
@@ -54,57 +38,63 @@ const OrderPage = () => {
 
   // Tính toán tổng tiền các sản phẩm đã chọn
   const calculateTotal = () => {
-    return cartItems
-      .filter(item => item.selected)
-      .reduce((total, item) => total + (item.price * item.quantity), 0);
+    return cart.cartItems
+      .filter(item => selectedItems[item.product._id])
+      .reduce((total, item) => {
+        const price = item.product.discount || item.product.price;
+        return total + (price * item.quantity);
+      }, 0);
   };
 
   // Đếm số sản phẩm đã chọn
   const getSelectedCount = () => {
-    return cartItems.filter(item => item.selected).length;
+    return cart.cartItems.filter(item => selectedItems[item.product._id]).length;
   };
 
   // Thay đổi số lượng sản phẩm
-  const updateQuantity = (id, newQuantity) => {
+  const handleUpdateQuantity = (productId, newQuantity) => {
     if (newQuantity < 1) return;
-    setCartItems(items =>
-      items.map(item =>
-        item._id === id ? { ...item, quantity: newQuantity } : item
-      )
-    );
+    dispatch(updateQuantity({ productId, quantity: newQuantity }));
   };
 
   // Chọn/bỏ chọn sản phẩm
-  const toggleItemSelection = (id) => {
-    setCartItems(items =>
-      items.map(item =>
-        item._id === id ? { ...item, selected: !item.selected } : item
-      )
-    );
+  const toggleItemSelection = (productId) => {
+    setSelectedItems(prev => ({
+      ...prev,
+      [productId]: !prev[productId]
+    }));
   };
 
   // Chọn/bỏ chọn tất cả
   const toggleSelectAll = () => {
     const newSelectAll = !selectAll;
     setSelectAll(newSelectAll);
-    setCartItems(items =>
-      items.map(item => ({ ...item, selected: newSelectAll }))
-    );
+    const newSelected = {};
+    cart.cartItems.forEach(item => {
+      newSelected[item.product._id] = newSelectAll;
+    });
+    setSelectedItems(newSelected);
   };
 
   // Xóa sản phẩm khỏi giỏ
-  const removeItem = (id) => {
-    setCartItems(items => items.filter(item => item._id !== id));
+  const handleRemoveItem = (productId) => {
+    dispatch(removeFromCart(productId));
+    // Remove from selected items as well
+    setSelectedItems(prev => {
+      const newSelected = { ...prev };
+      delete newSelected[productId];
+      return newSelected;
+    });
   };
 
   // Xử lý thanh toán
   const handleCheckout = () => {
-    const selectedItems = cartItems.filter(item => item.selected);
-    if (selectedItems.length === 0) {
+    const selectedCartItems = cart.cartItems.filter(item => selectedItems[item.product._id]);
+    if (selectedCartItems.length === 0) {
       message.warning('Vui lòng chọn ít nhất một sản phẩm để mua hàng');
       return;
     }
-    console.log('Proceed to checkout:', selectedItems);
+    console.log('Proceed to checkout:', selectedCartItems);
     message.success('Chuyển đến trang thanh toán');
   };
 
@@ -131,80 +121,80 @@ const OrderPage = () => {
         <h2>Giỏ hàng</h2>
       </WrapperHeader>
 
-      {cartItems.length === 0 ? (
+      {cart.cartItems.length === 0 ? (
         <WrapperEmpty>
-          <Empty
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-            description="Giỏ hàng của bạn đang trống"
-          >
-            <Button type="primary" onClick={() => navigate('/')}>
-              Tiếp tục mua sắm
-            </Button>
-          </Empty>
+          <div className="empty-title">Giỏ hàng của bạn đang trống</div>
+          <div className="empty-description">Hãy thêm sản phẩm vào giỏ hàng để tiếp tục mua sắm</div>
+          <Button className="shopping-btn" type="primary" onClick={() => navigate('/')}>
+            Tiếp tục mua sắm
+          </Button>
         </WrapperEmpty>
       ) : (
         <>
-          {/* Header table */}
-          <div style={{
-            display: 'flex',
-            padding: '16px',
-            backgroundColor: '#f5f5f5',
-            fontWeight: '600',
-            borderRadius: '8px 8px 0 0',
-            marginTop: '20px'
-          }}>
-            <div style={{ width: '50px', textAlign: 'center' }}>
-              <Checkbox
-                checked={selectAll}
-                onChange={toggleSelectAll}
-              />
-            </div>
-            <div style={{ flex: 1, paddingLeft: '20px' }}>
-              Tất cả ({cartItems.length} sản phẩm)
-            </div>
-            <div style={{ width: '150px', textAlign: 'center' }}>Đơn giá</div>
-            <div style={{ width: '150px', textAlign: 'center' }}>Số lượng</div>
-            <div style={{ width: '150px', textAlign: 'center' }}>Thành tiền</div>
-            <div style={{ width: '80px', textAlign: 'center' }}></div>
-          </div>
-
-          {/* Cart items */}
-          {cartItems.map((item) => (
-            <div key={item._id} style={{
+          <WrapperProductInfo>
+            {/* Header */}
+            <div style={{
               display: 'flex',
-              padding: '16px',
-              backgroundColor: '#fff',
+              alignItems: 'center',
+              padding: '20px',
+              backgroundColor: '#fafafa',
               borderBottom: '1px solid #f0f0f0',
-              alignItems: 'center'
+              fontWeight: '600',
+              color: '#666'
             }}>
-              {/* Checkbox */}
-              <div style={{ width: '50px', textAlign: 'center' }}>
+              <div style={{ width: '50px' }}>
                 <Checkbox
-                  checked={item.selected}
-                  onChange={() => toggleItemSelection(item._id)}
+                  checked={selectAll}
+                  onChange={toggleSelectAll}
                 />
               </div>
-
-              {/* Product info */}
-              <WrapperProductInfo style={{ flex: 1, paddingLeft: '20px' }}>
-                <WrapperProductImage>
-                  <Image
-                    src={item.image}
-                    alt={item.name}
-                    width={80}
-                    height={80}
-                    style={{ objectFit: 'cover', borderRadius: '8px' }}
-                  />
-                </WrapperProductImage>
-                <WrapperProductDetails style={{ marginLeft: '16px' }}>
-                  <h4>{item.name}</h4>
-                </WrapperProductDetails>
-              </WrapperProductInfo>
-
-              {/* Price */}
-              <div style={{ width: '150px', textAlign: 'center', fontSize: '16px', color: '#ff4d4f' }}>
-                {formatPrice(item.price)}
+              <div style={{ flex: 1 }}>
+                Tất cả ({cart.cartItems.length} sản phẩm)
               </div>
+              <div style={{ width: '120px', textAlign: 'center' }}>Đơn giá</div>
+              <div style={{ width: '150px', textAlign: 'center' }}>Số lượng</div>
+              <div style={{ width: '120px', textAlign: 'center' }}>Thành tiền</div>
+              <div style={{ width: '60px' }}></div>
+            </div>
+
+            {/* Cart items */}
+            {cart.cartItems.map((item) => (
+              <div key={item.product._id} className="product-item">
+                {/* Checkbox */}
+                <div style={{ width: '50px' }}>
+                  <Checkbox
+                    checked={selectedItems[item.product._id] || false}
+                    onChange={() => toggleItemSelection(item.product._id)}
+                  />
+                </div>
+
+                {/* Product info */}
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+                  <WrapperProductImage>
+                    <Image
+                      src={item.product.image}
+                      alt={item.product.name}
+                      width={80}
+                      height={80}
+                      preview={false}
+                    />
+                  </WrapperProductImage>
+                  <WrapperProductDetails>
+                    <div className="product-name">{item.product.name}</div>
+                    {item.product.discount && (
+                      <div className="product-original-price">
+                        {formatPrice(item.product.price)}
+                      </div>
+                    )}
+                  </WrapperProductDetails>
+                </div>
+
+                {/* Price */}
+                <div style={{ width: '120px', textAlign: 'center' }}>
+                  <div className="product-price">
+                    {formatPrice(item.product.discount || item.product.price)}
+                  </div>
+                </div>
 
               {/* Quantity controls */}
               <div style={{ width: '150px', textAlign: 'center' }}>
@@ -212,7 +202,7 @@ const OrderPage = () => {
                   <Button
                     size="small"
                     icon={<MinusOutlined />}
-                    onClick={() => updateQuantity(item._id, item.quantity - 1)}
+                    onClick={() => handleUpdateQuantity(item.product._id, item.quantity - 1)}
                     disabled={item.quantity <= 1}
                   />
                   <span style={{ margin: '0 16px', fontSize: '16px', minWidth: '30px', textAlign: 'center' }}>
@@ -221,14 +211,14 @@ const OrderPage = () => {
                   <Button
                     size="small"
                     icon={<PlusOutlined />}
-                    onClick={() => updateQuantity(item._id, item.quantity + 1)}
+                    onClick={() => handleUpdateQuantity(item.product._id, item.quantity + 1)}
                   />
                 </div>
               </div>
 
               {/* Total price */}
               <div style={{ width: '150px', textAlign: 'center', fontSize: '16px', fontWeight: '600', color: '#ff4d4f' }}>
-                {formatPrice(item.price * item.quantity)}
+                {formatPrice((item.product.discount || item.product.price) * item.quantity)}
               </div>
 
               {/* Delete button */}
@@ -236,7 +226,7 @@ const OrderPage = () => {
                 <Button
                   type="text"
                   icon={<DeleteOutlined />}
-                  onClick={() => removeItem(item._id)}
+                  onClick={() => handleRemoveItem(item.product._id)}
                   style={{ color: '#ff4d4f' }}
                 />
               </div>
