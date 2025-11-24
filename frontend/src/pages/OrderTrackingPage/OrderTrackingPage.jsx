@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import {
     WrapperContainer,
     WrapperHeader,
@@ -7,7 +7,7 @@ import {
     WrapperProductDetails,
     WrapperEmpty
 } from './style'
-import { Button, Tag, Popconfirm, Image, Input, Select } from 'antd'
+import { Button, Tag, Popconfirm, Image, Input, Select, Spin } from 'antd'
 import {
     ArrowLeftOutlined,
     ClockCircleOutlined,
@@ -19,21 +19,45 @@ import {
 } from '@ant-design/icons'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { cancelOrder, syncOrdersFromAPI } from '../../redux/slides/orderSlice'
+import { cancelOrder, syncOrdersFromAPI, clearOrders, updateOrderStatus, updatePaymentStatus } from '../../redux/slides/orderSlice'
 import { message } from 'antd'
 import * as OrderService from '../../service/OrderService'
+import socketService from '../../service/SocketService'
 
 const { Option } = Select
 
 const OrderTrackingPage = () => {
     const [filterStatus, setFilterStatus] = useState('all')
     const [searchText, setSearchText] = useState('')
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true) // Bắt đầu với loading true
 
     const orders = useSelector((state) => state.order.orders)
     const user = useSelector((state) => state.user)
     const dispatch = useDispatch()
     const navigate = useNavigate()
+
+    // Load orders function
+    const loadUserOrders = useCallback(async () => {
+        if (user?.access_token && (user?.id || user?._id)) {
+            try {
+                setLoading(true)
+                console.log('Loading user orders...')
+                // Clear existing orders để tránh conflict với admin orders
+                dispatch(clearOrders())
+                const response = await OrderService.getAllOrdersByUser(user.id || user._id, user.access_token)
+                if (response.status === 'OK') {
+                    console.log('User orders loaded:', response.data?.length)
+                    dispatch(syncOrdersFromAPI(response.data))
+                }
+            } catch (error) {
+                console.error('Error loading orders:', error)
+            } finally {
+                setTimeout(() => setLoading(false), 100)
+            }
+        } else {
+            setLoading(false)
+        }
+    }, [user?.access_token, user?.id, user?._id, dispatch])
 
     // Kiểm tra đăng nhập và load orders
     useEffect(() => {
@@ -48,24 +72,53 @@ const OrderTrackingPage = () => {
             return
         }
 
-        const loadOrders = async () => {
-            if (user?.access_token && (user?.id || user?._id)) {
-                try {
-                    setLoading(true)
-                    const response = await OrderService.getAllOrdersByUser(user.id || user._id, user.access_token)
-                    if (response.status === 'OK') {
-                        dispatch(syncOrdersFromAPI(response.data))
-                    }
-                } catch (error) {
-                    console.error('Error loading orders:', error)
-                } finally {
-                    setLoading(false)
-                }
+        loadUserOrders()
+    }, [user?.access_token, navigate, loadUserOrders])
+
+    // Force reload when tab becomes visible (for multi-tab support)
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (!document.hidden && user?.access_token && !user?.isAdmin) {
+                loadUserOrders()
             }
         }
 
-        loadOrders()
-    }, [user, dispatch, navigate])
+        document.addEventListener('visibilitychange', handleVisibilityChange)
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange)
+        }
+    }, [loadUserOrders, user?.access_token, user?.isAdmin])
+
+    // Socket.IO real-time synchronization - Listen for order updates from admin
+    useEffect(() => {
+        // Connect to socket
+        socketService.connect()
+
+        const handleOrderStatusUpdate = (data) => {
+            console.log('User received socket order status update:', data)
+            dispatch(updateOrderStatus({
+                orderId: data.orderId,
+                status: data.newStatus
+            }))
+        }
+
+        const handlePaymentStatusUpdate = (data) => {
+            console.log('User received socket payment status update:', data)
+            dispatch(updatePaymentStatus({
+                orderId: data.orderId,
+                paymentStatus: data.paymentStatus
+            }))
+        }
+
+        // Listen for socket events
+        socketService.on('orderStatusUpdate', handleOrderStatusUpdate)
+        socketService.on('paymentStatusUpdate', handlePaymentStatusUpdate)
+
+        return () => {
+            socketService.off('orderStatusUpdate', handleOrderStatusUpdate)
+            socketService.off('paymentStatusUpdate', handlePaymentStatusUpdate)
+        }
+    }, [dispatch])
 
     // Filter orders for current user only (exclude hidden orders)
     const userOrders = orders.filter(order => {
@@ -195,203 +248,206 @@ const OrderTrackingPage = () => {
                 )}
             </WrapperHeader>
 
-            {/* Filter and Search */}
-            <div style={{
-                background: 'white',
-                padding: '20px',
-                borderRadius: '8px',
-                marginBottom: '20px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-            }}>
-                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
-                    <Input
-                        placeholder="Tìm kiếm theo mã đơn hàng hoặc tên sản phẩm..."
-                        prefix={<SearchOutlined />}
-                        value={searchText}
-                        onChange={(e) => setSearchText(e.target.value)}
-                        style={{ minWidth: 300 }}
-                    />
+            <Spin spinning={loading} tip="Đang tải đơn hàng..." size="large">
 
-                    <Select
-                        value={filterStatus}
-                        onChange={setFilterStatus}
-                        style={{ minWidth: 150 }}
-                        suffixIcon={<FilterOutlined />}
-                    >
-                        <Option value="all">Tất cả trạng thái</Option>
-                        <Option value="pending">Chờ xác nhận</Option>
-                        <Option value="confirmed">Đã xác nhận</Option>
-                        <Option value="shipping">Đang giao hàng</Option>
-                        <Option value="delivered">Đã giao hàng</Option>
-                        <Option value="cancelled">Đã hủy</Option>
-                    </Select>
+                {/* Filter and Search */}
+                <div style={{
+                    background: 'white',
+                    padding: '20px',
+                    borderRadius: '8px',
+                    marginBottom: '20px',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                }}>
+                    <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
+                        <Input
+                            placeholder="Tìm kiếm theo mã đơn hàng hoặc tên sản phẩm..."
+                            prefix={<SearchOutlined />}
+                            value={searchText}
+                            onChange={(e) => setSearchText(e.target.value)}
+                            style={{ minWidth: 300 }}
+                        />
 
-                    <div style={{ marginLeft: 'auto', color: '#666' }}>
-                        Tổng cộng: <strong>{filteredOrders.length}</strong> đơn hàng của bạn
+                        <Select
+                            value={filterStatus}
+                            onChange={setFilterStatus}
+                            style={{ minWidth: 150 }}
+                            suffixIcon={<FilterOutlined />}
+                        >
+                            <Option value="all">Tất cả trạng thái</Option>
+                            <Option value="pending">Chờ xác nhận</Option>
+                            <Option value="confirmed">Đã xác nhận</Option>
+                            <Option value="shipping">Đang giao hàng</Option>
+                            <Option value="delivered">Đã giao hàng</Option>
+                            <Option value="cancelled">Đã hủy</Option>
+                        </Select>
+
+                        <div style={{ marginLeft: 'auto', color: '#666' }}>
+                            Tổng cộng: <strong>{filteredOrders.length}</strong> đơn hàng của bạn
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            {filteredOrders.length === 0 ? (
-                <WrapperEmpty>
-                    <div className="empty-title">
-                        {userOrders.length === 0 ? 'Bạn chưa có đơn hàng nào' : 'Không tìm thấy đơn hàng'}
-                    </div>
-                    <div className="empty-description">
-                        {userOrders.length === 0 ? 'Hãy mua sắm và đặt hàng để theo dõi đơn hàng' : 'Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm'}
-                    </div>
-                    <Button className="shopping-btn" type="primary" onClick={() => navigate('/')}>
-                        {userOrders.length === 0 ? 'Bắt đầu mua sắm' : 'Về trang chủ'}
-                    </Button>
-                </WrapperEmpty>
-            ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    {filteredOrders.map((order) => {
-                        const statusInfo = getOrderStatusInfo(order.orderStatus)
-                        return (
-                            <WrapperProductInfo key={order._id}>
-                                <div className="product-item" style={{ flexDirection: 'column', alignItems: 'stretch' }}>
-                                    {/* Order Header */}
-                                    <div style={{
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        marginBottom: '16px',
-                                        paddingBottom: '12px',
-                                        borderBottom: '2px solid #f0f0f0'
-                                    }}>
-                                        <div>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                                                <strong style={{ fontSize: '16px' }}>Đơn hàng #{order._id.slice(-8).toUpperCase()}</strong>
-                                                <Tag color={statusInfo.color} icon={statusInfo.icon} style={{ fontSize: '12px' }}>
-                                                    {statusInfo.text}
-                                                </Tag>
+                {filteredOrders.length === 0 ? (
+                    <WrapperEmpty>
+                        <div className="empty-title">
+                            {userOrders.length === 0 ? 'Bạn chưa có đơn hàng nào' : 'Không tìm thấy đơn hàng'}
+                        </div>
+                        <div className="empty-description">
+                            {userOrders.length === 0 ? 'Hãy mua sắm và đặt hàng để theo dõi đơn hàng' : 'Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm'}
+                        </div>
+                        <Button className="shopping-btn" type="primary" onClick={() => navigate('/')}>
+                            {userOrders.length === 0 ? 'Bắt đầu mua sắm' : 'Về trang chủ'}
+                        </Button>
+                    </WrapperEmpty>
+                ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        {filteredOrders.map((order) => {
+                            const statusInfo = getOrderStatusInfo(order.orderStatus)
+                            return (
+                                <WrapperProductInfo key={order._id}>
+                                    <div className="product-item" style={{ flexDirection: 'column', alignItems: 'stretch' }}>
+                                        {/* Order Header */}
+                                        <div style={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',
+                                            marginBottom: '16px',
+                                            paddingBottom: '12px',
+                                            borderBottom: '2px solid #f0f0f0'
+                                        }}>
+                                            <div>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                                                    <strong style={{ fontSize: '16px' }}>Đơn hàng #{order._id.slice(-8).toUpperCase()}</strong>
+                                                    <Tag color={statusInfo.color} icon={statusInfo.icon} style={{ fontSize: '12px' }}>
+                                                        {statusInfo.text}
+                                                    </Tag>
+                                                </div>
+                                                <div style={{ fontSize: '12px', color: '#666' }}>
+                                                    <div>Đặt lúc: {new Date(order.createdAt).toLocaleString('vi-VN')}</div>
+                                                    {order.shippingInfo?.fullName && (
+                                                        <div>Người nhận: {order.shippingInfo.fullName} - {order.shippingInfo.phone}</div>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <div style={{ fontSize: '12px', color: '#666' }}>
-                                                <div>Đặt lúc: {new Date(order.createdAt).toLocaleString('vi-VN')}</div>
-                                                {order.shippingInfo?.fullName && (
-                                                    <div>Người nhận: {order.shippingInfo.fullName} - {order.shippingInfo.phone}</div>
+
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                {/* Users can only cancel pending orders */}
+                                                {order.orderStatus === 'pending' && (
+                                                    <Popconfirm
+                                                        title="Bạn có chắc muốn hủy đơn hàng này?"
+                                                        onConfirm={() => handleCancelOrder(order._id)}
+                                                        okText="Có"
+                                                        cancelText="Không"
+                                                    >
+                                                        <Button size="small" danger>
+                                                            Hủy đơn
+                                                        </Button>
+                                                    </Popconfirm>
+                                                )}
+
+                                                {/* Allow reorder for completed orders */}
+                                                {order.orderStatus === 'delivered' && (
+                                                    <Button
+                                                        size="small"
+                                                        type="primary"
+                                                        onClick={() => handleReorder(order._id)}
+                                                    >
+                                                        Mua lại
+                                                    </Button>
                                                 )}
                                             </div>
                                         </div>
 
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                            {/* Users can only cancel pending orders */}
-                                            {order.orderStatus === 'pending' && (
-                                                <Popconfirm
-                                                    title="Bạn có chắc muốn hủy đơn hàng này?"
-                                                    onConfirm={() => handleCancelOrder(order._id)}
-                                                    okText="Có"
-                                                    cancelText="Không"
-                                                >
-                                                    <Button size="small" danger>
-                                                        Hủy đơn
-                                                    </Button>
-                                                </Popconfirm>
-                                            )}
-
-                                            {/* Allow reorder for completed orders */}
-                                            {order.orderStatus === 'delivered' && (
-                                                <Button
-                                                    size="small"
-                                                    type="primary"
-                                                    onClick={() => handleReorder(order._id)}
-                                                >
-                                                    Mua lại
-                                                </Button>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* Shipping Info */}
-                                    {order.shippingInfo && (
-                                        <div style={{
-                                            background: '#f8f9fa',
-                                            padding: '12px',
-                                            borderRadius: '6px',
-                                            marginBottom: '16px',
-                                            fontSize: '13px'
-                                        }}>
-                                            <strong>Địa chỉ giao hàng:</strong>
-                                            <div>{order.shippingInfo.address}, {order.shippingInfo.ward}, {order.shippingInfo.district}, {order.shippingInfo.province}</div>
-                                            {order.shippingInfo.note && <div>Ghi chú: {order.shippingInfo.note}</div>}
-                                        </div>
-                                    )}
-
-                                    {/* Order Items */}
-                                    <div style={{ marginBottom: '16px' }}>
-                                        {order.orderItems.map((item, index) => (
-                                            <div key={index} style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '16px',
-                                                marginBottom: index < order.orderItems.length - 1 ? '12px' : '0',
-                                                padding: '8px',
-                                                background: '#fafafa',
-                                                borderRadius: '6px'
+                                        {/* Shipping Info */}
+                                        {order.shippingInfo && (
+                                            <div style={{
+                                                background: '#f8f9fa',
+                                                padding: '12px',
+                                                borderRadius: '6px',
+                                                marginBottom: '16px',
+                                                fontSize: '13px'
                                             }}>
-                                                <WrapperProductImage>
-                                                    <Image
-                                                        src={item.product.image}
-                                                        alt={item.product.name}
-                                                        width={60}
-                                                        height={60}
-                                                        preview={false}
-                                                    />
-                                                </WrapperProductImage>
-                                                <div style={{ flex: 1 }}>
-                                                    <div className="product-name" style={{ fontSize: '14px', marginBottom: '4px' }}>
-                                                        {item.product.name}
-                                                    </div>
-                                                    <div style={{ fontSize: '12px', color: '#666' }}>
-                                                        Số lượng: <strong>{item.quantity}</strong> |
-                                                        Đơn giá: <strong>{formatPrice(item.product.discount || item.product.price)}</strong>
-                                                    </div>
-                                                </div>
-                                                <div style={{
-                                                    fontSize: '14px',
-                                                    fontWeight: '600',
-                                                    color: '#ff4d4f',
-                                                    minWidth: '100px',
-                                                    textAlign: 'right'
-                                                }}>
-                                                    {formatPrice((item.product.discount || item.product.price) * item.quantity)}
-                                                </div>
+                                                <strong>Địa chỉ giao hàng:</strong>
+                                                <div>{order.shippingInfo.address}, {order.shippingInfo.ward}, {order.shippingInfo.district}, {order.shippingInfo.province}</div>
+                                                {order.shippingInfo.note && <div>Ghi chú: {order.shippingInfo.note}</div>}
                                             </div>
-                                        ))}
-                                    </div>
+                                        )}
 
-                                    {/* Order Total and Payment */}
-                                    <div style={{
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        paddingTop: '12px',
-                                        borderTop: '2px solid #f0f0f0'
-                                    }}>
-                                        <div style={{ fontSize: '13px', color: '#666' }}>
-                                            <div>Phương thức: {order.paymentMethod === 'cod' ? 'COD' : order.paymentMethod === 'banking' ? 'Chuyển khoản' : 'Thẻ tín dụng'}</div>
-                                            <div>Trạng thái thanh toán:
-                                                <Tag color={order.paymentStatus === 'paid' ? 'green' : 'orange'} style={{ marginLeft: '8px' }}>
-                                                    {order.paymentStatus === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán'}
-                                                </Tag>
-                                            </div>
+                                        {/* Order Items */}
+                                        <div style={{ marginBottom: '16px' }}>
+                                            {order.orderItems.map((item, index) => (
+                                                <div key={index} style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '16px',
+                                                    marginBottom: index < order.orderItems.length - 1 ? '12px' : '0',
+                                                    padding: '8px',
+                                                    background: '#fafafa',
+                                                    borderRadius: '6px'
+                                                }}>
+                                                    <WrapperProductImage>
+                                                        <Image
+                                                            src={item.product.image}
+                                                            alt={item.product.name}
+                                                            width={60}
+                                                            height={60}
+                                                            preview={false}
+                                                        />
+                                                    </WrapperProductImage>
+                                                    <div style={{ flex: 1 }}>
+                                                        <div className="product-name" style={{ fontSize: '14px', marginBottom: '4px' }}>
+                                                            {item.product.name}
+                                                        </div>
+                                                        <div style={{ fontSize: '12px', color: '#666' }}>
+                                                            Số lượng: <strong>{item.quantity}</strong> |
+                                                            Đơn giá: <strong>{formatPrice(item.product.discount || item.product.price)}</strong>
+                                                        </div>
+                                                    </div>
+                                                    <div style={{
+                                                        fontSize: '14px',
+                                                        fontWeight: '600',
+                                                        color: '#ff4d4f',
+                                                        minWidth: '100px',
+                                                        textAlign: 'right'
+                                                    }}>
+                                                        {formatPrice((item.product.discount || item.product.price) * item.quantity)}
+                                                    </div>
+                                                </div>
+                                            ))}
                                         </div>
-                                        <div style={{ textAlign: 'right' }}>
-                                            <div style={{ fontSize: '16px', fontWeight: '600', color: '#ff4d4f' }}>
-                                                Tổng tiền: {formatPrice(order.totalAmount)}
+
+                                        {/* Order Total and Payment */}
+                                        <div style={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',
+                                            paddingTop: '12px',
+                                            borderTop: '2px solid #f0f0f0'
+                                        }}>
+                                            <div style={{ fontSize: '13px', color: '#666' }}>
+                                                <div>Phương thức: {order.paymentMethod === 'cod' ? 'COD' : order.paymentMethod === 'banking' ? 'Chuyển khoản' : 'Thẻ tín dụng'}</div>
+                                                <div>Trạng thái thanh toán:
+                                                    <Tag color={order.paymentStatus === 'paid' ? 'green' : 'orange'} style={{ marginLeft: '8px' }}>
+                                                        {order.paymentStatus === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán'}
+                                                    </Tag>
+                                                </div>
                                             </div>
-                                            <div style={{ fontSize: '12px', color: '#666' }}>
-                                                (Đã bao gồm phí vận chuyển)
+                                            <div style={{ textAlign: 'right' }}>
+                                                <div style={{ fontSize: '16px', fontWeight: '600', color: '#ff4d4f' }}>
+                                                    Tổng tiền: {formatPrice(order.totalAmount)}
+                                                </div>
+                                                <div style={{ fontSize: '12px', color: '#666' }}>
+                                                    (Đã bao gồm phí vận chuyển)
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </WrapperProductInfo>
-                        )
-                    })}
-                </div>
-            )}
+                                </WrapperProductInfo>
+                            )
+                        })}
+                    </div>
+                )}
+            </Spin>
         </WrapperContainer>
     )
 }

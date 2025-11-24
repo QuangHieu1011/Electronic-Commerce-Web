@@ -65,12 +65,30 @@ export const getAllOrdersByUser = async (userId, access_token) => {
 }
 
 export const getAllOrders = async (access_token) => {
-    const res = await axiosJWT.get(`${process.env.REACT_APP_API_URL}/order/get-all-orders`, {
-        headers: {
-            authorization: `Bearer ${access_token}`,
+    try {
+        const res = await axiosJWT.get(`${process.env.REACT_APP_API_URL}/order/get-all-orders`, {
+            headers: {
+                authorization: `Bearer ${access_token}`,
+            }
+        })
+        return res.data
+    } catch (error) {
+        // Nếu lỗi 401, tự động refresh token và retry
+        if (error.response?.status === 401) {
+            const refreshRes = await refreshToken();
+            const newToken = refreshRes?.access_token;
+            if (newToken) {
+                const retryRes = await axiosJWT.get(`${process.env.REACT_APP_API_URL}/order/get-all-orders`, {
+                    headers: {
+                        authorization: `Bearer ${newToken}`,
+                    }
+                })
+                return retryRes.data
+            }
         }
-    })
-    return res.data
+        // Nếu không phải lỗi 401 hoặc refresh thất bại, trả về lỗi gốc
+        throw error
+    }
 }
 
 export const getOrderDetails = async (orderId, access_token) => {
@@ -97,6 +115,22 @@ export const updateOrderStatus = async (orderId, orderStatus, access_token) => {
         return res.data
     } catch (error) {
         console.error('OrderService.updateOrderStatus error:', error)
+        // Nếu lỗi 401, tự động refresh token và retry
+        if (error.response?.status === 401) {
+            const refreshRes = await refreshToken();
+            const newToken = refreshRes?.access_token;
+            if (newToken) {
+                const retryRes = await axiosJWT.put(`${process.env.REACT_APP_API_URL}/order/update-status/${orderId}`,
+                    { orderStatus },
+                    {
+                        headers: {
+                            authorization: `Bearer ${newToken}`,
+                        }
+                    }
+                )
+                return retryRes.data
+            }
+        }
         throw error
     }
 }
@@ -116,6 +150,22 @@ export const updatePaymentStatus = async (orderId, paymentStatus, access_token) 
         return res.data
     } catch (error) {
         console.error('OrderService.updatePaymentStatus error:', error)
+        // Nếu lỗi 401, tự động refresh token và retry
+        if (error.response?.status === 401) {
+            const refreshRes = await refreshToken();
+            const newToken = refreshRes?.access_token;
+            if (newToken) {
+                const retryRes = await axiosJWT.put(`${process.env.REACT_APP_API_URL}/order/update-payment/${orderId}`,
+                    { paymentStatus },
+                    {
+                        headers: {
+                            authorization: `Bearer ${newToken}`,
+                        }
+                    }
+                )
+                return retryRes.data
+            }
+        }
         throw error
     }
 }

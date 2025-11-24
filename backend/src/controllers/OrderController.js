@@ -106,6 +106,17 @@ const updateOrderStatus = async (req, res) => {
             })
         }
 
+        // Emit socket event for real-time update
+        const io = req.app.get('io')
+        if (io) {
+            io.emit('orderStatusUpdate', {
+                orderId: order._id,
+                newStatus: orderStatus,
+                order: order
+            })
+            console.log('Socket event emitted: orderStatusUpdate')
+        }
+
         console.log('Update successful')
         return res.status(200).json({
             status: 'OK',
@@ -143,6 +154,17 @@ const updatePaymentStatus = async (req, res) => {
                 status: 'ERR',
                 message: 'Không tìm thấy đơn hàng'
             })
+        }
+
+        // Emit socket event for real-time update
+        const io = req.app.get('io')
+        if (io) {
+            io.emit('paymentStatusUpdate', {
+                orderId: order._id,
+                paymentStatus: paymentStatus,
+                order: order
+            })
+            console.log('Socket event emitted: paymentStatusUpdate')
         }
 
         return res.status(200).json({

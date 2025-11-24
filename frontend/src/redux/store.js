@@ -12,7 +12,7 @@ import orderReducer from './slides/orderSlice'
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['cart', 'order'] // Chỉ persist cart và order, không persist user và product
+  whitelist: ['cart'] // Chỉ persist cart, không persist user, product và order để tránh conflict giữa admin/user
 }
 
 // Combine reducers
