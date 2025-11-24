@@ -69,6 +69,17 @@ export const WrapperProductImage = styled.div`
     height: 100%;
     object-fit: cover;
   }
+  
+  .ant-image {
+    width: 100%;
+    height: 100%;
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
 `
 
 export const WrapperEmpty = styled.div`

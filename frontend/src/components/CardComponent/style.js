@@ -6,6 +6,7 @@ export const WrapperCardStyle = styled(Card)`
     & img {
         width: 200px;
         height: 200px;
+        object-fit: cover;
     },
     position: relative;
 `

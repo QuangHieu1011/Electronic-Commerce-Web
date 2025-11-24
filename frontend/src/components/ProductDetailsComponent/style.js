@@ -7,6 +7,16 @@ export const WrapperContainerImage = styled.div`
   align-items: center;
   background: #fff;
   padding: 12px;
+  
+  .ant-image {
+    width: 100%;
+    height: auto;
+    
+    img {
+      object-fit: contain;
+      max-height: 400px;
+    }
+  }
 `;
 
 export const WrapperListImage = styled.div`
