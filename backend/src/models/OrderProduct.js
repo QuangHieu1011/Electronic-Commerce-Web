@@ -1,43 +1,58 @@
 const mongoose = require('mongoose')
 
-const orderSchema= new mongoose.Schema({
+const orderSchema = new mongoose.Schema({
     orderItems: [
         {
-            name: {type: String, required: true},
-            amount: {type: Number, required: true},
-            image: {type: String, required: true},
-            price: {type: Number, required: true},
+            quantity: { type: Number, required: true },
             product: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Product',
-                required: true,
-            },
+                _id: { type: String, required: true },
+                name: { type: String, required: true },
+                image: { type: String, required: true },
+                price: { type: Number, required: true },
+                discount: { type: Number, default: 0 },
+                countInStock: { type: Number, required: true },
+                type: { type: String, required: true }
+            }
         },
     ],
-    shippingAddress: {
-        fullName: {type: String, required: true},
-        address: {type: String, required: true},
-        city: {type: String, required: true},
-        phone: {type: Number, required: true},
+    shippingInfo: {
+        fullName: { type: String, required: true },
+        phone: { type: String, required: true },
+        address: { type: String, required: true },
+        ward: { type: String, required: true },
+        district: { type: String, required: true },
+        province: { type: String, required: true },
+        note: { type: String, default: '' }
     },
-    paymentMethod: {type: String, required: true},
-    itemsPrice: {type: Number, required: true},
-    shippingPrice: {type: Number, required: true},
-    taxPrice: {type: Number, required: true},
-    totalPrice: {type: Number, required: true},
+    userInfo: {
+        id: { type: String },
+        name: { type: String },
+        email: { type: String }
+    },
+    paymentMethod: { type: String, required: true, enum: ['cod', 'banking', 'credit'], default: 'cod' },
+    totalAmount: { type: Number, required: true },
+    orderStatus: {
+        type: String,
+        required: true,
+        enum: ['pending', 'confirmed', 'shipping', 'delivered', 'cancelled'],
+        default: 'pending'
+    },
+    paymentStatus: {
+        type: String,
+        required: true,
+        enum: ['unpaid', 'paid', 'refunded'],
+        default: 'unpaid'
+    },
+    isDeletedByUser: { type: Boolean, default: false },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
-    isPaid: {type: Boolean, default: false},
-    paidAt: {type: Date},
-    isDelivered: {type: Boolean, default: false},
-    deliveredAt: {type: Date},
 },
     {
-    timestamps: true,
+        timestamps: true,
     }
 );
-const Order= mongoose.model('Order', orderSchema);
-module.exports= Order;
+const Order = mongoose.model('Order', orderSchema);
+module.exports = Order;

@@ -11,14 +11,14 @@ const authMiddleware = (req, res, next) => {
         });
     }
     const token = authHeader.split(' ')[1];
-    jwt.verify(token , process.env.ACCESS_TOKEN, function(err,user) {
-        if(err){
+    jwt.verify(token, process.env.ACCESS_TOKEN, function (err, user) {
+        if (err) {
             return res.status(401).json({
                 status: 'ERROR',
                 message: 'The authentication'
             });
         }
-        if(user?.isAdmin){
+        if (user?.isAdmin) {
             next()
         } else {
             return res.status(401).json({
@@ -39,7 +39,7 @@ const authUserMiddleware = (req, res, next) => {
     }
     const token = authHeader.split(' ')[1];
     const userId = req.params.id;
-    jwt.verify(token, process.env.ACCESS_TOKEN, function(err, user) {
+    jwt.verify(token, process.env.ACCESS_TOKEN, function (err, user) {
         if (err) {
             return res.status(401).json({
                 status: 'ERROR',
@@ -57,7 +57,41 @@ const authUserMiddleware = (req, res, next) => {
         }
     });
 }
-module.exports ={
+
+
+const authAnyUserMiddleware = (req, res, next) => {
+    console.log('=== AUTH ANY USER MIDDLEWARE ===');
+    console.log('req.headers:', req.headers);
+    const authHeader = req.headers.authorization;
+    console.log('authHeader:', authHeader);
+
+    if (!authHeader) {
+        console.log('No authorization header');
+        return res.status(401).json({
+            status: 'ERROR',
+            message: 'No token provided'
+        });
+    }
+
+    const token = authHeader.split(' ')[1];
+    console.log('Extracted token:', token);
+    console.log('ACCESS_TOKEN from env:', process.env.ACCESS_TOKEN);
+
+    jwt.verify(token, process.env.ACCESS_TOKEN, function (err, user) {
+        if (err) {
+            console.log('JWT verification error:', err);
+            return res.status(401).json({
+                status: 'ERROR',
+                message: 'The authentication failed'
+            });
+        }
+        console.log('Verified user:', user);
+        req.user = user; 
+        next();
+    });
+}
+module.exports = {
     authMiddleware,
-    authUserMiddleware
+    authUserMiddleware,
+    authAnyUserMiddleware
 }

@@ -15,6 +15,9 @@ export const WrapperHeader = styled.div`
   border-radius: 12px;
   margin-bottom: 24px;
   box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 16px;
   
   h2 {
     margin: 0;
@@ -26,22 +29,21 @@ export const WrapperHeader = styled.div`
 export const WrapperProductInfo = styled.div`
   background: white;
   border-radius: 12px;
-  margin-bottom: 20px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   overflow: hidden;
   border: 1px solid #f0f0f0;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+  }
   
   .product-item {
     padding: 20px;
     display: flex;
     align-items: center;
     gap: 16px;
-    border-bottom: 1px solid #f5f5f5;
-    transition: all 0.3s ease;
-    
-    &:hover {
-      background: #fafafa;
-    }
     
     &:last-child {
       border-bottom: none;
@@ -50,8 +52,8 @@ export const WrapperProductInfo = styled.div`
 `
 
 export const WrapperProductImage = styled.div`
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -88,56 +90,6 @@ export const WrapperProductDetails = styled.div`
     font-size: 14px;
     color: #999;
     text-decoration: line-through;
-  }
-`
-
-export const WrapperSummary = styled.div`
-  background: white;
-  padding: 24px;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  position: sticky;
-  top: 20px;
-  border: 1px solid #f0f0f0;
-  
-  .summary-title {
-    font-size: 20px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 20px;
-    text-align: center;
-  }
-  
-  .summary-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 12px;
-    font-size: 14px;
-    
-    &.total {
-      font-size: 18px;
-      font-weight: 600;
-      color: #ff4d4f;
-      border-top: 1px solid #f0f0f0;
-      padding-top: 12px;
-      margin-top: 12px;
-    }
-  }
-  
-  .checkout-btn {
-    width: 100%;
-    height: 48px;
-    font-size: 16px;
-    font-weight: 600;
-    border-radius: 8px;
-    margin-top: 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    
-    &:hover {
-      background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
-      transform: translateY(-1px);
-    }
   }
 `
 

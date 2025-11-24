@@ -1,7 +1,10 @@
 import AdminPage from "../pages/AdminPage/AdminPage";
+import AdminOrderManagement from "../pages/AdminOrderManagement/AdminOrderManagement";
+import CheckoutPage from "../pages/CheckoutPage/CheckoutPage";
 import HomePage from "../pages/HomePage/HomePage";
 import NotFoundPage from "../pages/NotFoundPage/NotFoundPage";
 import OrderPage from "../pages/OrderPage/OrderPage";
+import OrderTrackingPage from "../pages/OrderTrackingPage/OrderTrackingPage";
 import ProductDetailsPage from "../pages/ProductDetailsPage/ProductDetailsPage";
 import ProductsPage from "../pages/ProductsPage/ProductsPage";
 import ProfilePage from "../pages/Profile/ProfilePage";
@@ -18,6 +21,21 @@ export const routes = [
     {
         path: "/order",
         page: OrderPage,
+        isShowHeader: true
+    },
+    {
+        path: "/checkout",
+        page: CheckoutPage,
+        isShowHeader: true
+    },
+    {
+        path: "/order-tracking",
+        page: OrderTrackingPage,
+        isShowHeader: true
+    },
+    {
+        path: "/admin/orders",
+        page: AdminOrderManagement,
         isShowHeader: true
     },
     {
