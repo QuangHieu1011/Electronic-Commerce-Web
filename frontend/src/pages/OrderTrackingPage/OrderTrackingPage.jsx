@@ -36,6 +36,14 @@ const OrderTrackingPage = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
+    // Calculate discounted price
+    const calculateDiscountedPrice = (product) => {
+        if (product.discount && product.discount > 0) {
+            return product.price * (1 - product.discount / 100)
+        }
+        return product.price
+    }
+
     // Load orders function
     const loadUserOrders = useCallback(async () => {
         if (user?.access_token && (user?.id || user?._id)) {
@@ -399,8 +407,7 @@ const OrderTrackingPage = () => {
                                                             {item.product.name}
                                                         </div>
                                                         <div style={{ fontSize: '12px', color: '#666' }}>
-                                                            Số lượng: <strong>{item.quantity}</strong> |
-                                                            Đơn giá: <strong>{formatPrice(item.product.discount || item.product.price)}</strong>
+                                                            SL: {item.quantity} x {formatPrice(calculateDiscountedPrice(item.product))}
                                                         </div>
                                                     </div>
                                                     <div style={{
@@ -410,7 +417,7 @@ const OrderTrackingPage = () => {
                                                         minWidth: '100px',
                                                         textAlign: 'right'
                                                     }}>
-                                                        {formatPrice((item.product.discount || item.product.price) * item.quantity)}
+                                                        {formatPrice(calculateDiscountedPrice(item.product) * item.quantity)}
                                                     </div>
                                                 </div>
                                             ))}
