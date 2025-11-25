@@ -12,21 +12,27 @@ import {
     Image,
     message,
     Space,
-    Typography
+    Typography,
+    Tag,
+    Modal
 } from 'antd'
 import {
     ArrowLeftOutlined,
     CreditCardOutlined,
     BankOutlined,
     WalletOutlined,
-    CheckCircleOutlined
+    CheckCircleOutlined,
+    GiftOutlined,
+    CloseCircleOutlined
 } from '@ant-design/icons'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { createOrder } from '../../redux/slides/orderSlice'
 import { removeFromCart } from '../../redux/slides/cartSlice'
-// import { updateUser } from '../../redux/slides/userSlide'
 import * as OrderService from '../../service/OrderService'
+import BankingPaymentModal from '../../components/PaymentModal/BankingPaymentModal'
+import CreditCardPaymentModal from '../../components/PaymentModal/CreditCardPaymentModal'
+import VoucherModal from '../../components/PaymentModal/VoucherModal'
 import {
     WrapperContainer,
     WrapperHeader,
@@ -42,6 +48,11 @@ const CheckoutPage = () => {
     const [form] = Form.useForm()
     const [paymentMethod, setPaymentMethod] = useState('cod')
     const [loading, setLoading] = useState(false)
+    const [showBankingModal, setShowBankingModal] = useState(false)
+    const [showCreditModal, setShowCreditModal] = useState(false)
+    const [showVoucherModal, setShowVoucherModal] = useState(false)
+    const [appliedVoucher, setAppliedVoucher] = useState(null)
+    const [shippingFee, setShippingFee] = useState(30000)
 
     const dispatch = useDispatch()
     const navigate = useNavigate()
@@ -83,6 +94,35 @@ const CheckoutPage = () => {
         }
     }, [user, form, navigate, selectedProducts, totalAmount]) // eslint-disable-line react-hooks/exhaustive-deps
 
+    // Tính phí ship theo tỉnh/thành
+    useEffect(() => {
+        const province = form.getFieldValue('province')
+        if (province === 'Hồ Chí Minh' || province === 'Hà Nội') {
+            setShippingFee(30000) // Nội thành
+        } else if (province === 'Đà Nẵng' || province === 'Cần Thơ') {
+            setShippingFee(50000) // Thành phố lớn
+        } else {
+            setShippingFee(70000) // Tỉnh xa
+        }
+    }, [form])
+
+    // Tính tổng tiền sau khi áp voucher
+    const calculateFinalAmount = useMemo(() => {
+        let total = totalAmount + shippingFee
+
+        if (appliedVoucher) {
+            if (appliedVoucher.discountType === 'shipping') {
+                // Giảm phí ship
+                total = totalAmount + Math.max(0, shippingFee - appliedVoucher.appliedDiscount)
+            } else {
+                // Giảm tổng đơn hàng
+                total = totalAmount + shippingFee - appliedVoucher.appliedDiscount
+            }
+        }
+
+        return total
+    }, [totalAmount, shippingFee, appliedVoucher])
+
     // Format giá tiền
     const formatPrice = (price) => {
         return new Intl.NumberFormat('vi-VN', {
@@ -91,8 +131,39 @@ const CheckoutPage = () => {
         }).format(price)
     }
 
+    // Xử lý áp dụng voucher
+    const handleApplyVoucher = (voucher) => {
+        setAppliedVoucher(voucher)
+    }
+
+    // Xóa voucher
+    const handleRemoveVoucher = () => {
+        setAppliedVoucher(null)
+        message.info('Đã xóa voucher')
+    }
+
+    // Xử lý thanh toán thành công từ modal
+    const handlePaymentSuccess = async (values) => {
+        await processOrder(values)
+    }
+
     // Xử lý khi hoàn tất đơn hàng
     const handleFinishOrder = async (values) => {
+        // Nếu chọn banking hoặc credit card, hiển thị modal thanh toán
+        if (paymentMethod === 'banking') {
+            setShowBankingModal(true)
+            return
+        } else if (paymentMethod === 'credit') {
+            setShowCreditModal(true)
+            return
+        }
+
+        // COD - xử lý trực tiếp
+        await processOrder(values)
+    }
+
+    // Xử lý đơn hàng
+    const processOrder = async (values) => {
         setLoading(true)
 
         try {
@@ -100,15 +171,24 @@ const CheckoutPage = () => {
             const orderData = {
                 orderItems: selectedProducts,
                 userInfo: user,
-                totalAmount: totalAmount + 30000, // Cộng phí ship
+                totalAmount: totalAmount,
+                shippingFee: shippingFee,
+                finalAmount: calculateFinalAmount,
+                voucher: appliedVoucher ? {
+                    code: appliedVoucher.code,
+                    title: appliedVoucher.title,
+                    discountType: appliedVoucher.discountType,
+                    discountValue: appliedVoucher.discountValue,
+                    appliedDiscount: appliedVoucher.appliedDiscount
+                } : null,
                 shippingInfo: {
-                    fullName: values.fullName,
-                    phone: values.phone,
-                    address: values.address,
-                    ward: values.ward,
-                    district: values.district,
-                    province: values.province,
-                    note: values.note || ''
+                    fullName: values.fullName || form.getFieldValue('fullName'),
+                    phone: values.phone || form.getFieldValue('phone'),
+                    address: values.address || form.getFieldValue('address'),
+                    ward: values.ward || form.getFieldValue('ward'),
+                    district: values.district || form.getFieldValue('district'),
+                    province: values.province || form.getFieldValue('province'),
+                    note: values.note || form.getFieldValue('note') || ''
                 },
                 paymentMethod: paymentMethod
             }
@@ -124,6 +204,10 @@ const CheckoutPage = () => {
                 console.log('API response:', response)
 
                 if (response.status === 'OK') {
+                    // Đóng modal nếu có
+                    setShowBankingModal(false)
+                    setShowCreditModal(false)
+
                     // Cũng lưu vào Redux để sync UI ngay lập tức
                     dispatch(createOrder(orderData))
 
@@ -132,8 +216,25 @@ const CheckoutPage = () => {
                         dispatch(removeFromCart({ productId: item.product._id }))
                     })
 
-                    message.success('Đặt hàng thành công!')
-                    navigate('/order-tracking')
+                    // Hiển thị modal thành công
+                    Modal.success({
+                        title: '🎉 Đặt hàng thành công!',
+                        content: (
+                            <div>
+                                <p>Cảm ơn bạn đã mua hàng!</p>
+                                <p>Mã đơn hàng: <strong>#{response.data?._id?.slice(-8).toUpperCase()}</strong></p>
+                                <p>Tổng tiền: <strong style={{ color: '#ff4d4f' }}>{formatPrice(calculateFinalAmount)}</strong></p>
+                                {paymentMethod !== 'cod' && (
+                                    <p style={{ color: '#52c41a' }}>✓ Thanh toán thành công</p>
+                                )}
+                                <p style={{ marginTop: 12, fontSize: 13, color: '#666' }}>
+                                    Chúng tôi sẽ gửi email xác nhận đơn hàng đến {user?.email || 'email của bạn'}
+                                </p>
+                            </div>
+                        ),
+                        okText: 'Xem đơn hàng',
+                        onOk: () => navigate('/order-tracking')
+                    })
                 } else {
                     throw new Error(response.message || 'Lỗi từ server')
                 }
@@ -232,12 +333,23 @@ const CheckoutPage = () => {
                                             name="province"
                                             rules={[{ required: true, message: 'Vui lòng chọn tỉnh/thành phố!' }]}
                                         >
-                                            <Select placeholder="Chọn tỉnh/thành phố">
-                                                <Option value="Hồ Chí Minh">TP. Hồ Chí Minh</Option>
-                                                <Option value="Hà Nội">Hà Nội</Option>
-                                                <Option value="Đà Nẵng">Đà Nẵng</Option>
-                                                <Option value="Cần Thơ">Cần Thơ</Option>
-                                                <Option value="Khác">Tỉnh khác</Option>
+                                            <Select 
+                                                placeholder="Chọn tỉnh/thành phố"
+                                                onChange={(value) => {
+                                                    if (value === 'Hồ Chí Minh' || value === 'Hà Nội') {
+                                                        setShippingFee(30000)
+                                                    } else if (value === 'Đà Nẵng' || value === 'Cần Thơ') {
+                                                        setShippingFee(50000)
+                                                    } else {
+                                                        setShippingFee(70000)
+                                                    }
+                                                }}
+                                            >
+                                                <Option value="Hồ Chí Minh">TP. Hồ Chí Minh (30,000đ)</Option>
+                                                <Option value="Hà Nội">Hà Nội (30,000đ)</Option>
+                                                <Option value="Đà Nẵng">Đà Nẵng (50,000đ)</Option>
+                                                <Option value="Cần Thơ">Cần Thơ (50,000đ)</Option>
+                                                <Option value="Khác">Tỉnh khác (70,000đ)</Option>
                                             </Select>
                                         </Form.Item>
                                     </Col>
@@ -395,6 +507,54 @@ const CheckoutPage = () => {
 
                             <Divider />
 
+                            {/* Mã giảm giá */}
+                            <div style={{ marginBottom: 16 }}>
+                                {appliedVoucher ? (
+                                    <div style={{ 
+                                        padding: 12, 
+                                        background: '#fff7e6', 
+                                        border: '1px solid #ffd591',
+                                        borderRadius: 8,
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center'
+                                    }}>
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                                                <GiftOutlined style={{ color: '#fa8c16' }} />
+                                                <span style={{ fontWeight: 600, fontSize: 13 }}>{appliedVoucher.title}</span>
+                                            </div>
+                                            <div style={{ fontSize: 12, color: '#666' }}>
+                                                Mã: {appliedVoucher.code} • Giảm {formatPrice(appliedVoucher.appliedDiscount)}
+                                            </div>
+                                        </div>
+                                        <Button
+                                            type="text"
+                                            size="small"
+                                            icon={<CloseCircleOutlined />}
+                                            onClick={handleRemoveVoucher}
+                                            danger
+                                        />
+                                    </div>
+                                ) : (
+                                    <Button
+                                        block
+                                        size="large"
+                                        icon={<GiftOutlined />}
+                                        onClick={() => setShowVoucherModal(true)}
+                                        style={{
+                                            borderStyle: 'dashed',
+                                            borderColor: '#ff4d4f',
+                                            color: '#ff4d4f'
+                                        }}
+                                    >
+                                        Chọn hoặc nhập mã giảm giá
+                                    </Button>
+                                )}
+                            </div>
+
+                            <Divider />
+
                             {/* Tính tổng */}
                             <div style={{ fontSize: 14 }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
@@ -403,29 +563,63 @@ const CheckoutPage = () => {
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                                     <span>Phí vận chuyển:</span>
-                                    <span>{formatPrice(30000)}</span>
+                                    <span style={{ textDecoration: appliedVoucher?.discountType === 'shipping' ? 'line-through' : 'none', color: appliedVoucher?.discountType === 'shipping' ? '#999' : '#000' }}>
+                                        {formatPrice(shippingFee)}
+                                    </span>
                                 </div>
+                                {appliedVoucher?.discountType === 'shipping' && (
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                                        <span style={{ color: '#52c41a' }}>Phí ship sau giảm:</span>
+                                        <span style={{ color: '#52c41a', fontWeight: 600 }}>
+                                            {formatPrice(Math.max(0, shippingFee - appliedVoucher.appliedDiscount))}
+                                        </span>
+                                    </div>
+                                )}
+                                {appliedVoucher && appliedVoucher.discountType !== 'shipping' && (
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                                        <span style={{ color: '#52c41a' }}>Giảm giá:</span>
+                                        <span style={{ color: '#52c41a', fontWeight: 600 }}>
+                                            - {formatPrice(appliedVoucher.appliedDiscount)}
+                                        </span>
+                                    </div>
+                                )}
                                 <Divider />
                                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 18, fontWeight: 600, color: '#ff4d4f' }}>
                                     <span>Tổng cộng:</span>
-                                    <span>{formatPrice(totalAmount + 30000)}</span>
+                                    <span>{formatPrice(calculateFinalAmount)}</span>
                                 </div>
-                            </div>
-
-                            {paymentMethod === 'banking' && (
-                                <div style={{ marginTop: 16, padding: 12, background: '#f6ffed', border: '1px solid #b7eb8f', borderRadius: 6 }}>
-                                    <Text strong>Thông tin chuyển khoản:</Text>
-                                    <div style={{ fontSize: 12, marginTop: 8 }}>
-                                        <div>STK: 1234567890</div>
-                                        <div>Ngân hàng: Vietcombank</div>
-                                        <div>Chủ TK: SHOP ELECTRONICS</div>
+                                {appliedVoucher && (
+                                    <div style={{ fontSize: 12, color: '#52c41a', marginTop: 8, textAlign: 'right' }}>
+                                        Bạn đã tiết kiệm {formatPrice(appliedVoucher.appliedDiscount)}! 🎉
                                     </div>
-                                </div>
-                            )}
+                                )}
+                            </div>
                         </WrapperSummary>
                     </Col>
                 </Row>
             </WrapperContent>
+
+            {/* Modals */}
+            <BankingPaymentModal
+                visible={showBankingModal}
+                onClose={() => setShowBankingModal(false)}
+                onSuccess={handlePaymentSuccess}
+                orderData={{ totalAmount: calculateFinalAmount }}
+            />
+
+            <CreditCardPaymentModal
+                visible={showCreditModal}
+                onClose={() => setShowCreditModal(false)}
+                onSuccess={handlePaymentSuccess}
+                orderData={{ totalAmount: calculateFinalAmount }}
+            />
+
+            <VoucherModal
+                visible={showVoucherModal}
+                onClose={() => setShowVoucherModal(false)}
+                onApply={handleApplyVoucher}
+                totalAmount={totalAmount}
+            />
         </WrapperContainer>
     )
 }

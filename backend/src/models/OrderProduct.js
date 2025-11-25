@@ -31,6 +31,15 @@ const orderSchema = new mongoose.Schema({
     },
     paymentMethod: { type: String, required: true, enum: ['cod', 'banking', 'credit'], default: 'cod' },
     totalAmount: { type: Number, required: true },
+    voucher: {
+        code: { type: String, default: null },
+        title: { type: String, default: null },
+        discountType: { type: String, enum: ['shipping', 'fixed', 'percent'], default: null },
+        discountValue: { type: Number, default: 0 },
+        appliedDiscount: { type: Number, default: 0 }
+    },
+    shippingFee: { type: Number, default: 30000 },
+    finalAmount: { type: Number, required: true }, // Tổng tiền sau khi áp dụng voucher
     orderStatus: {
         type: String,
         required: true,
