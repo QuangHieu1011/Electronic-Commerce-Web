@@ -1,7 +1,18 @@
 import React, { useEffect, useState } from 'react'
-import { WrapperContentProfile, WrapperHeader, WrapperInput, WrapperLabel, WrapperUploadFile } from './style'
+import { 
+    WrapperContainer,
+    WrapperContentProfile, 
+    WrapperHeader, 
+    WrapperInput, 
+    WrapperLabel, 
+    WrapperUploadFile,
+    WrapperAvatarSection,
+    WrapperInfoGrid,
+    WrapperInfoCard,
+    WrapperActionButtons
+} from './style'
 import InputForm from '../../components/InputForm/InputForm'
-import { Button, Upload } from 'antd';
+import { Button, Upload, Input, Divider } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import * as UserService from '../../service/UserService'
@@ -9,7 +20,7 @@ import { useMutationHooks } from '../../hooks/useMutationHook';
 import Loading from '../../components/LoadingComponent/Loading';
 import * as message from '../../components/Message/Message'
 import { updateUser } from '../../redux/slides/userSlide'
-import { UploadOutlined } from '@ant-design/icons';
+import { UploadOutlined, UserOutlined, MailOutlined, PhoneOutlined, HomeOutlined, SaveOutlined, CameraOutlined } from '@ant-design/icons';
 import { getBase64 } from '../../utils';
 
 const ProfilePage = () => {
@@ -91,114 +102,175 @@ const ProfilePage = () => {
 
 
     return (
-        <div style={{ width: '1270px', margin: '0 auto', height: '500vh' }}>
-            <WrapperHeader>Thông tin người dùng</WrapperHeader>
+        <WrapperContainer>
+            <WrapperHeader>
+                <h1>Thông tin cá nhân</h1>
+            </WrapperHeader>
+
             <Loading isLoading={isPending}>
                 <WrapperContentProfile>
-                    <WrapperInput>
-                        <WrapperLabel htmlFor="name">Name</WrapperLabel>
-                        <InputForm style={{ width: '300px' }} id="name" value={name} onChange={handleOnchangeName} />
-                        <Button
-                            onClick={handleUpdate}
-                            style={{
-                                height: '30px',
-                                width: 'fit-content',
-                                borderRadius: '4px',
-                                color: 'rgb(26, 148, 255)',
-                                fontSize: '15px',
-                                fontWeight: '700',
-                                padding: '2px 6px 6px',
-                            }}
-                        >
-                            Cập nhật
-                        </Button>
-                    </WrapperInput>
-                    <WrapperInput>
-                        <WrapperLabel htmlFor="email">Email</WrapperLabel>
-                        <InputForm style={{ width: '300px' }} id="email" value={email} onChange={handleOnchangeEmail} />
-                        <Button
-                            onClick={handleUpdate}
-                            style={{
-                                height: '30px',
-                                width: 'fit-content',
-                                borderRadius: '4px',
-                                color: 'rgb(26, 148, 255)',
-                                fontSize: '15px',
-                                fontWeight: '700',
-                                padding: '2px 6px 6px',
-                            }}
-                        >
-                            Cập nhật
-                        </Button>
-                    </WrapperInput>
-                    <WrapperInput>
-                        <WrapperLabel htmlFor="phone">Phone</WrapperLabel>
-                        <InputForm style={{ width: '300px' }} id="phone" value={phone} onChange={handleOnchangePhone} />
-                        <Button
-                            onClick={handleUpdate}
-                            style={{
-                                height: '30px',
-                                width: 'fit-content',
-                                borderRadius: '4px',
-                                color: 'rgb(26, 148, 255)',
-                                fontSize: '15px',
-                                fontWeight: '700',
-                                padding: '2px 6px 6px',
-                            }}
-                        >
-                            Cập nhật
-                        </Button>
-                    </WrapperInput>
-                    <WrapperInput>
-                        <WrapperLabel htmlFor="address">Address</WrapperLabel>
-                        <InputForm style={{ width: '300px' }} id="address" value={address} onChange={handleOnchangeAddress} />
-                        <Button
-                            onClick={handleUpdate}
-                            style={{
-                                height: '30px',
-                                width: 'fit-content',
-                                borderRadius: '4px',
-                                color: 'rgb(26, 148, 255)',
-                                fontSize: '15px',
-                                fontWeight: '700',
-                                padding: '2px 6px 6px',
-                            }}
-                        >
-                            Cập nhật
-                        </Button>
-                    </WrapperInput>
-                    <WrapperInput>
-                        <WrapperLabel htmlFor="avatar">Avatar</WrapperLabel>
-                        <WrapperUploadFile onChange={handleOnchangeAvatar} maxCount={1}>
-                            <Button icon={<UploadOutlined />}>Select File</Button>
+                    {/* Avatar Section */}
+                    <WrapperAvatarSection>
+                        <div className="avatar-wrapper">
+                            {avatar ? (
+                                <img 
+                                    src={avatar} 
+                                    style={{
+                                        height: '140px',
+                                        width: '140px',
+                                        borderRadius: '50%',
+                                        objectFit: 'cover'
+                                    }} 
+                                    alt="avatar" 
+                                />
+                            ) : (
+                                <div style={{
+                                    height: '140px',
+                                    width: '140px',
+                                    borderRadius: '50%',
+                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '48px',
+                                    color: '#fff',
+                                    fontWeight: '700'
+                                }}>
+                                    {name?.charAt(0)?.toUpperCase() || 'U'}
+                                </div>
+                            )}
+                        </div>
+                        
+                        <WrapperUploadFile onChange={handleOnchangeAvatar} maxCount={1} showUploadList={false}>
+                            <Button 
+                                icon={<CameraOutlined />}
+                                size="large"
+                                style={{
+                                    marginTop: '20px',
+                                    borderRadius: '24px',
+                                    padding: '0 32px',
+                                    height: '48px',
+                                    fontSize: '15px',
+                                    fontWeight: '600',
+                                    border: '2px solid #667eea',
+                                    color: '#667eea'
+                                }}
+                            >
+                                Thay đổi ảnh đại diện
+                            </Button>
                         </WrapperUploadFile>
-                        {avatar && (
-                            <img src={avatar} style={{
-                                height: '60px',
-                                width: '60px',
-                                borderRadius: '50%',
-                                objectFit: 'cover'
-                            }} alt="avatar" />
-                        )}
-                        {/* <InputForm style={{width: '300px'}}  id="avatar" value={avatar} onChange={handleOnchangeAvatar} /> */}
-                        <Button
+                    </WrapperAvatarSection>
+
+                    {/* Info Grid */}
+                    <WrapperInfoGrid>
+                        {/* Name Card */}
+                        <WrapperInfoCard>
+                            <WrapperInput>
+                                <WrapperLabel htmlFor="name">
+                                    <UserOutlined /> Họ và tên
+                                </WrapperLabel>
+                                <div className="input-group">
+                                    <Input
+                                        id="name"
+                                        value={name}
+                                        onChange={(e) => handleOnchangeName(e.target.value)}
+                                        placeholder="Nhập họ và tên"
+                                        size="large"
+                                        prefix={<UserOutlined style={{ color: '#8c8c8c' }} />}
+                                    />
+                                    <Button onClick={handleUpdate}>
+                                        Lưu
+                                    </Button>
+                                </div>
+                            </WrapperInput>
+                        </WrapperInfoCard>
+
+                        {/* Email Card */}
+                        <WrapperInfoCard>
+                            <WrapperInput>
+                                <WrapperLabel htmlFor="email">
+                                    <MailOutlined /> Email
+                                </WrapperLabel>
+                                <div className="input-group">
+                                    <Input
+                                        id="email"
+                                        value={email}
+                                        onChange={(e) => handleOnchangeEmail(e.target.value)}
+                                        placeholder="Nhập email"
+                                        size="large"
+                                        prefix={<MailOutlined style={{ color: '#8c8c8c' }} />}
+                                    />
+                                    <Button onClick={handleUpdate}>
+                                        Lưu
+                                    </Button>
+                                </div>
+                            </WrapperInput>
+                        </WrapperInfoCard>
+
+                        {/* Phone Card */}
+                        <WrapperInfoCard>
+                            <WrapperInput>
+                                <WrapperLabel htmlFor="phone">
+                                    <PhoneOutlined /> Số điện thoại
+                                </WrapperLabel>
+                                <div className="input-group">
+                                    <Input
+                                        id="phone"
+                                        value={phone}
+                                        onChange={(e) => handleOnchangePhone(e.target.value)}
+                                        placeholder="Nhập số điện thoại"
+                                        size="large"
+                                        prefix={<PhoneOutlined style={{ color: '#8c8c8c' }} />}
+                                    />
+                                    <Button onClick={handleUpdate}>
+                                        Lưu
+                                    </Button>
+                                </div>
+                            </WrapperInput>
+                        </WrapperInfoCard>
+
+                        {/* Address Card */}
+                        <WrapperInfoCard>
+                            <WrapperInput>
+                                <WrapperLabel htmlFor="address">
+                                    <HomeOutlined /> Địa chỉ
+                                </WrapperLabel>
+                                <div className="input-group">
+                                    <Input
+                                        id="address"
+                                        value={address}
+                                        onChange={(e) => handleOnchangeAddress(e.target.value)}
+                                        placeholder="Nhập địa chỉ"
+                                        size="large"
+                                        prefix={<HomeOutlined style={{ color: '#8c8c8c' }} />}
+                                    />
+                                    <Button onClick={handleUpdate}>
+                                        Lưu
+                                    </Button>
+                                </div>
+                            </WrapperInput>
+                        </WrapperInfoCard>
+                    </WrapperInfoGrid>
+
+                    {/* Action Buttons */}
+                    <WrapperActionButtons>
+                        <Button 
+                            className="primary"
+                            icon={<SaveOutlined />}
                             onClick={handleUpdate}
-                            style={{
-                                height: '30px',
-                                width: 'fit-content',
-                                borderRadius: '4px',
-                                color: 'rgb(26, 148, 255)',
-                                fontSize: '15px',
-                                fontWeight: '700',
-                                padding: '2px 6px 6px',
-                            }}
                         >
-                            Cập nhật
+                            Lưu tất cả thay đổi
                         </Button>
-                    </WrapperInput>
+                        <Button 
+                            className="secondary"
+                            onClick={() => navigate('/')}
+                        >
+                            Quay về trang chủ
+                        </Button>
+                    </WrapperActionButtons>
                 </WrapperContentProfile>
             </Loading>
-        </div>
+        </WrapperContainer>
     )
 }
 

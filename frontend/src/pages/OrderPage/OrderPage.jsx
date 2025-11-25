@@ -57,6 +57,15 @@ const OrderPage = () => {
     }).format(price);
   };
 
+  // Calculate discounted price
+  const calculateDiscountedPrice = (product) => {
+    if (!product || !product.price) return 0;
+    if (product.discount && product.discount > 0) {
+      return product.price * (1 - product.discount / 100);
+    }
+    return product.price;
+  };
+
   // Handle quantity update
   const handleUpdateQuantity = (productId, newQuantity) => {
     if (newQuantity >= 1) {
@@ -99,7 +108,7 @@ const OrderPage = () => {
     return cart.cartItems
       .filter(item => selectedItems[item.product._id])
       .reduce((total, item) => {
-        const price = item.product.discount || item.product.price;
+        const price = calculateDiscountedPrice(item.product);
         return total + (price * item.quantity);
       }, 0);
   };
@@ -212,8 +221,13 @@ const OrderPage = () => {
                   {/* Price */}
                   <div style={{ width: '120px', textAlign: 'center' }}>
                     <div className="product-price">
-                      {formatPrice(item.product.discount || item.product.price)}
+                      {formatPrice(calculateDiscountedPrice(item.product))}
                     </div>
+                    {item.product.discount > 0 && (
+                      <div style={{ fontSize: '12px', color: '#999', textDecoration: 'line-through', marginTop: '4px' }}>
+                        {formatPrice(item.product.price)}
+                      </div>
+                    )}
                   </div>
 
                   {/* Quantity controls */}
@@ -249,7 +263,7 @@ const OrderPage = () => {
                   {/* Total price */}
                   <div style={{ width: '120px', textAlign: 'center' }}>
                     <div style={{ fontSize: '16px', fontWeight: '600', color: '#ff4d4f' }}>
-                      {formatPrice((item.product.discount || item.product.price) * item.quantity)}
+                      {formatPrice(calculateDiscountedPrice(item.product) * item.quantity)}
                     </div>
                   </div>
 
