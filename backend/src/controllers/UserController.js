@@ -183,6 +183,26 @@ const deleteMany = async (req, res) => {
         });
     }
 };
+const getChatbotToken = async (req, res) => {
+    try {
+        const userId = req.userId; // From authUserMiddleware
+        
+        if (!userId) {
+            return res.status(401).json({
+                status: 'ERR',
+                message: 'User not authenticated'
+            });
+        }
+
+        const response = await UserService.getChatbotToken(userId);
+        return res.status(200).json(response);
+    } catch (e) {
+        return res.status(500).json({
+            status: 'ERR',
+            message: e.message || e
+        });
+    }
+};
 module.exports = {
     createUser,
     loginUser,
@@ -192,5 +212,6 @@ module.exports = {
     getDetailsUser,
     refreshToken,
     logoutUser,
-    deleteMany
+    deleteMany,
+    getChatbotToken
 };
