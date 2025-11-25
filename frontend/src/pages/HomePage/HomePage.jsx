@@ -8,6 +8,7 @@ import slider3 from '../../assets/images/Slider 3.png'
 import CardComponent from '../../components/CardComponent/CardComponent'
 import { useQuery } from '@tanstack/react-query'
 import * as ProductService from '../../service/ProductService'
+import * as UserService from '../../service/UserService'
 import { useSelector } from 'react-redux'
 import Loading from '../../components/LoadingComponent/Loading'
 import { useDebounce } from '../../hooks/useDebounce'
@@ -17,6 +18,7 @@ import { useDebounce } from '../../hooks/useDebounce'
 
 const HomePage = () => {
   const searchProduct = useSelector((state) => state?.product?.search);
+  const user = useSelector((state) => state?.user);
   const searchDebounce = useDebounce(searchProduct, 1000);
   const [loading, setLoading] = useState(false)
   const [limit, setLimit] = useState(6)
@@ -50,6 +52,28 @@ const HomePage = () => {
   useEffect(() => {
     fetchAllTypeProduct()
   },[])
+
+  // Initialize chatbot with user identity
+  useEffect(() => {
+    const initializeChatbot = async () => {
+      // Check if user is logged in and chatbot is available
+      if (user?.id && user?.access_token && window.chatbase) {
+        try {
+          const response = await UserService.getChatbotToken(user.access_token);
+          if (response.status === 'OK' && response.token) {
+            // Identify user with Chatbase
+            window.chatbase('identify', { token: response.token });
+          }
+        } catch (error) {
+          console.error('Failed to initialize chatbot:', error);
+        }
+      }
+    };
+
+    // Wait a bit for chatbot to load
+    const timer = setTimeout(initializeChatbot, 1000);
+    return () => clearTimeout(timer);
+  }, [user])
 
 
   return (

@@ -179,6 +179,49 @@ const deleteManyUser = (ids) => {
     });
 };
 
+const getChatbotToken = (userId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const user = await User.findOne({ _id: userId });
+            
+            if (!user) {
+                resolve({
+                    status: 'ERR',
+                    message: 'User not found'
+                });
+                return;
+            }
+
+            const jwt = require('jsonwebtoken');
+            const secret = process.env.CHATBOT_IDENTITY_SECRET;
+            
+            if (!secret) {
+                reject(new Error('CHATBOT_IDENTITY_SECRET is not configured'));
+                return;
+            }
+
+            const token = jwt.sign(
+                { 
+                    user_id: user._id.toString(),
+                    email: user.email,
+                    name: user.name,
+                    phone: user.phone
+                }, 
+                secret, 
+                { expiresIn: '1h' }
+            );
+
+            resolve({
+                status: 'OK',
+                message: 'SUCCESS',
+                token: token
+            });
+        } catch (e) {
+            reject(e);
+        }
+    });
+};
+
 module.exports = {
     createUser,
     loginUser,
@@ -186,6 +229,6 @@ module.exports = {
     deleteUser,
     getAllUser,
     getDetailsUser,
-    deleteManyUser
-
+    deleteManyUser,
+    getChatbotToken
 };

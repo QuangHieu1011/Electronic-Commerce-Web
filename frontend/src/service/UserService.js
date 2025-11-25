@@ -152,3 +152,29 @@ export const deleteManyUser = async (data, access_token) => {
         throw error;
     }
 }
+
+export const getChatbotToken = async (access_token) => {
+    try {
+        const res = await axiosJWT.get(`${process.env.REACT_APP_API_URL}/user/chatbot-token`, {
+            headers: {
+                Authorization: `Bearer ${access_token}`,
+            }
+        });
+        return res.data;
+    } catch (error) {
+        if (error.response && error.response.status === 401) {
+            const refreshRes = await refreshToken();
+            const newToken = refreshRes?.access_token;
+            if (newToken) {
+                localStorage.setItem('access_token', JSON.stringify(newToken));
+                const retryRes = await axiosJWT.get(`${process.env.REACT_APP_API_URL}/user/chatbot-token`, {
+                    headers: {
+                        Authorization: `Bearer ${newToken}`,
+                    }
+                });
+                return retryRes.data;
+            }
+        }
+        throw error;
+    }
+}
