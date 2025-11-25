@@ -173,6 +173,183 @@ const ProductDetailsComponent = ({ idProduct }) => {
           </div>
         </Col>
       </Row>
+
+      {/* Mô tả sản phẩm */}
+      <Row style={{ padding: '24px', background: '#fff', borderRadius: '12px', marginTop: '20px' }}>
+        <Col span={24}>
+          <h2 style={{ 
+            fontSize: '22px', 
+            fontWeight: '700', 
+            marginBottom: '20px',
+            borderBottom: '2px solid #1890ff',
+            paddingBottom: '12px'
+          }}>
+            📝 Mô tả sản phẩm
+          </h2>
+          <div style={{ 
+            fontSize: '15px', 
+            lineHeight: '1.8',
+            color: '#595959',
+            whiteSpace: 'pre-wrap'
+          }}>
+            {productDetails?.description || 'Chưa có mô tả chi tiết cho sản phẩm này.'}
+          </div>
+        </Col>
+      </Row>
+
+      {/* Đánh giá và bình luận */}
+      <Row style={{ padding: '24px', background: '#fff', borderRadius: '12px', marginTop: '20px' }}>
+        <Col span={24}>
+          <h2 style={{ 
+            fontSize: '22px', 
+            fontWeight: '700', 
+            marginBottom: '20px',
+            borderBottom: '2px solid #1890ff',
+            paddingBottom: '12px'
+          }}>
+            ⭐ Đánh giá & Nhận xét
+          </h2>
+
+          {/* Tổng quan đánh giá */}
+          <div style={{ 
+            display: 'flex', 
+            gap: '40px', 
+            padding: '24px',
+            background: '#fafafa',
+            borderRadius: '8px',
+            marginBottom: '24px'
+          }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '48px', fontWeight: '700', color: '#faad14' }}>
+                {productDetails?.rating || 0}
+              </div>
+              <Rate 
+                allowHalf 
+                value={productDetails?.rating || 0} 
+                disabled 
+                style={{ fontSize: '20px', color: '#faad14' }} 
+              />
+              <div style={{ marginTop: '8px', color: '#8c8c8c' }}>
+                {productDetails?.selled || 0} đánh giá
+              </div>
+            </div>
+            <div style={{ flex: 1 }}>
+              {[5, 4, 3, 2, 1].map(star => (
+                <div key={star} style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '12px',
+                  marginBottom: '8px'
+                }}>
+                  <span style={{ width: '80px' }}>{star} <StarFilled style={{ color: '#faad14' }} /></span>
+                  <div style={{ 
+                    flex: 1, 
+                    height: '8px', 
+                    background: '#e8e8e8', 
+                    borderRadius: '4px',
+                    overflow: 'hidden'
+                  }}>
+                    <div style={{ 
+                      width: `${star === 5 ? 70 : star === 4 ? 20 : 10}%`, 
+                      height: '100%', 
+                      background: '#faad14',
+                      transition: 'width 0.3s ease'
+                    }} />
+                  </div>
+                  <span style={{ width: '60px', textAlign: 'right', color: '#8c8c8c' }}>
+                    {star === 5 ? 70 : star === 4 ? 20 : 10}%
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Danh sách bình luận demo */}
+          <div style={{ marginTop: '24px' }}>
+            {[1, 2, 3].map(index => (
+              <div key={index} style={{ 
+                padding: '20px',
+                borderBottom: '1px solid #f0f0f0',
+                transition: 'background 0.3s ease'
+              }}>
+                <div style={{ display: 'flex', gap: '16px' }}>
+                  <div style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white',
+                    fontSize: '20px',
+                    fontWeight: '600'
+                  }}>
+                    {String.fromCharCode(65 + index)}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                      <span style={{ fontWeight: '600', fontSize: '15px' }}>
+                        Khách hàng {index}
+                      </span>
+                      <Rate 
+                        allowHalf 
+                        value={5} 
+                        disabled 
+                        style={{ fontSize: '14px', color: '#faad14' }} 
+                      />
+                    </div>
+                    <div style={{ color: '#8c8c8c', fontSize: '13px', marginBottom: '12px' }}>
+                      {new Date(Date.now() - index * 86400000).toLocaleDateString('vi-VN')}
+                    </div>
+                    <div style={{ fontSize: '14px', lineHeight: '1.6', color: '#595959' }}>
+                      Sản phẩm rất tốt, chất lượng đúng như mô tả. Shop phục vụ nhiệt tình, 
+                      giao hàng nhanh. Mình sẽ [综 tiếp ủng hộ shop! 👍
+                    </div>
+                    <div style={{ 
+                      marginTop: '12px',
+                      display: 'flex',
+                      gap: '8px',
+                      flexWrap: 'wrap'
+                    }}>
+                      {[1, 2].map(imgIndex => (
+                        <div key={imgIndex} style={{
+                          width: '80px',
+                          height: '80px',
+                          background: '#f5f5f5',
+                          borderRadius: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '12px',
+                          color: '#8c8c8c'
+                        }}>
+                          📷
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Nút xem thêm */}
+          <div style={{ textAlign: 'center', marginTop: '24px' }}>
+            <Button 
+              size="large"
+              style={{
+                borderRadius: '8px',
+                padding: '0 40px',
+                height: '44px',
+                fontWeight: '600'
+              }}
+            >
+              Xem thêm đánh giá
+            </Button>
+          </div>
+        </Col>
+      </Row>
     </Loading>
   )
 }

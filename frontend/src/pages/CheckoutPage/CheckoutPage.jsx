@@ -216,25 +216,20 @@ const CheckoutPage = () => {
                         dispatch(removeFromCart({ productId: item.product._id }))
                     })
 
-                    // Hiển thị modal thành công
-                    Modal.success({
-                        title: '🎉 Đặt hàng thành công!',
-                        content: (
-                            <div>
-                                <p>Cảm ơn bạn đã mua hàng!</p>
-                                <p>Mã đơn hàng: <strong>#{response.data?._id?.slice(-8).toUpperCase()}</strong></p>
-                                <p>Tổng tiền: <strong style={{ color: '#ff4d4f' }}>{formatPrice(calculateFinalAmount)}</strong></p>
-                                {paymentMethod !== 'cod' && (
-                                    <p style={{ color: '#52c41a' }}>✓ Thanh toán thành công</p>
-                                )}
-                                <p style={{ marginTop: 12, fontSize: 13, color: '#666' }}>
-                                    Chúng tôi sẽ gửi email xác nhận đơn hàng đến {user?.email || 'email của bạn'}
-                                </p>
-                            </div>
-                        ),
-                        okText: 'Xem đơn hàng',
-                        onOk: () => navigate('/order-tracking')
+                    // Hiển thị thông báo thành công
+                    message.success({
+                        content: `🎉 Đặt hàng thành công! Mã đơn hàng: #${response.data?._id?.slice(-8).toUpperCase()}`,
+                        duration: 2,
+                        onClose: () => {
+                            // Chuyển hướng đến trang theo dõi đơn hàng
+                            navigate('/order-tracking')
+                        }
                     })
+                    
+                    // Chuyển hướng ngay lập tức sau 1 giây
+                    setTimeout(() => {
+                        navigate('/order-tracking')
+                    }, 1000)
                 } else {
                     throw new Error(response.message || 'Lỗi từ server')
                 }
