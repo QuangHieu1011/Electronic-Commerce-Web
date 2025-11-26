@@ -54,6 +54,14 @@ const CheckoutPage = () => {
     const navigate = useNavigate()
     const location = useLocation()
 
+    // Calculate discounted price
+    const calculateDiscountedPrice = (product) => {
+        if (product.discount && product.discount > 0) {
+            return product.price * (1 - product.discount / 100)
+        }
+        return product.price
+    }
+
     // Lấy thông tin sản phẩm từ state được truyền qua navigation
     const selectedProducts = useMemo(() => location.state?.selectedProducts || [], [location.state?.selectedProducts])
     const totalAmount = useMemo(() => location.state?.totalAmount || 0, [location.state?.totalAmount])
@@ -619,11 +627,11 @@ const CheckoutPage = () => {
                                                 {item.product.name}
                                             </div>
                                             <div style={{ fontSize: 12, color: '#666' }}>
-                                                SL: {item.quantity} x {formatPrice(item.product.discount || item.product.price)}
+                                                SL: {item.quantity} | Đơn giá: {formatPrice(calculateDiscountedPrice(item.product))}
                                             </div>
                                         </div>
                                         <div style={{ fontSize: 14, fontWeight: 600, color: '#ff4d4f' }}>
-                                            {formatPrice((item.product.discount || item.product.price) * item.quantity)}
+                                            {formatPrice(calculateDiscountedPrice(item.product) * item.quantity)}
                                         </div>
                                     </div>
                                 ))}

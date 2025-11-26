@@ -28,6 +28,7 @@ import { message } from 'antd'
 
 const ProductDetailsComponent = ({ idProduct }) => {
   const [numProduct, setNumProduct] = useState(1);
+  const [selectedImage, setSelectedImage] = useState('');
   const user = useSelector((state) => state?.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -80,6 +81,23 @@ const ProductDetailsComponent = ({ idProduct }) => {
     enabled: !!idProduct,
   })
 
+  // Khởi tạo selectedImage khi productDetails load xong
+  React.useEffect(() => {
+    if (productDetails?.image) {
+      setSelectedImage(productDetails.image);
+    }
+  }, [productDetails]);
+
+  // Kết hợp ảnh chính và ảnh phụ
+  const allImages = React.useMemo(() => {
+    if (!productDetails) return [];
+    const images = [productDetails.image];
+    if (productDetails.images && productDetails.images.length > 0) {
+      images.push(...productDetails.images.slice(0, 5));
+    }
+    return images.slice(0, 6);
+  }, [productDetails]);
+
 
   return (
     <Loading isLoading={isPending}>
@@ -88,19 +106,33 @@ const ProductDetailsComponent = ({ idProduct }) => {
         <Col span={10} style={{ borderRight: '1px solid #e5e5e5', paddingRight: '10px' }}>
           <WrapperContainerImage>
             <Image
-              src={productDetails?.image}
+              src={selectedImage || productDetails?.image}
               alt="image product"
               preview={false}
             />
           </WrapperContainerImage>
 
           <WrapperListImage>
-            {[1, 2, 3, 4, 5, 6].map((_, index) => (
-              <WrapperStyleColImage key={index}>
+            {allImages.map((img, index) => (
+              <WrapperStyleColImage 
+                key={index}
+                onClick={() => setSelectedImage(img)}
+                style={{
+                  cursor: 'pointer',
+                  border: selectedImage === img ? '3px solid #1890ff' : '3px solid transparent',
+                  boxShadow: selectedImage === img ? '0 4px 16px rgba(24, 144, 255, 0.3)' : 'none',
+                  transform: selectedImage === img ? 'scale(1.02)' : 'scale(1)',
+                  background: selectedImage === img ? '#fff' : '#f8f8f8'
+                }}
+              >
                 <WrapperStyleImageSmall
-                  src={imageProductSmall}
-                  alt={`image small ${index + 1}`}
+                  src={img}
+                  alt={`${productDetails?.name} ${index + 1}`}
                   preview={false}
+                  style={{
+                    opacity: selectedImage === img ? 1 : 0.75,
+                    transition: 'opacity 0.3s ease'
+                  }}
                 />
               </WrapperStyleColImage>
             ))}
