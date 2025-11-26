@@ -1,10 +1,12 @@
 import axios from "axios"
+import { axiosJWT } from './UserService'
 
-export const axiosJWT = axios.create()
+// Export axiosJWT để backward compatibility
+export { axiosJWT }
 
 // Hàm refresh token
 const refreshToken = async () => {
-    const res = await axios.post(`${process.env.REACT_APP_API_URL}/user/refresh-token`, {
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/user/refresh-token`, {}, {
         withCredentials: true
     })
     return res.data;
@@ -17,19 +19,34 @@ export const createOrder = async (data, access_token) => {
                 authorization: `Bearer ${access_token}`,
             }
         })
-        return res.data
+        return {
+            ...res.data,
+            newAccessToken: null // Không có token mới nếu request thành công
+        }
     } catch (error) {
-        // Nếu lỗi 401, tự động refresh token và retry
-        if (error.response?.status === 401) {
-            const refreshRes = await refreshToken();
-            const newToken = refreshRes?.access_token;
-            if (newToken) {
-                const retryRes = await axiosJWT.post(`${process.env.REACT_APP_API_URL}/order/create`, data, {
-                    headers: {
-                        authorization: `Bearer ${newToken}`,
+        // Check tất cả possible 401 conditions
+        const is401 = error.response?.status === 401 ||
+            error.status === 401 ||
+            error.code === 'ERR_BAD_REQUEST' ||
+            (error.response?.data?.message && error.response.data.message.includes('authentication'))
+
+        if (is401) {
+            try {
+                const refreshRes = await refreshToken();
+                const newToken = refreshRes?.access_token;
+                if (newToken) {
+                    const retryRes = await axiosJWT.post(`${process.env.REACT_APP_API_URL}/order/create`, data, {
+                        headers: {
+                            authorization: `Bearer ${newToken}`,
+                        }
+                    })
+                    return {
+                        ...retryRes.data,
+                        newAccessToken: newToken // Trả về token mới để update Redux
                     }
-                })
-                return retryRes.data
+                }
+            } catch (refreshError) {
+                // Silent fail for refresh errors
             }
         }
         // Nếu không phải lỗi 401 hoặc refresh thất bại, trả về lỗi gốc
@@ -44,19 +61,29 @@ export const getAllOrdersByUser = async (userId, access_token) => {
                 authorization: `Bearer ${access_token}`,
             }
         })
-        return res.data
+        return {
+            ...res.data,
+            newAccessToken: null
+        }
     } catch (error) {
         // Nếu lỗi 401, tự động refresh token và retry
         if (error.response?.status === 401) {
-            const refreshRes = await refreshToken();
-            const newToken = refreshRes?.access_token;
-            if (newToken) {
-                const retryRes = await axiosJWT.get(`${process.env.REACT_APP_API_URL}/order/get-all-orders/${userId}`, {
-                    headers: {
-                        authorization: `Bearer ${newToken}`,
+            try {
+                const refreshRes = await refreshToken();
+                const newToken = refreshRes?.access_token;
+                if (newToken) {
+                    const retryRes = await axiosJWT.get(`${process.env.REACT_APP_API_URL}/order/get-all-orders/${userId}`, {
+                        headers: {
+                            authorization: `Bearer ${newToken}`,
+                        }
+                    })
+                    return {
+                        ...retryRes.data,
+                        newAccessToken: newToken
                     }
-                })
-                return retryRes.data
+                }
+            } catch (refreshError) {
+                // Silent fail for refresh errors
             }
         }
         // Nếu không phải lỗi 401 hoặc refresh thất bại, trả về lỗi gốc

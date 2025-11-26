@@ -29,7 +29,7 @@ const orderSchema = new mongoose.Schema({
         name: { type: String },
         email: { type: String }
     },
-    paymentMethod: { type: String, required: true, enum: ['cod', 'banking', 'credit'], default: 'cod' },
+    paymentMethod: { type: String, required: true, enum: ['cod', 'banking', 'credit', 'paypal'], default: 'cod' },
     totalAmount: { type: Number, required: true },
     voucher: {
         code: { type: String, default: null },
@@ -43,7 +43,7 @@ const orderSchema = new mongoose.Schema({
     orderStatus: {
         type: String,
         required: true,
-        enum: ['pending', 'confirmed', 'shipping', 'delivered', 'cancelled'],
+        enum: ['pending', 'paid', 'confirmed', 'shipping', 'delivered', 'cancelled'],
         default: 'pending'
     },
     paymentStatus: {
@@ -51,6 +51,14 @@ const orderSchema = new mongoose.Schema({
         required: true,
         enum: ['unpaid', 'paid', 'refunded'],
         default: 'unpaid'
+    },
+    paymentInfo: {
+        transactionId: { type: String, default: null },
+        paymentStatus: { type: String, default: null },
+        amount: { type: String, default: null },
+        currency: { type: String, default: null },
+        payer: { type: Object, default: null },
+        paymentTime: { type: String, default: null }
     },
     isDeletedByUser: { type: Boolean, default: false },
     user: {
