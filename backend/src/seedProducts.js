@@ -489,6 +489,466 @@ const sampleProducts = [
         discount: 8,
         selled: 30
     },
+    {
+    name: "iPhone 14 Pro 256GB (Tím Deep Purple)",
+    image: "https://images.pexels.com/photos/788946/pexels-photo-788946.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Phone",
+    price: 28990000,
+    countInStock: 55,
+    rating: 4.8,
+    description: "Chip A16 Bionic, Dynamic Island, camera 48MP ProRAW, màn hình Always-On.",
+    discount: 12,
+    selled: 180
+  },
+  {
+    name: "Samsung Galaxy S23 FE 256GB (Xanh Mint)",
+    image: "https://images.pexels.com/photos/1092644/pexels-photo-1092644.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Phone",
+    price: 14990000,
+    countInStock: 70,
+    rating: 4.6,
+    description: "Chip Exynos 2200, camera OIS 50MP, sạc nhanh 25W, màn hình 120Hz.",
+    discount: 15,
+    selled: 210
+  },
+  {
+    name: "Google Pixel 8 Pro 256GB (Xanh Bay)",
+    image: "https://images.pexels.com/photos/404280/pexels-photo-404280.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Phone",
+    price: 24990000,
+    countInStock: 40,
+    rating: 4.7,
+    description: "Google Tensor G3, nhiếp ảnh AI đỉnh cao, màn hình LTPO 120Hz.",
+    discount: 8,
+    selled: 95
+  },
+  {
+    name: "OnePlus 12 5G 512GB (Đen)",
+    image: "https://images.pexels.com/photos/699122/pexels-photo-699122.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Phone",
+    price: 22990000,
+    countInStock: 35,
+    rating: 4.7,
+    description: "Snapdragon 8 Gen 3, sạc siêu nhanh 100W, màn hình AMOLED ProXDR.",
+    discount: 10,
+    selled: 75
+  },
+  {
+    name: "Xiaomi 13T Pro 512GB (Xanh Alpine Blue)",
+    image: "https://images.pexels.com/photos/1092671/pexels-photo-1092671.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Phone",
+    price: 15990000,
+    countInStock: 60,
+    rating: 4.6,
+    description: "Camera Leica 50MP, sạc nhanh 120W, chip MediaTek Dimensity 9200+.",
+    discount: 12,
+    selled: 140
+  },
+  {
+    name: "OPPO Find N3 Flip 256GB (Hồng)",
+    image: "https://images.pexels.com/photos/163065/mobile-phone-android-apps-phone-163065.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Phone",
+    price: 22990000,
+    countInStock: 25,
+    rating: 4.8,
+    description: "Điện thoại gập vỏ sò, màn hình ngoài 3.26 inch, camera tele 32MP.",
+    discount: 7,
+    selled: 55
+  },
+  {
+    name: "Realme GT 5 Pro 256GB (Trắng)",
+    image: "https://images.pexels.com/photos/47261/pexels-photo-47261.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Phone",
+    price: 13990000,
+    countInStock: 50,
+    rating: 4.5,
+    description: "Snapdragon 8 Gen 3, màn hình cong AMOLED, sạc nhanh 100W.",
+    discount: 15,
+    selled: 120
+  },
+  {
+    name: "Nothing Phone (2) 256GB (Đen)",
+    image: "https://images.pexels.com/photos/1294886/pexels-photo-1294886.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Phone",
+    price: 14990000,
+    countInStock: 45,
+    rating: 4.6,
+    description: "Thiết kế Glyph Interface độc đáo, chip Snapdragon 8+ Gen 1, sạc không dây.",
+    discount: 10,
+    selled: 85
+  },
+  {
+    name: "Motorola Edge 40 Pro 256GB (Xanh)",
+    image: "https://images.pexels.com/photos/699122/pexels-photo-699122.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Phone",
+    price: 16990000,
+    countInStock: 38,
+    rating: 4.5,
+    description: "Snapdragon 8 Gen 2, màn hình cong 165Hz, sạc nhanh 125W.",
+    discount: 12,
+    selled: 65
+  },
+  {
+    name: "Asus ROG Phone 8 Pro 512GB (Đen)",
+    image: "https://images.pexels.com/photos/1092644/pexels-photo-1092644.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Phone",
+    price: 29990000,
+    countInStock: 20,
+    rating: 4.9,
+    description: "Gaming phone hàng đầu, Snapdragon 8 Gen 3, AirTriggers, tản nhiệt GameCool.",
+    discount: 5,
+    selled: 45
+  },
+
+  // ================================================
+  // 💻 LAPTOP - 10 sản phẩm
+  // ================================================
+  {
+    name: "Lenovo ThinkPad X1 Carbon Gen 11 (i7/16GB/512GB)",
+    image: "https://images.pexels.com/photos/18105/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=500",
+    type: "Laptop",
+    price: 42990000,
+    countInStock: 22,
+    rating: 4.8,
+    description: "Laptop doanh nhân cao cấp, nhẹ 1.12kg, bàn phím tốt nhất, pin 14 giờ.",
+    discount: 8,
+    selled: 48
+  },
+  {
+    name: "MSI Prestige 14 Evo (i5/16GB/512GB)",
+    image: "https://images.pexels.com/photos/238118/pexels-photo-238118.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Laptop",
+    price: 24990000,
+    countInStock: 35,
+    rating: 4.6,
+    description: "Ultrabook mỏng nhẹ, Intel Evo Platform, màn hình 2.8K 90Hz.",
+    discount: 10,
+    selled: 70
+  },
+  {
+    name: "Acer Swift X 14 (R7/RTX 4050)",
+    image: "https://images.pexels.com/photos/7974/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=500",
+    type: "Laptop",
+    price: 27990000,
+    countInStock: 28,
+    rating: 4.7,
+    description: "Laptop sáng tạo nội dung, GPU rời mạnh mẽ, màn hình OLED 2.8K.",
+    discount: 12,
+    selled: 55
+  },
+  {
+    name: "Razer Blade 15 Advanced (i7/RTX 4070)",
+    image: "https://images.pexels.com/photos/1229861/pexels-photo-1229861.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Laptop",
+    price: 58990000,
+    countInStock: 15,
+    rating: 4.9,
+    description: "Gaming laptop cao cấp, màn hình 240Hz QHD, thiết kế nhôm CNC.",
+    discount: 5,
+    selled: 32
+  },
+  {
+    name: "Microsoft Surface Laptop Studio 2 (i7/32GB/1TB)",
+    image: "https://images.pexels.com/photos/812264/pexels-photo-812264.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Laptop",
+    price: 62990000,
+    countInStock: 12,
+    rating: 4.8,
+    description: "Laptop 2-in-1 độc đáo, màn hình cảm ứng 120Hz, RTX 4060, hỗ trợ Surface Pen.",
+    discount: 7,
+    selled: 28
+  },
+  {
+    name: "LG Gram 17 (2024) (i7/16GB/512GB)",
+    image: "https://images.pexels.com/photos/261679/pexels-photo-261679.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Laptop",
+    price: 39990000,
+    countInStock: 20,
+    rating: 4.7,
+    description: "Màn hình 17 inch nhưng chỉ nặng 1.35kg, pin 20 giờ, chuẩn quân đội Mỹ.",
+    discount: 10,
+    selled: 42
+  },
+  {
+    name: "Gigabyte Aero 16 OLED (i9/RTX 4060)",
+    image: "https://images.pexels.com/photos/3987066/pexels-photo-3987066.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Laptop",
+    price: 52990000,
+    countInStock: 18,
+    rating: 4.8,
+    description: "Laptop cho creator, màn hình OLED 4K 100% DCI-P3, X-Rite Pantone.",
+    discount: 8,
+    selled: 35
+  },
+  {
+    name: "HP Omen 16 (2024) (i7/RTX 4060)",
+    image: "https://images.pexels.com/photos/1229861/pexels-photo-1229861.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Laptop",
+    price: 34990000,
+    countInStock: 30,
+    rating: 4.6,
+    description: "Gaming laptop tầm trung cao, màn hình 165Hz, tản nhiệt Omen Tempest.",
+    discount: 12,
+    selled: 65
+  },
+  {
+    name: "Samsung Galaxy Book3 Ultra (i7/RTX 4050)",
+    image: "https://images.pexels.com/photos/6830538/pexels-photo-6830538.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Laptop",
+    price: 44990000,
+    countInStock: 25,
+    rating: 4.7,
+    description: "Laptop cao cấp Samsung, màn hình 3K AMOLED, liên kết Samsung Galaxy.",
+    discount: 10,
+    selled: 38
+  },
+  {
+    name: "Framework Laptop 13 (i5/16GB/512GB)",
+    image: "https://images.pexels.com/photos/205421/pexels-photo-205421.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Laptop",
+    price: 29990000,
+    countInStock: 15,
+    rating: 4.8,
+    description: "Laptop module hóa, có thể tự nâng cấp và sửa chữa, thân thiện môi trường.",
+    discount: 5,
+    selled: 25
+  },
+
+  // ================================================
+  // 📟 TABLET - 5 sản phẩm
+  // ================================================
+  {
+    name: "iPad Pro 12.9-inch M2 (512GB)",
+    image: "https://images.pexels.com/photos/1334597/pexels-photo-1334597.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Tablet",
+    price: 39990000,
+    countInStock: 28,
+    rating: 4.9,
+    description: "Màn hình Liquid Retina XDR, chip M2 cực mạnh, hỗ trợ Apple Pencil hover.",
+    discount: 5,
+    selled: 85
+  },
+  {
+    name: "Samsung Galaxy Tab S9 Ultra 512GB (5G)",
+    image: "https://images.pexels.com/photos/1334597/pexels-photo-1334597.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Tablet",
+    price: 32990000,
+    countInStock: 22,
+    rating: 4.8,
+    description: "Màn hình khổng lồ 14.6 inch AMOLED, chip Snapdragon 8 Gen 2, kèm S Pen.",
+    discount: 8,
+    selled: 52
+  },
+  {
+    name: "Microsoft Surface Pro 9 (i7/16GB/256GB)",
+    image: "https://images.pexels.com/photos/5310587/pexels-photo-5310587.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Tablet",
+    price: 31990000,
+    countInStock: 30,
+    rating: 4.7,
+    description: "Tablet Windows 2-in-1, chạy được phần mềm desktop, hỗ trợ Surface Pen.",
+    discount: 10,
+    selled: 68
+  },
+  {
+    name: "Lenovo Tab P12 Pro 256GB",
+    image: "https://images.pexels.com/photos/4145153/pexels-photo-4145153.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Tablet",
+    price: 16990000,
+    countInStock: 40,
+    rating: 4.6,
+    description: "Màn hình AMOLED 12.6 inch 120Hz, 4 loa JBL, hỗ trợ Lenovo Precision Pen 3.",
+    discount: 12,
+    selled: 95
+  },
+  {
+    name: "Huawei MatePad Pro 13.2 256GB",
+    image: "https://images.pexels.com/photos/1334597/pexels-photo-1334597.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Tablet",
+    price: 24990000,
+    countInStock: 20,
+    rating: 4.7,
+    description: "Màn hình OLED 13.2 inch siêu lớn, hiệu năng mạnh mẽ, hỗ trợ M-Pencil Gen 3.",
+    discount: 8,
+    selled: 45
+  },
+
+  // ================================================
+  // ⌚ SMARTWATCH - 5 sản phẩm
+  // ================================================
+  {
+    name: "Apple Watch Ultra 2 (49mm GPS + Cellular)",
+    image: "https://images.pexels.com/photos/437037/pexels-photo-437037.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Watch",
+    price: 23990000,
+    countInStock: 25,
+    rating: 4.9,
+    description: "Đồng hồ thể thao cực đại, vỏ Titanium, pin 36 giờ, nút Action độc đáo.",
+    discount: 5,
+    selled: 55
+  },
+  {
+    name: "Samsung Galaxy Watch 6 Classic 47mm (LTE)",
+    image: "https://images.pexels.com/photos/393047/pexels-photo-393047.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Watch",
+    price: 12990000,
+    countInStock: 45,
+    rating: 4.7,
+    description: "Thiết kế viền xoay cổ điển, màn hình AMOLED sáng, theo dõi sức khỏe toàn diện.",
+    discount: 10,
+    selled: 120
+  },
+  {
+    name: "Garmin Forerunner 965 (AMOLED)",
+    image: "https://images.pexels.com/photos/277390/pexels-photo-277390.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Watch",
+    price: 18990000,
+    countInStock: 30,
+    rating: 4.8,
+    description: "Đồng hồ chạy bộ chuyên nghiệp, màn hình AMOLED, bản đồ chi tiết, pin 23 ngày.",
+    discount: 7,
+    selled: 65
+  },
+  {
+    name: "Huawei Watch GT 4 46mm",
+    image: "https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Watch",
+    price: 6990000,
+    countInStock: 60,
+    rating: 4.6,
+    description: "Thiết kế sang trọng, pin 14 ngày, theo dõi sức khỏe toàn diện, giá cả phải chăng.",
+    discount: 12,
+    selled: 140
+  },
+  {
+    name: "Amazfit GTR 4 New Version",
+    image: "https://images.pexels.com/photos/125779/pexels-photo-125779.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Watch",
+    price: 4490000,
+    countInStock: 80,
+    rating: 4.5,
+    description: "Màn hình AMOLED 1.43 inch, GPS kép, pin 14 ngày, hơn 150 chế độ thể thao.",
+    discount: 15,
+    selled: 200
+  },
+
+  // ================================================
+  // 🎧 TAI NGHE & LOA - 5 sản phẩm
+  // ================================================
+  {
+    name: "AirPods Pro 2 (USB-C)",
+    image: "https://images.pexels.com/photos/3825517/pexels-photo-3825517.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Headphone",
+    price: 6490000,
+    countInStock: 100,
+    rating: 4.8,
+    description: "Chip H2, khử tiếng ồn thích ứng, Spatial Audio, cổng USB-C.",
+    discount: 8,
+    selled: 250
+  },
+  {
+    name: "Sony WH-1000XM5",
+    image: "https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Headphone",
+    price: 8990000,
+    countInStock: 60,
+    rating: 4.9,
+    description: "Tai nghe over-ear khử ồn tốt nhất, 8 microphone, pin 30 giờ, chất âm Hi-Res.",
+    discount: 10,
+    selled: 180
+  },
+  {
+    name: "Bose QuietComfort Ultra Earbuds",
+    image: "https://images.pexels.com/photos/8000620/pexels-photo-8000620.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Headphone",
+    price: 7490000,
+    countInStock: 50,
+    rating: 4.7,
+    description: "Khử tiếng ồn đỉnh cao, Immersive Audio, vừa tai thoải mái, pin 6 giờ.",
+    discount: 12,
+    selled: 95
+  },
+  {
+    name: "Samsung Galaxy Buds2 Pro",
+    image: "https://images.pexels.com/photos/4226881/pexels-photo-4226881.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Headphone",
+    price: 4990000,
+    countInStock: 80,
+    rating: 4.6,
+    description: "Khử ồn chủ động, 360 Audio, kết nối Galaxy liền mạch, chống nước IPX7.",
+    discount: 15,
+    selled: 150
+  },
+  {
+    name: "JBL Charge 5 Portable Speaker",
+    image: "https://images.pexels.com/photos/1279105/pexels-photo-1279105.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "Speaker",
+    price: 4790000,
+    countInStock: 70,
+    rating: 4.7,
+    description: "Loa Bluetooth mạnh mẽ, chống nước IP67, pin 20 giờ, có thể làm powerbank.",
+    discount: 10,
+    selled: 180
+  },
+
+  // ================================================
+  // 📺 SMART TV - 5 sản phẩm
+  // ================================================
+  {
+    name: "Sony BRAVIA XR A95L OLED 4K 65 inch",
+    image: "https://images.pexels.com/photos/1201996/pexels-photo-1201996.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "TV",
+    price: 75990000,
+    countInStock: 5,
+    rating: 4.9,
+    description: "QD-OLED panel đỉnh cao, chip Cognitive XR, Acoustic Surface Audio+, Google TV.",
+    discount: 8,
+    selled: 12
+  },
+  {
+    name: "LG OLED evo C3 4K 55 inch",
+    image: "https://images.pexels.com/photos/1201996/pexels-photo-1201996.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "TV",
+    price: 32990000,
+    countInStock: 18,
+    rating: 4.8,
+    description: "OLED tự phát sáng, chip α9 Gen6 AI, 120Hz VRR cho gaming, webOS 23.",
+    discount: 12,
+    selled: 35
+  },
+  {
+    name: "Samsung Neo QLED QN90C 4K 65 inch",
+    image: "https://images.pexels.com/photos/2506947/pexels-photo-2506947.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "TV",
+    price: 42990000,
+    countInStock: 12,
+    rating: 4.7,
+    description: "Mini LED Quantum Matrix, Neural Quantum Processor 4K, Object Tracking Sound+.",
+    discount: 15,
+    selled: 28
+  },
+  {
+    name: "TCL C845 Mini LED 4K 65 inch",
+    image: "https://images.pexels.com/photos/1201996/pexels-photo-1201996.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "TV",
+    price: 22990000,
+    countInStock: 20,
+    rating: 4.6,
+    description: "Mini LED với 1344 vùng dimming, 144Hz VRR, Google TV, giá cả tốt.",
+    discount: 18,
+    selled: 45
+  },
+  {
+    name: "Xiaomi TV Q2 QLED 4K 55 inch",
+    image: "https://images.pexels.com/photos/1201996/pexels-photo-1201996.jpeg?auto=compress&cs=tinysrgb&w=500",
+    type: "TV",
+    price: 16990000,
+    countInStock: 25,
+    rating: 4.5,
+    description: "QLED Quantum Dot, 120Hz, Dolby Vision & Atmos, Google TV, thiết kế kim loại.",
+    discount: 15,
+    selled: 60
+  }
 ];
 
 const seedDatabase = async () => {
