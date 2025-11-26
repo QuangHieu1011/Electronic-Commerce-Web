@@ -39,13 +39,12 @@ const TypeProductPage = () => {
 
     let res = await ProductService.getAllProduct(search, limit, page, sort, filter);
 
-    // Chỉ lọc theo rating và price range ở frontend nếu có filters
-    // Nhưng giữ nguyên total từ backend để pagination hoạt động đúng
+    
     if (currentFilters && res.data) {
       let filteredData = [...res.data];
       let hasClientFilter = false;
 
-      // Lọc theo rating
+      
       if (currentFilters.rating && currentFilters.rating.length > 0) {
         filteredData = filteredData.filter(product => {
           return currentFilters.rating.some(rating => product.rating >= rating);

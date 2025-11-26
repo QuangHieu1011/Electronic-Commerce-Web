@@ -4,6 +4,7 @@ const userController = require('../controllers/UserController');
 const { authMiddleware, authUserMiddleware } = require("../middleware/authMiddleware");
 
 router.post('/sign-up', userController.createUser)
+router.post('/sign-up-otp', userController.createUserWithOTP)
 router.post('/sign-in', userController.loginUser)
 router.post('/log-out', userController.logoutUser)
 router.put('/update-user/:id', authUserMiddleware, userController.updateUser)
