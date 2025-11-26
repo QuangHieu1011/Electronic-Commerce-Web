@@ -377,6 +377,7 @@ const OrderTrackingPage = () => {
                                                         onConfirm={() => handleCancelOrder(order._id)}
                                                         okText="Có"
                                                         cancelText="Không"
+                                                        okButtonProps={{ danger: true, type: 'primary' }}
                                                     >
                                                         <Button size="small" danger>
                                                             Hủy đơn

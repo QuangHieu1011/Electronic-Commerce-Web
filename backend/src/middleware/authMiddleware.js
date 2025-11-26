@@ -29,7 +29,6 @@ const authMiddleware = (req, res, next) => {
     });
 }
 const authUserMiddleware = (req, res, next) => {
-    console.log('req.header', req.headers);
     const authHeader = req.headers.authorization;
     if (!authHeader) {
         return res.status(401).json({
@@ -38,7 +37,6 @@ const authUserMiddleware = (req, res, next) => {
         });
     }
     const token = authHeader.split(' ')[1];
-    const userId = req.params.id;
     jwt.verify(token, process.env.ACCESS_TOKEN, function (err, user) {
         if (err) {
             return res.status(401).json({
@@ -46,15 +44,8 @@ const authUserMiddleware = (req, res, next) => {
                 message: 'The authentication'
             });
         }
-        console.log('user', user);
-        if (user?.isAdmin || user?.id === userId) {
-            next();
-        } else {
-            return res.status(401).json({
-                status: 'ERROR',
-                message: 'The authentication'
-            });
-        }
+        req.user = user;
+        next();
     });
 }
 
@@ -86,7 +77,7 @@ const authAnyUserMiddleware = (req, res, next) => {
             });
         }
         console.log('Verified user:', user);
-        req.user = user; 
+        req.user = user;
         next();
     });
 }
