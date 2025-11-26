@@ -2,15 +2,15 @@
 import { createSlice, isPending } from '@reduxjs/toolkit'
 
 const initialState = {
-    name: '',
-    email: '',
-    phone: '',
-    address:'',
-    avatar: '',
-    access_token: '',
-    id: '',
-    isAdmin: false
-    
+  name: '',
+  email: '',
+  phone: '',
+  address: '',
+  avatar: '',
+  access_token: '',
+  id: '',
+  isAdmin: false
+
 }
 
 export const userSlide = createSlice({
@@ -18,15 +18,18 @@ export const userSlide = createSlice({
   initialState,
   reducers: {
     updateUser: (state, action) => {
-      const { name='', email='', access_token='', phone='', address='', avatar='', _id='', isAdmin } = action.payload
+      const { name = '', email = '', access_token = '', phone = '', address = '', avatar = '', _id = '', isAdmin } = action.payload
       state.name = name;
       state.email = email;
       state.phone = phone;
       state.address = address;
       state.avatar = avatar;
-      state.id=_id;
+      state.id = _id;
       state.access_token = access_token;
-      state.isAdmin = isAdmin;  
+      state.isAdmin = isAdmin;
+    },
+    updateAccessToken: (state, action) => {
+      state.access_token = action.payload;
     },
     resetUser: (state) => {
       state.name = '';
@@ -34,7 +37,7 @@ export const userSlide = createSlice({
       state.phone = '';
       state.address = '';
       state.avatar = '';
-      state.id= '';
+      state.id = '';
       state.access_token = '';
       state.isAdmin = false;
     },
@@ -42,6 +45,6 @@ export const userSlide = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { updateUser, resetUser } = userSlide.actions
+export const { updateUser, updateAccessToken, resetUser } = userSlide.actions
 
 export default userSlide.reducer

@@ -5,6 +5,7 @@ import HomePage from "../pages/HomePage/HomePage";
 import NotFoundPage from "../pages/NotFoundPage/NotFoundPage";
 import OrderPage from "../pages/OrderPage/OrderPage";
 import OrderTrackingPage from "../pages/OrderTrackingPage/OrderTrackingPage";
+import PaymentSuccess from "../pages/PaymentSuccess/PaymentSuccess";
 import ProductDetailsPage from "../pages/ProductDetailsPage/ProductDetailsPage";
 import ProductsPage from "../pages/ProductsPage/ProductsPage";
 import ProfilePage from "../pages/Profile/ProfilePage";
@@ -26,6 +27,11 @@ export const routes = [
     {
         path: "/checkout",
         page: CheckoutPage,
+        isShowHeader: true
+    },
+    {
+        path: "/payment-success",
+        page: PaymentSuccess,
         isShowHeader: true
     },
     {

@@ -18,8 +18,9 @@ import {
     FilterOutlined
 } from '@ant-design/icons'
 import { useSelector, useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { cancelOrder, syncOrdersFromAPI, clearOrders, updateOrderStatus, updatePaymentStatus } from '../../redux/slides/orderSlice'
+import { updateAccessToken } from '../../redux/slides/userSlide'
 import { message } from 'antd'
 import * as OrderService from '../../service/OrderService'
 import socketService from '../../service/SocketService'
@@ -35,6 +36,7 @@ const OrderTrackingPage = () => {
     const user = useSelector((state) => state.user)
     const dispatch = useDispatch()
     const navigate = useNavigate()
+    const location = useLocation()
 
     // Calculate discounted price
     const calculateDiscountedPrice = (product) => {
@@ -53,9 +55,20 @@ const OrderTrackingPage = () => {
                 // Clear existing orders để tránh conflict với admin orders
                 dispatch(clearOrders())
                 const response = await OrderService.getAllOrdersByUser(user.id || user._id, user.access_token)
+
+                // Nếu có token mới từ refresh, update Redux
+                if (response.newAccessToken) {
+                    console.log('Updating access token in Redux...')
+                    dispatch(updateAccessToken(response.newAccessToken))
+                }
+
                 if (response.status === 'OK') {
-                    console.log('User orders loaded:', response.data?.length)
+                    console.log('=== ORDERS LOADED ===')
+                    console.log('Orders count:', response.data?.length)
+                    console.log('Orders data:', response.data)
                     dispatch(syncOrdersFromAPI(response.data))
+                } else {
+                    console.log('Failed to load orders:', response)
                 }
             } catch (error) {
                 console.error('Error loading orders:', error)
@@ -82,6 +95,30 @@ const OrderTrackingPage = () => {
 
         loadUserOrders()
     }, [user?.access_token, navigate, loadUserOrders])
+
+    // Auto refresh khi có order mới từ checkout và khi vào lại trang
+    useEffect(() => {
+        // Force reload khi có state từ navigation
+        if (location.state?.forceReload && location.state?.newOrderId) {
+            console.log('Force reloading orders for new order:', location.state.newOrderId)
+            setTimeout(() => {
+                loadUserOrders()
+            }, 500)
+
+            // Clear state để tránh reload nhiều lần
+            navigate('/order-tracking', { replace: true })
+            return
+        }
+
+        // Auto refresh mỗi khi vào trang (để catch orders mới)
+        const timer = setTimeout(() => {
+            if (user?.access_token) {
+                loadUserOrders()
+            }
+        }, 300)
+
+        return () => clearTimeout(timer)
+    }, [location.state, loadUserOrders, navigate, user?.access_token])
 
     // Force reload when tab becomes visible (for multi-tab support)
     useEffect(() => {
@@ -155,6 +192,7 @@ const OrderTrackingPage = () => {
     const getOrderStatusInfo = (status) => {
         const statusMap = {
             'pending': { color: 'orange', text: 'Chờ xác nhận', icon: <ClockCircleOutlined /> },
+            'paid': { color: 'green', text: 'Đã thanh toán', icon: <CheckCircleOutlined /> },
             'confirmed': { color: 'blue', text: 'Đã xác nhận', icon: <CheckCircleOutlined /> },
             'shipping': { color: 'cyan', text: 'Đang giao hàng', icon: <TruckOutlined /> },
             'delivered': { color: 'green', text: 'Đã giao hàng', icon: <CheckCircleOutlined /> },
@@ -283,6 +321,7 @@ const OrderTrackingPage = () => {
                         >
                             <Option value="all">Tất cả trạng thái</Option>
                             <Option value="pending">Chờ xác nhận</Option>
+                            <Option value="paid">Đã thanh toán</Option>
                             <Option value="confirmed">Đã xác nhận</Option>
                             <Option value="shipping">Đang giao hàng</Option>
                             <Option value="delivered">Đã giao hàng</Option>
@@ -339,7 +378,7 @@ const OrderTrackingPage = () => {
                                             </div>
 
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                                {/* Users can only cancel pending orders */}
+                                                {/* Users can only cancel pending orders (not paid orders) */}
                                                 {order.orderStatus === 'pending' && (
                                                     <Popconfirm
                                                         title="Bạn có chắc muốn hủy đơn hàng này?"
@@ -432,12 +471,25 @@ const OrderTrackingPage = () => {
                                             borderTop: '2px solid #f0f0f0'
                                         }}>
                                             <div style={{ fontSize: '13px', color: '#666' }}>
-                                                <div>Phương thức: {order.paymentMethod === 'cod' ? 'COD' : order.paymentMethod === 'banking' ? 'Chuyển khoản' : 'Thẻ tín dụng'}</div>
+                                                <div>Phương thức: {
+                                                    order.paymentMethod === 'cod' ? 'COD' :
+                                                        order.paymentMethod === 'paypal' ? 'PayPal' :
+                                                            order.paymentMethod === 'banking' ? 'Chuyển khoản' :
+                                                                'Thẻ tín dụng'
+                                                }</div>
                                                 <div>Trạng thái thanh toán:
-                                                    <Tag color={order.paymentStatus === 'paid' ? 'green' : 'orange'} style={{ marginLeft: '8px' }}>
-                                                        {order.paymentStatus === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán'}
+                                                    <Tag color={order.orderStatus === 'paid' || order.paymentStatus === 'paid' ? 'green' : 'orange'} style={{ marginLeft: '8px' }}>
+                                                        {order.orderStatus === 'paid' || order.paymentStatus === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán'}
                                                     </Tag>
                                                 </div>
+                                                {order.paymentInfo?.transactionId && (
+                                                    <div style={{ marginTop: '4px' }}>
+                                                        Transaction ID:
+                                                        <code style={{ marginLeft: '4px', fontSize: '11px', backgroundColor: '#f5f5f5', padding: '2px 4px', borderRadius: '2px' }}>
+                                                            {order.paymentInfo.transactionId}
+                                                        </code>
+                                                    </div>
+                                                )}
                                             </div>
                                             <div style={{ textAlign: 'right' }}>
                                                 <div style={{ fontSize: '16px', fontWeight: '600', color: '#ff4d4f' }}>

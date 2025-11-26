@@ -13,13 +13,10 @@ import {
     message,
     Space,
     Typography,
-    Tag,
     Modal
 } from 'antd'
 import {
     ArrowLeftOutlined,
-    CreditCardOutlined,
-    BankOutlined,
     WalletOutlined,
     CheckCircleOutlined,
     GiftOutlined,
@@ -29,9 +26,9 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { createOrder } from '../../redux/slides/orderSlice'
 import { removeFromCart } from '../../redux/slides/cartSlice'
+import { updateAccessToken } from '../../redux/slides/userSlide'
 import * as OrderService from '../../service/OrderService'
-import BankingPaymentModal from '../../components/PaymentModal/BankingPaymentModal'
-import CreditCardPaymentModal from '../../components/PaymentModal/CreditCardPaymentModal'
+import PayPalPaymentModal from '../../components/PaymentModal/PayPalPaymentModal'
 import VoucherModal from '../../components/PaymentModal/VoucherModal'
 import {
     WrapperContainer,
@@ -41,15 +38,14 @@ import {
     WrapperSummary
 } from './style'
 
-const { Title, Text } = Typography
+const { Title } = Typography
 const { Option } = Select
 
 const CheckoutPage = () => {
     const [form] = Form.useForm()
     const [paymentMethod, setPaymentMethod] = useState('cod')
     const [loading, setLoading] = useState(false)
-    const [showBankingModal, setShowBankingModal] = useState(false)
-    const [showCreditModal, setShowCreditModal] = useState(false)
+    const [showPayPalModal, setShowPayPalModal] = useState(false)
     const [showVoucherModal, setShowVoucherModal] = useState(false)
     const [appliedVoucher, setAppliedVoucher] = useState(null)
     const [shippingFee, setShippingFee] = useState(30000)
@@ -114,6 +110,15 @@ const CheckoutPage = () => {
         }
     }, [form])
 
+    // Tự động mở PayPal modal khi chọn PayPal
+    useEffect(() => {
+        if (paymentMethod === 'paypal') {
+            setShowPayPalModal(true)
+        } else {
+            setShowPayPalModal(false)
+        }
+    }, [paymentMethod])
+
     // Tính tổng tiền sau khi áp voucher
     const calculateFinalAmount = useMemo(() => {
         let total = totalAmount + shippingFee
@@ -150,32 +155,60 @@ const CheckoutPage = () => {
         message.info('Đã xóa voucher')
     }
 
-    // Xử lý thanh toán thành công từ modal
-    const handlePaymentSuccess = async (values) => {
-        await processOrder(values)
+    // Xử lý thanh toán thành công từ PayPal
+    const handlePaymentSuccess = async (paymentData) => {
+        console.log('PayPal Payment Success:', paymentData)
+
+        // Lấy thông tin form hiện tại
+        const formValues = form.getFieldsValue()
+
+        // Tạo order data với thông tin PayPal
+        const orderData = {
+            orderItems: selectedProducts,
+            userInfo: user,
+            totalAmount: totalAmount,
+            shippingFee: shippingFee,
+            finalAmount: calculateFinalAmount,
+            voucher: appliedVoucher ? {
+                code: appliedVoucher.code,
+                title: appliedVoucher.title,
+                discountType: appliedVoucher.discountType,
+                discountValue: appliedVoucher.discountValue,
+                appliedDiscount: appliedVoucher.appliedDiscount
+            } : null,
+            shippingInfo: {
+                fullName: formValues.fullName,
+                phone: formValues.phone,
+                address: formValues.address,
+                ward: formValues.ward,
+                district: formValues.district,
+                province: formValues.province,
+                note: formValues.note || ''
+            },
+            paymentMethod: 'paypal',
+            paymentInfo: {
+                transactionId: paymentData.transactionId,
+                paymentStatus: paymentData.paymentStatus,
+                amount: paymentData.amount,
+                currency: paymentData.currency,
+                payer: paymentData.payer,
+                paymentTime: paymentData.paymentTime
+            },
+            orderStatus: 'paid' // PayPal đã thanh toán thành công
+        }
+
+        await processOrder(orderData, true) // true = đã thanh toán
     }
 
     // Xử lý khi hoàn tất đơn hàng
     const handleFinishOrder = async (values) => {
-        // Nếu chọn banking hoặc credit card, hiển thị modal thanh toán
-        if (paymentMethod === 'banking') {
-            setShowBankingModal(true)
-            return
-        } else if (paymentMethod === 'credit') {
-            setShowCreditModal(true)
-            return
-        }
+        // Kiểm tra nếu có PayPal payment data từ localStorage
+        const paypalData = localStorage.getItem('paypalPaymentData')
 
-        // COD - xử lý trực tiếp
-        await processOrder(values)
-    }
+        if (paymentMethod === 'paypal' && paypalData) {
+            // PayPal đã thanh toán, tạo order với trạng thái đã thanh toán
+            const paypalInfo = JSON.parse(paypalData)
 
-    // Xử lý đơn hàng
-    const processOrder = async (values) => {
-        setLoading(true)
-
-        try {
-            // Tạo đơn hàng
             const orderData = {
                 orderItems: selectedProducts,
                 userInfo: user,
@@ -198,7 +231,68 @@ const CheckoutPage = () => {
                     province: values.province || form.getFieldValue('province'),
                     note: values.note || form.getFieldValue('note') || ''
                 },
-                paymentMethod: paymentMethod
+                paymentMethod: 'paypal',
+                orderStatus: 'paid', // Đã thanh toán PayPal
+                paymentInfo: {
+                    transactionId: paypalInfo.transactionId,
+                    paymentStatus: paypalInfo.paymentStatus,
+                    amount: paypalInfo.amount,
+                    currency: paypalInfo.currency,
+                    payer: paypalInfo.payer,
+                    paymentTime: paypalInfo.paymentTime
+                }
+            }
+
+            // Xóa PayPal data khỏi localStorage
+            localStorage.removeItem('paypalPaymentData')
+
+            // Tạo order với trạng thái đã thanh toán
+            await processOrder(orderData, true)
+            return
+        }
+
+        // COD - xử lý trực tiếp
+        await processOrder(values)
+    }
+
+    // Xử lý đơn hàng
+    const processOrder = async (orderDataOrValues, isPaid = false) => {
+        setLoading(true)
+        let orderData
+
+        try {
+
+            // Nếu đã có orderData (từ PayPal), dùng luôn
+            if (orderDataOrValues.orderItems) {
+                orderData = orderDataOrValues
+            } else {
+                // Nếu chỉ có form values (COD), tạo orderData mới
+                const values = orderDataOrValues
+                orderData = {
+                    orderItems: selectedProducts,
+                    userInfo: user,
+                    totalAmount: totalAmount,
+                    shippingFee: shippingFee,
+                    finalAmount: calculateFinalAmount,
+                    voucher: appliedVoucher ? {
+                        code: appliedVoucher.code,
+                        title: appliedVoucher.title,
+                        discountType: appliedVoucher.discountType,
+                        discountValue: appliedVoucher.discountValue,
+                        appliedDiscount: appliedVoucher.appliedDiscount
+                    } : null,
+                    shippingInfo: {
+                        fullName: values.fullName || form.getFieldValue('fullName'),
+                        phone: values.phone || form.getFieldValue('phone'),
+                        address: values.address || form.getFieldValue('address'),
+                        ward: values.ward || form.getFieldValue('ward'),
+                        district: values.district || form.getFieldValue('district'),
+                        province: values.province || form.getFieldValue('province'),
+                        note: values.note || form.getFieldValue('note') || ''
+                    },
+                    paymentMethod: paymentMethod,
+                    orderStatus: 'pending' // COD chưa thanh toán
+                }
             }
 
             console.log('Sending order data:', orderData)
@@ -208,16 +302,41 @@ const CheckoutPage = () => {
 
             // Gọi API để lưu vào database
             if (user?.access_token) {
+                console.log('=== CREATING ORDER ===')
+                console.log('Order data being sent:', JSON.stringify(orderData, null, 2))
+                console.log('User ID:', user?.id)
+                console.log('Access token exists:', !!user?.access_token)
+
                 const response = await OrderService.createOrder(orderData, user.access_token)
-                console.log('API response:', response)
+                console.log('=== API RESPONSE ===')
+                console.log('Full response:', response)
+                console.log('Response status:', response?.status)
+                console.log('Response data:', response?.data)
+
+                // Nếu có token mới từ refresh, update Redux
+                if (response.newAccessToken) {
+                    console.log('Updating access token in Redux...')
+                    dispatch(updateAccessToken(response.newAccessToken))
+                }
 
                 if (response.status === 'OK') {
                     // Đóng modal nếu có
-                    setShowBankingModal(false)
-                    setShowCreditModal(false)
+                    setShowPayPalModal(false)
 
-                    // Cũng lưu vào Redux để sync UI ngay lập tức
-                    dispatch(createOrder(orderData))
+                    // Thông báo thành công
+                    if (isPaid) {
+                        message.success('Đặt hàng và thanh toán PayPal thành công!')
+                    } else {
+                        message.success('Đặt hàng thành công!')
+                    }
+
+                    // Lưu order vào Redux với dữ liệu từ server (có _id)
+                    const orderWithId = {
+                        ...orderData,
+                        _id: response.data._id,
+                        createdAt: response.data.createdAt || new Date().toISOString()
+                    }
+                    dispatch(createOrder(orderWithId))
 
                     // Xóa sản phẩm đã mua khỏi giỏ hàng
                     selectedProducts.forEach(item => {
@@ -225,19 +344,22 @@ const CheckoutPage = () => {
                     })
 
                     // Hiển thị thông báo thành công
-                    message.success({
-                        content: `🎉 Đặt hàng thành công! Mã đơn hàng: #${response.data?._id?.slice(-8).toUpperCase()}`,
-                        duration: 2,
-                        onClose: () => {
-                            // Chuyển hướng đến trang theo dõi đơn hàng
-                            navigate('/order-tracking')
-                        }
-                    })
-                    
-                    // Chuyển hướng ngay lập tức sau 1 giây
+                    const orderCode = response.data?._id?.slice(-8).toUpperCase() || 'N/A'
+                    const successMessage = isPaid
+                        ? `🎉 Thanh toán PayPal và đặt hàng thành công! Mã đơn hàng: #${orderCode}`
+                        : `🎉 Đặt hàng thành công! Mã đơn hàng: #${orderCode}`
+
+                    message.success(successMessage, 2)
+
+                    // Chuyển hướng ngay lập tức với state để force reload
                     setTimeout(() => {
-                        navigate('/order-tracking')
-                    }, 1000)
+                        navigate('/order-tracking', {
+                            state: {
+                                newOrderId: response.data._id,
+                                forceReload: true
+                            }
+                        })
+                    }, 1500)
                 } else {
                     throw new Error(response.message || 'Lỗi từ server')
                 }
@@ -253,7 +375,23 @@ const CheckoutPage = () => {
 
         } catch (error) {
             console.error('Order creation error:', error)
-            message.error('Có lỗi xảy ra khi đặt hàng: ' + (error.response?.data?.message || error.message))
+
+            // Nếu là PayPal đã thanh toán thành công, vẫn chuyển trang
+            if (isPaid && orderData) {
+                message.warning('PayPal thanh toán thành công nhưng có lỗi lưu order. Vui lòng liên hệ hỗ trợ.')
+
+                // Vẫn lưu local và chuyển trang
+                dispatch(createOrder(orderData))
+                selectedProducts.forEach(item => {
+                    dispatch(removeFromCart({ productId: item.product._id }))
+                })
+
+                setTimeout(() => {
+                    navigate('/order-tracking')
+                }, 1000)
+            } else {
+                message.error('Có lỗi xảy ra khi đặt hàng: ' + (error.response?.data?.message || error.message))
+            }
         } finally {
             setLoading(false)
         }
@@ -336,7 +474,7 @@ const CheckoutPage = () => {
                                             name="province"
                                             rules={[{ required: true, message: 'Vui lòng chọn tỉnh/thành phố!' }]}
                                         >
-                                            <Select 
+                                            <Select
                                                 placeholder="Chọn tỉnh/thành phố"
                                                 onChange={(value) => {
                                                     if (value === 'Hồ Chí Minh' || value === 'Hà Nội') {
@@ -416,31 +554,22 @@ const CheckoutPage = () => {
 
                                         <Card
                                             hoverable
-                                            className={paymentMethod === 'banking' ? 'selected' : ''}
-                                            onClick={() => setPaymentMethod('banking')}
+                                            className={paymentMethod === 'paypal' ? 'selected' : ''}
+                                            onClick={() => setPaymentMethod('paypal')}
                                         >
-                                            <Radio value="banking">
+                                            <Radio value="paypal">
                                                 <Space>
-                                                    <BankOutlined style={{ fontSize: 20, color: '#1890ff' }} />
-                                                    <div>
-                                                        <div style={{ fontWeight: 600 }}>Chuyển khoản ngân hàng</div>
-                                                        <div style={{ fontSize: 12, color: '#666' }}>Chuyển khoản qua ATM, Internet Banking</div>
+                                                    <div style={{
+                                                        fontSize: 20,
+                                                        color: '#0070ba',
+                                                        fontWeight: 'bold',
+                                                        fontFamily: 'Helvetica'
+                                                    }}>
+                                                        PayPal
                                                     </div>
-                                                </Space>
-                                            </Radio>
-                                        </Card>
-
-                                        <Card
-                                            hoverable
-                                            className={paymentMethod === 'credit' ? 'selected' : ''}
-                                            onClick={() => setPaymentMethod('credit')}
-                                        >
-                                            <Radio value="credit">
-                                                <Space>
-                                                    <CreditCardOutlined style={{ fontSize: 20, color: '#722ed1' }} />
                                                     <div>
-                                                        <div style={{ fontWeight: 600 }}>Thanh toán bằng thẻ</div>
-                                                        <div style={{ fontSize: 12, color: '#666' }}>Visa, MasterCard, JCB</div>
+                                                        <div style={{ fontWeight: 600 }}>Thanh toán PayPal</div>
+                                                        <div style={{ fontSize: 12, color: '#666' }}>Thẻ tín dụng, thẻ ghi nợ, PayPal Balance</div>
                                                     </div>
                                                 </Space>
                                             </Radio>
@@ -513,9 +642,9 @@ const CheckoutPage = () => {
                             {/* Mã giảm giá */}
                             <div style={{ marginBottom: 16 }}>
                                 {appliedVoucher ? (
-                                    <div style={{ 
-                                        padding: 12, 
-                                        background: '#fff7e6', 
+                                    <div style={{
+                                        padding: 12,
+                                        background: '#fff7e6',
                                         border: '1px solid #ffd591',
                                         borderRadius: 8,
                                         display: 'flex',
@@ -603,18 +732,12 @@ const CheckoutPage = () => {
             </WrapperContent>
 
             {/* Modals */}
-            <BankingPaymentModal
-                visible={showBankingModal}
-                onClose={() => setShowBankingModal(false)}
+            <PayPalPaymentModal
+                visible={showPayPalModal}
+                onClose={() => setShowPayPalModal(false)}
                 onSuccess={handlePaymentSuccess}
-                orderData={{ totalAmount: calculateFinalAmount }}
-            />
-
-            <CreditCardPaymentModal
-                visible={showCreditModal}
-                onClose={() => setShowCreditModal(false)}
-                onSuccess={handlePaymentSuccess}
-                orderData={{ totalAmount: calculateFinalAmount }}
+                orderData={{ orderId: `ORDER_${Date.now()}`, totalAmount: calculateFinalAmount }}
+                amount={calculateFinalAmount}
             />
 
             <VoucherModal
