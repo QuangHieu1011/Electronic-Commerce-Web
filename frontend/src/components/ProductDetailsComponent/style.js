@@ -40,44 +40,54 @@ export const WrapperContainerImage = styled.div`
 `;
 
 export const WrapperListImage = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 12px; 
-  padding: 16px 0;
-  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px; 
+  padding: 20px 8px;
+  margin-top: 20px;
   border-radius: 8px;
-  flex-wrap: wrap;
 
   @media (max-width: 768px) {
-    gap: 8px;
-    padding: 12px 0;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 12px 4px;
   }
 `;
 
-export const WrapperStyleColImage = styled(Col)`
+export const WrapperStyleColImage = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #f8f8f8;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    background: #fff;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
+  }
 `;
 
 export const WrapperStyleImageSmall = styled(Image)`
-  width: 80px;
-  height: 80px;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 2px solid transparent;
 
-  &:hover {
-    border-color: #1890ff;
-    transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+  img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
   }
 
   @media (max-width: 768px) {
-    width: 64px;
-    height: 64px;
+    border-radius: 6px;
   }
 `;
 
