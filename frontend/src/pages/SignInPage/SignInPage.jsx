@@ -11,6 +11,7 @@ import Loading from '../../components/LoadingComponent/Loading'
 import { jwtDecode } from 'jwt-decode';
 import { useDispatch } from 'react-redux'
 import { updateUser } from '../../redux/slides/userSlide'
+import ResetPasswordModal from '../../components/ResetPasswordModal/ResetPasswordModal'
 
 
 
@@ -20,6 +21,7 @@ const SignInPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
+  const [showResetModal, setShowResetModal] = useState(false);
   const dispatch = useDispatch();
 
   const navigate = useNavigate();
@@ -141,7 +143,12 @@ const SignInPage = () => {
             </Button>
           </Loading>
 
-          <WrapperTextLight> Quên mật khẩu?</WrapperTextLight>
+          <WrapperTextLight
+            onClick={() => setShowResetModal(true)}
+            style={{ cursor: 'pointer', textDecoration: 'underline' }}
+          >
+            Quên mật khẩu?
+          </WrapperTextLight>
           <WrapperP> Chưa có tài khoản? <WrapperTextLight onClick={handleNavigateSignup} style={{ cursor: 'pointer' }}> Tạo tài khoản </WrapperTextLight></WrapperP>
         </WrapperContainerLeft>
         <WrapperContainerRight>
@@ -149,6 +156,16 @@ const SignInPage = () => {
           <WrapperH4>Mua sắm tại TechStore</WrapperH4>
         </WrapperContainerRight>
       </div>
+
+      {/* Reset Password Modal */}
+      <ResetPasswordModal
+        visible={showResetModal}
+        onClose={() => setShowResetModal(false)}
+        onSuccess={() => {
+          setShowResetModal(false);
+          // Có thể thêm thông báo thành công ở đây
+        }}
+      />
     </div>
   )
 }

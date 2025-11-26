@@ -186,7 +186,7 @@ const deleteMany = async (req, res) => {
 const getChatbotToken = async (req, res) => {
     try {
         const userId = req.userId; // From authUserMiddleware
-        
+
         if (!userId) {
             return res.status(401).json({
                 status: 'ERR',
@@ -203,8 +203,50 @@ const getChatbotToken = async (req, res) => {
         });
     }
 };
+
+// Đăng ký với xác thực OTP
+const createUserWithOTP = async (req, res) => {
+    try {
+        const body = req.body || {};
+        const { name, email, password, confirmPassword, phone, isOTPVerified } = body;
+        const reg = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
+        const isCheckEmail = email ? reg.test(email) : false;
+
+        if (!email || !password || !confirmPassword) {
+            return res.status(400).json({
+                status: 'ERR',
+                message: 'Tất cả thông tin là bắt buộc'
+            });
+        } else if (!isCheckEmail) {
+            return res.status(400).json({
+                status: 'ERR',
+                message: 'Email không hợp lệ'
+            });
+        } else if (password !== confirmPassword) {
+            return res.status(400).json({
+                status: 'ERR',
+                message: 'Mật khẩu và xác nhận mật khẩu phải giống nhau'
+            });
+        } else if (!isOTPVerified) {
+            return res.status(400).json({
+                status: 'ERR',
+                message: 'Vui lòng xác thực OTP trước khi đăng ký'
+            });
+        }
+
+        const response = await UserService.createUser(body);
+        return res.status(200).json(response);
+    } catch (e) {
+        return res.status(500).json({
+            status: 'ERR',
+            message: e.message || e
+        });
+    }
+};
+
 module.exports = {
     createUser,
+    createUserWithOTP,
     loginUser,
     updateUser,
     deleteUser,

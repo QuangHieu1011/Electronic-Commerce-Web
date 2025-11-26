@@ -3,7 +3,7 @@ import { Col } from "antd";
 
 export const WrapperContainer = styled.div`
   padding: 0 120px;
-  background: #efefef;
+  background: #efefef !important;
   min-height: 100vh;
   
   @media (max-width: 768px) {
