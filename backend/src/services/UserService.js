@@ -178,7 +178,6 @@ const deleteManyUser = (ids) => {
         }
     });
 };
-
 const getChatbotToken = (userId) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -231,4 +230,4 @@ module.exports = {
     getDetailsUser,
     deleteManyUser,
     getChatbotToken
-};
+}

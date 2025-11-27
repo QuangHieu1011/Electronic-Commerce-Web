@@ -9,8 +9,9 @@ const initialState = {
   avatar: '',
   access_token: '',
   id: '',
-  isAdmin: false
-
+  isAdmin: false,
+  loyaltyDiscountEligible: false,
+  orderCount: 0
 }
 
 export const userSlide = createSlice({
@@ -18,7 +19,18 @@ export const userSlide = createSlice({
   initialState,
   reducers: {
     updateUser: (state, action) => {
-      const { name = '', email = '', access_token = '', phone = '', address = '', avatar = '', _id = '', isAdmin } = action.payload
+      const {
+        name = '',
+        email = '',
+        access_token = '',
+        phone = '',
+        address = '',
+        avatar = '',
+        _id = '',
+        isAdmin,
+        loyaltyDiscountEligible = false,
+        orderCount = 0
+      } = action.payload;
       state.name = name;
       state.email = email;
       state.phone = phone;
@@ -27,6 +39,8 @@ export const userSlide = createSlice({
       state.id = _id;
       state.access_token = access_token;
       state.isAdmin = isAdmin;
+      state.loyaltyDiscountEligible = loyaltyDiscountEligible;
+      state.orderCount = orderCount;
     },
     updateAccessToken: (state, action) => {
       state.access_token = action.payload;
@@ -40,6 +54,8 @@ export const userSlide = createSlice({
       state.id = '';
       state.access_token = '';
       state.isAdmin = false;
+      state.loyaltyDiscountEligible = false;
+      state.orderCount = 0;
     },
   },
 })

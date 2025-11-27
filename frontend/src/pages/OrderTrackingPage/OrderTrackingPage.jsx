@@ -494,8 +494,13 @@ const OrderTrackingPage = () => {
                                             </div>
                                             <div style={{ textAlign: 'right' }}>
                                                 <div style={{ fontSize: '16px', fontWeight: '600', color: '#ff4d4f' }}>
-                                                    Tổng tiền: {formatPrice(order.totalAmount)}
+                                                    Tổng tiền: {formatPrice(order.finalAmount ?? order.totalAmount)}
                                                 </div>
+                                                {order.voucher?.appliedDiscount > 0 && (
+                                                    <div style={{ fontSize: '12px', color: '#1890ff' }}>
+                                                        (Đã tiết kiệm {formatPrice(order.voucher.appliedDiscount)})
+                                                    </div>
+                                                )}
                                                 <div style={{ fontSize: '12px', color: '#666' }}>
                                                     (Đã bao gồm phí vận chuyển)
                                                 </div>
