@@ -7,6 +7,9 @@ import productReducer from './slides/productSlide'
 import userReducer from './slides/userSlide'
 import cartReducer from './slides/cartSlice'
 import orderReducer from './slides/orderSlice'
+import comparisonReducer from './slides/comparisonSlice'
+import wishlistReducer from './slides/wishlistSlice'
+import recentlyViewedReducer from './slides/recentlyViewedSlice'
 
 // Persist config
 const persistConfig = {
@@ -20,7 +23,10 @@ const rootReducer = combineReducers({
   product: productReducer,
   user: userReducer,
   cart: cartReducer,
-  order: orderReducer
+  order: orderReducer,
+  comparison: comparisonReducer,
+  wishlist: wishlistReducer,
+  recentlyViewed: recentlyViewedReducer
 })
 
 // Create persisted reducer

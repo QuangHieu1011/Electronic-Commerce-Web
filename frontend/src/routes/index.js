@@ -12,6 +12,8 @@ import ProfilePage from "../pages/Profile/ProfilePage";
 import SignInPage from "../pages/SignInPage/SignInPage";
 import SignUpPage from "../pages/SignUpPage/SignUpPage";
 import TypeProductPage from "../pages/TypeProductPage/TypeProductPage";
+import ComparisonPage from "../pages/ComparisonPage/ComparisonPage";
+import WishlistPage from "../pages/WishlistPage/WishlistPage";
 
 export const routes = [
     {
@@ -37,6 +39,16 @@ export const routes = [
     {
         path: "/order-tracking",
         page: OrderTrackingPage,
+        isShowHeader: true
+    },
+    {
+        path: "/comparison",
+        page: ComparisonPage,
+        isShowHeader: true
+    },
+    {
+        path: "/wishlist",
+        page: WishlistPage,
         isShowHeader: true
     },
     {

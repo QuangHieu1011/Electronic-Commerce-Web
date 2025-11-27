@@ -5,7 +5,9 @@ import Search from 'antd/es/transfer/search';
 import {
   UserOutlined,
   CaretDownOutlined,
-  ShoppingCartOutlined
+  ShoppingCartOutlined,
+  HeartOutlined,
+  SwapOutlined
 } from '@ant-design/icons';
 import ButtonInputSearch from '../ButtonInputSearch/ButtonInputSearch';
 import { useNavigate } from 'react-router-dom';
@@ -24,6 +26,8 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
   const cart = useSelector((state) => state.cart);
+  const comparisonItems = useSelector((state) => state.comparison?.comparisonItems || []);
+  const wishlistItems = useSelector((state) => state.wishlist?.wishlistItems || []);
   const dispatch = useDispatch();
   const handleNavigatedLogin = () => {
     navigate('/sign-in');
@@ -74,11 +78,11 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
   return (
     <div style={{ width: '100%', background: 'rgb(26,148,255)', display: 'flex' }}>
       <WrapperHeader style={{ justifyContent: isHiddenSearch && isHiddenSearch ? 'space-between' : 'unset' }}>
-        <Col span={5}>
+        <Col span={4}>
           <WrapperTextHeader onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>TECHSTORE</WrapperTextHeader>
         </Col>
         {!isHiddenSearch && (
-          <Col span={13}>
+          <Col span={12}>
             <ButtonInputSearch
               size="large"
               placeholder="Input search text"
@@ -88,7 +92,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
           </Col>
         )}
 
-        <Col span={6}>
+        <Col span={8}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
             <Loading isLoading={loading}>
               <WrapperHeaderAccount>
@@ -114,12 +118,26 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
               </WrapperHeaderAccount>
             </Loading>
             {!isHiddenCart && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }} onClick={() => navigate('/order')}>
-                <Badge count={cart?.totalQuantity || 0} size="small">
-                  <ShoppingCartOutlined style={{ fontSize: '30px', color: '#fff' }} />
-                </Badge>
-                <WrapperText>Giỏ Hàng</WrapperText>
-              </div>
+              <>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }} onClick={() => navigate('/comparison')}>
+                  <Badge count={comparisonItems.length} size="small" style={{ backgroundColor: '#52c41a' }}>
+                    <SwapOutlined style={{ fontSize: '28px', color: '#fff' }} />
+                  </Badge>
+                  <WrapperText>So sánh</WrapperText>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }} onClick={() => navigate('/wishlist')}>
+                  <Badge count={wishlistItems.length} size="small" style={{ backgroundColor: '#ff4d4f' }}>
+                    <HeartOutlined style={{ fontSize: '28px', color: '#fff' }} />
+                  </Badge>
+                  <WrapperText>Yêu thích</WrapperText>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }} onClick={() => navigate('/order')}>
+                  <Badge count={cart?.totalQuantity || 0} size="small">
+                    <ShoppingCartOutlined style={{ fontSize: '28px', color: '#fff' }} />
+                  </Badge>
+                  <WrapperText>Giỏ Hàng</WrapperText>
+                </div>
+              </>
             )}
           </div>
         </Col>

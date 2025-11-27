@@ -12,6 +12,7 @@ router.delete('/delete/:id' ,authMiddleware, ProductController.deleteProduct)
 router.get('/getAll' , ProductController.getAllProduct)
 router.post('/delete-many' , authMiddleware,ProductController.deleteMany)
 router.get('/get-all-type', ProductController.getAllType)
+router.get('/frequently-bought-together/:id', ProductController.getFrequentlyBoughtTogether)
 
 
 module.exports = router;
