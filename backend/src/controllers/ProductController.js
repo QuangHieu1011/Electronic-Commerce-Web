@@ -121,6 +121,26 @@ const getAllType = async (req, res) => {
     }
 };
 
+const getFrequentlyBoughtTogether = async (req, res) => {
+    try {
+        const productId = req.params.id;
+        if (!productId) {
+            return res.status(400).json({
+                status: 'ERR',
+                message: 'Product ID is required'
+            });
+        }
+
+        const response = await ProductService.getFrequentlyBoughtTogether(productId);
+        return res.status(200).json(response);
+    } catch (e) {
+        return res.status(500).json({
+            status: 'ERR',
+            message: e.message || e
+        });
+    }
+};
+
 module.exports = {
     createProduct,
     updateProduct,
@@ -128,5 +148,6 @@ module.exports = {
     deleteProduct,
     getAllProduct,
     deleteMany,
-    getAllType
+    getAllType,
+    getFrequentlyBoughtTogether
 };

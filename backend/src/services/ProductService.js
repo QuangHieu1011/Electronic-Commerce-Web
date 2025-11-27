@@ -204,6 +204,65 @@ const getAllType = () => {
     });
 };
 
+const getFrequentlyBoughtTogether = (productId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const Order = require("../models/OrderProduct");
+            
+            // Tìm các đơn hàng có chứa sản phẩm này
+            const orders = await Order.find({
+                'orderItems.product._id': productId
+            });
+
+            if (!orders || orders.length === 0) {
+                // Nếu không có đơn hàng, trả về sản phẩm cùng loại
+                const currentProduct = await Product.findById(productId);
+                if (currentProduct) {
+                    const relatedProducts = await Product.find({
+                        type: currentProduct.type,
+                        _id: { $ne: productId }
+                    }).limit(3);
+
+                    return resolve({
+                        status: 'OK',
+                        message: 'Get related products success',
+                        data: relatedProducts
+                    });
+                }
+            }
+
+            // Đếm frequency của các sản phẩm khác
+            const productCount = {};
+            orders.forEach(order => {
+                order.orderItems.forEach(item => {
+                    const itemProductId = item.product._id.toString();
+                    if (itemProductId !== productId) {
+                        productCount[itemProductId] = (productCount[itemProductId] || 0) + 1;
+                    }
+                });
+            });
+
+            // Lấy top 3 sản phẩm được mua cùng nhiều nhất
+            const topProductIds = Object.entries(productCount)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3)
+                .map(([id]) => id);
+
+            const recommendedProducts = await Product.find({
+                _id: { $in: topProductIds }
+            });
+
+            resolve({
+                status: 'OK',
+                message: 'Get frequently bought together success',
+                data: recommendedProducts
+            });
+        } catch (e) {
+            reject(e);
+        }
+    });
+};
+
 module.exports = {
     createProduct,
     updateProduct,
@@ -211,5 +270,6 @@ module.exports = {
     deleteProduct,
     getAllProduct,
     deleteManyProduct,
-    getAllType
+    getAllType,
+    getFrequentlyBoughtTogether
 };
