@@ -9,12 +9,12 @@ export const WrapperContainer = styled.div`
 `
 
 export const WrapperHeader = styled.div`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, rgb(26,148,255) 0%, rgb(26,180,255) 100%);
   color: white;
   padding: 24px;
   border-radius: 12px;
   margin-bottom: 24px;
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 20px rgba(26, 148, 255, 0.3);
   
   h2 {
     margin: 0;
@@ -142,11 +142,11 @@ export const WrapperSummary = styled.div`
     font-weight: 600;
     border-radius: 8px;
     margin-top: 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, rgb(26,148,255) 0%, rgb(26,180,255) 100%);
     border: none;
     
     &:hover {
-      background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+      background: linear-gradient(135deg, rgb(20,130,235) 0%, rgb(20,160,235) 100%);
       transform: translateY(-1px);
     }
   }
@@ -171,7 +171,7 @@ export const WrapperEmpty = styled.div`
   }
   
   .shopping-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, rgb(26,148,255) 0%, rgb(26,180,255) 100%);
     border: none;
     height: 40px;
     padding: 0 24px;

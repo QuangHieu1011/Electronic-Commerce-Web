@@ -42,7 +42,7 @@ const WishlistPage = () => {
                     <div className="empty-description">
                         Hãy thêm sản phẩm yêu thích để dễ dàng tìm lại sau này
                     </div>
-                    <Button type="primary" size="large" onClick={() => navigate('/')} danger>
+                    <Button type="primary" size="large" onClick={() => navigate('/')}>
                         Khám phá ngay
                     </Button>
                 </WrapperEmpty>
@@ -62,10 +62,9 @@ const WishlistPage = () => {
                 </Button>
                 <h2>❤️ Sản Phẩm Yêu Thích ({wishlistItems.length})</h2>
                 <Button
-                    danger
                     icon={<DeleteOutlined />}
                     onClick={handleClearAll}
-                    style={{ background: 'rgba(255,255,255,0.9)', color: '#ff4d4f', border: 'none' }}
+                    style={{ background: 'rgba(255,255,255,0.2)', color: 'white', border: 'none' }}
                 >
                     Xóa tất cả
                 </Button>
