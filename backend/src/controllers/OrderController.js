@@ -9,7 +9,19 @@ const createOrder = async (req, res) => {
         console.log('User ID:', userId)
         console.log('Order data:', orderData)
 
-        // Tạo order với user ID
+        // Kiểm tra khách hàng thân thiết
+        const User = require('../models/UserModel');
+        const user = await User.findById(userId);
+        let discount = 0;
+        let loyaltyDiscountApplied = false;
+        if (user && user.loyaltyDiscountEligible) {
+            discount = 0.1; // 10%
+            loyaltyDiscountApplied = true;
+        }
+
+        // finalAmount đã được frontend tính đúng, KHÔNG trừ tiếp loyalty discount ở backend
+        let finalAmount = orderData.finalAmount;
+
         const newOrderData = {
             ...orderData,
             user: userId,
@@ -17,6 +29,15 @@ const createOrder = async (req, res) => {
                 id: userId,
                 name: orderData.userInfo?.name,
                 email: orderData.userInfo?.email
+            },
+            finalAmount,
+            voucher: {
+                ...orderData.voucher,
+                code: loyaltyDiscountApplied ? 'LOYALTY10' : orderData.voucher?.code || null,
+                title: loyaltyDiscountApplied ? 'Giảm giá thành viên thân thiết 10%' : orderData.voucher?.title || null,
+                discountType: loyaltyDiscountApplied ? 'percent' : orderData.voucher?.discountType || null,
+                discountValue: loyaltyDiscountApplied ? 10 : orderData.voucher?.discountValue || 0,
+                appliedDiscount: loyaltyDiscountApplied ? Math.round(orderData.finalAmount * 0.1) : orderData.voucher?.appliedDiscount || 0
             }
         }
 
@@ -96,14 +117,26 @@ const updateOrderStatus = async (req, res) => {
             { new: true }
         )
 
-        console.log('Updated order:', order)
-
         if (!order) {
             console.log('Order not found')
             return res.status(404).json({
                 status: 'ERR',
                 message: 'Không tìm thấy đơn hàng'
             })
+        }
+
+        // Nếu đơn hàng chuyển sang trạng thái 'delivered', tăng orderCount cho user
+        if (orderStatus === 'delivered') {
+            const User = require('../models/UserModel');
+            const user = await User.findById(order.user);
+            if (user) {
+                user.orderCount = (user.orderCount || 0) + 1;
+                // Nếu đủ 5 đơn hàng, kích hoạt quyền giảm giá
+                if (user.orderCount >= 5 && !user.loyaltyDiscountEligible) {
+                    user.loyaltyDiscountEligible = true;
+                }
+                await user.save();
+            }
         }
 
         // Emit socket event for real-time update

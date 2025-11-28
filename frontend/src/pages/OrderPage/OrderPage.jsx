@@ -18,6 +18,7 @@ const OrderPage = () => {
   const [selectedItems, setSelectedItems] = useState({});
   const [selectAll, setSelectAll] = useState(false);
   const cart = useSelector((state) => state.cart);
+  const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -112,6 +113,11 @@ const OrderPage = () => {
         return total + (price * item.quantity);
       }, 0);
   };
+
+  // Loyalty discount
+  const isLoyalty = user?.loyaltyDiscountEligible;
+  const loyaltyDiscount = isLoyalty ? Math.round(calculateTotal() * 0.1) : 0;
+  const totalAfterLoyalty = calculateTotal() - loyaltyDiscount;
 
   // Get selected count
   const getSelectedCount = () => {
@@ -302,9 +308,21 @@ const OrderPage = () => {
                 <span>Miễn phí</span>
               </div>
 
+
+              {(isLoyalty && loyaltyDiscount > 0) && (
+                <>
+                  <div className="summary-row" style={{ color: '#1890ff', fontWeight: 600 }}>
+                    🎉 Bạn là khách hàng thân thiết! Được giảm 10% toàn bộ đơn hàng.
+                  </div>
+                  <div className="summary-row">
+                    <span>Giảm giá thân thiết:</span>
+                    <span>-{formatPrice(loyaltyDiscount)}</span>
+                  </div>
+                </>
+              )}
               <div className="summary-row total">
                 <span>Tổng cộng:</span>
-                <span>{formatPrice(calculateTotal())}</span>
+                <span>{formatPrice(isLoyalty ? totalAfterLoyalty : calculateTotal())}</span>
               </div>
 
               <Button

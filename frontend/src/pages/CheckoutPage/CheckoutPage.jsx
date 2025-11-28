@@ -119,22 +119,31 @@ const CheckoutPage = () => {
         }
     }, [paymentMethod])
 
-    // Tính tổng tiền sau khi áp voucher
-    const calculateFinalAmount = useMemo(() => {
-        let total = totalAmount + shippingFee
+    // Tính tổng tiền các sản phẩm đã trừ discount theo từng sản phẩm
+    const calculateProductTotal = () => {
+        return selectedProducts.reduce((total, item) => {
+            const price = calculateDiscountedPrice(item.product);
+            return total + price * item.quantity;
+        }, 0);
+    };
 
+    // Kiểm tra khách hàng thân thiết
+    const isLoyalty = user?.loyaltyDiscountEligible;
+    const loyaltyDiscount = isLoyalty ? Math.round(calculateProductTotal() * 0.1) : 0;
+    const totalAfterLoyalty = calculateProductTotal() - loyaltyDiscount;
+
+    // Tính tổng tiền cuối cùng (cộng phí ship, trừ voucher nếu có)
+    const calculateFinalAmount = useMemo(() => {
+        let total = totalAfterLoyalty + shippingFee;
         if (appliedVoucher) {
             if (appliedVoucher.discountType === 'shipping') {
-                // Giảm phí ship
-                total = totalAmount + Math.max(0, shippingFee - appliedVoucher.appliedDiscount)
+                total = totalAfterLoyalty + Math.max(0, shippingFee - appliedVoucher.appliedDiscount);
             } else {
-                // Giảm tổng đơn hàng
-                total = totalAmount + shippingFee - appliedVoucher.appliedDiscount
+                total = totalAfterLoyalty + shippingFee - appliedVoucher.appliedDiscount;
             }
         }
-
-        return total
-    }, [totalAmount, shippingFee, appliedVoucher])
+        return total;
+    }, [totalAfterLoyalty, shippingFee, appliedVoucher])
 
     // Format giá tiền
     const formatPrice = (price) => {
@@ -649,7 +658,8 @@ const CheckoutPage = () => {
                                         borderRadius: 8,
                                         display: 'flex',
                                         justifyContent: 'space-between',
-                                        alignItems: 'center'
+                                        alignItems: 'center',
+                                        position: 'relative'
                                     }}>
                                         <div style={{ flex: 1 }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
@@ -659,6 +669,11 @@ const CheckoutPage = () => {
                                             <div style={{ fontSize: 12, color: '#666' }}>
                                                 Mã: {appliedVoucher.code} • Giảm {formatPrice(appliedVoucher.appliedDiscount)}
                                             </div>
+                                            {appliedVoucher.code === 'LOYALTY10' && (
+                                                <div style={{ color: '#1890ff', fontWeight: 600, marginTop: 4 }}>
+                                                    🎉 Bạn là khách hàng thân thiết! Được giảm 10% toàn bộ đơn hàng.
+                                                </div>
+                                            )}
                                         </div>
                                         <Button
                                             type="text"
@@ -691,8 +706,14 @@ const CheckoutPage = () => {
                             <div style={{ fontSize: 14 }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                                     <span>Tạm tính ({selectedProducts.length} sản phẩm):</span>
-                                    <span>{formatPrice(totalAmount)}</span>
+                                    <span>{formatPrice(calculateProductTotal())}</span>
                                 </div>
+                                {isLoyalty && (
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                                        <span style={{ color: '#1890ff' }}>Giảm giá thân thiết (10%):</span>
+                                        <span style={{ color: '#1890ff', fontWeight: 600 }}>- {formatPrice(loyaltyDiscount)}</span>
+                                    </div>
+                                )}
                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                                     <span>Phí vận chuyển:</span>
                                     <span style={{ textDecoration: appliedVoucher?.discountType === 'shipping' ? 'line-through' : 'none', color: appliedVoucher?.discountType === 'shipping' ? '#999' : '#000' }}>
@@ -720,9 +741,15 @@ const CheckoutPage = () => {
                                     <span>Tổng cộng:</span>
                                     <span>{formatPrice(calculateFinalAmount)}</span>
                                 </div>
+                                {(isLoyalty && loyaltyDiscount > 0) && (
+                                    <div style={{ fontSize: 12, color: '#1890ff', marginTop: 8, textAlign: 'right' }}>
+                                        🎉 Bạn là khách hàng thân thiết! Được giảm 10% toàn bộ đơn hàng.<br />
+                                        Bạn đã tiết kiệm {formatPrice(loyaltyDiscount)}!
+                                    </div>
+                                )}
                                 {appliedVoucher && (
                                     <div style={{ fontSize: 12, color: '#52c41a', marginTop: 8, textAlign: 'right' }}>
-                                        Bạn đã tiết kiệm {formatPrice(appliedVoucher.appliedDiscount)}! 🎉
+                                        Bạn đã tiết kiệm thêm {formatPrice(appliedVoucher.appliedDiscount)}!
                                     </div>
                                 )}
                             </div>

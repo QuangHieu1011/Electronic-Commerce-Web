@@ -118,7 +118,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
               </WrapperHeaderAccount>
             </Loading>
             {!isHiddenCart && (
-              <>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }} onClick={() => navigate('/comparison')}>
                   <Badge count={comparisonItems.length} size="small" style={{ backgroundColor: '#52c41a' }}>
                     <SwapOutlined style={{ fontSize: '28px', color: '#fff' }} />
@@ -137,7 +137,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
                   </Badge>
                   <WrapperText>Giỏ Hàng</WrapperText>
                 </div>
-              </>
+              </div>
             )}
           </div>
         </Col>
