@@ -24,6 +24,7 @@ import { updateAccessToken } from '../../redux/slides/userSlide'
 import { message } from 'antd'
 import * as OrderService from '../../service/OrderService'
 import socketService from '../../service/SocketService'
+import OrderTrackMap from '../../components/OrderTrackMap/OrderTrackMap'
 
 const { Option } = Select
 
@@ -405,6 +406,12 @@ const OrderTrackingPage = () => {
                                                 )}
                                             </div>
                                         </div>
+
+                                        {/* Order Tracking Map */}
+                                        <OrderTrackMap 
+                                            orderStatus={order.orderStatus}
+                                            createdAt={order.createdAt}
+                                        />
 
                                         {/* Shipping Info */}
                                         {order.shippingInfo && (

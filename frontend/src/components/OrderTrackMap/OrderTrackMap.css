@@ -1,0 +1,196 @@
+.track-map-card {
+  margin-top: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.map-container {
+  position: relative;
+  padding: 20px 0;
+}
+
+.map-background {
+  position: relative;
+  height: 180px;
+  background: linear-gradient(180deg, #e3f2fd 0%, #fff 100%);
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid #e0e0e0;
+  padding: 20px;
+}
+
+/* Route line */
+.route-line {
+  position: absolute;
+  top: 50%;
+  left: 8%;
+  right: 8%;
+  height: 4px;
+  background: linear-gradient(90deg, 
+    #4caf50 0%, 
+    #8bc34a 25%, 
+    #cddc39 50%, 
+    #e0e0e0 75%,
+    #e0e0e0 100%
+  );
+  border-radius: 2px;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+.route-line.confirmed {
+  background: linear-gradient(90deg, 
+    #4caf50 0%, 
+    #4caf50 33%, 
+    #8bc34a 33%, 
+    #e0e0e0 66%,
+    #e0e0e0 100%
+  );
+}
+
+.route-line.shipping {
+  background: linear-gradient(90deg, 
+    #4caf50 0%, 
+    #4caf50 33%, 
+    #8bc34a 66%, 
+    #cddc39 66%, 
+    #e0e0e0 100%
+  );
+}
+
+.route-line.delivered {
+  background: linear-gradient(90deg, 
+    #4caf50 0%, 
+    #4caf50 100%
+  );
+}
+
+/* Location markers */
+.location-marker {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  text-align: center;
+}
+
+.marker-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+  filter: grayscale(100%);
+  opacity: 0.5;
+  transition: all 0.3s ease;
+}
+
+.location-marker.active .marker-icon {
+  filter: grayscale(0%);
+  opacity: 1;
+  animation: bounce 0.6s ease;
+}
+
+.marker-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #999;
+  background: rgba(255,255,255,0.9);
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.location-marker.active .marker-label {
+  color: #2e7d32;
+  background: #e8f5e9;
+  font-weight: 700;
+}
+
+/* Shipper animated icon */
+.shipper-icon {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 36px;
+  z-index: 3;
+  animation: moveShipper 2s ease-in-out infinite;
+  transition: left 1s ease-out;
+  filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+}
+
+@keyframes moveShipper {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -55%) scale(1.1); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Shipper info card */
+.shipper-info-card {
+  margin-top: 20px;
+  background: #f6ffed;
+  border-color: #b7eb8f;
+}
+
+.shipper-info-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.shipper-avatar {
+  font-size: 40px;
+}
+
+.shipper-details {
+  flex: 1;
+}
+
+.shipper-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.shipper-phone {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.shipper-status {
+  font-size: 12px;
+  color: #52c41a;
+  margin-top: 4px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .map-background {
+    height: 150px;
+  }
+  
+  .marker-icon {
+    font-size: 24px;
+  }
+  
+  .marker-label {
+    font-size: 10px;
+    padding: 2px 6px;
+    max-width: 80px;
+  }
+  
+  .shipper-icon {
+    font-size: 28px;
+  }
+  
+  .route-line {
+    left: 5%;
+    right: 5%;
+  }
+}
