@@ -7,7 +7,7 @@ export const WrapperContainer = styled.div`
 `
 
 export const WrapperHeader = styled.div`
-    background: linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%);
+    background: linear-gradient(135deg, rgb(26,148,255) 0%, rgb(26,180,255) 100%);
     padding: 20px 40px;
     border-radius: 12px;
     margin-bottom: 30px;
@@ -40,7 +40,7 @@ export const WrapperEmpty = styled.div`
 
     .empty-icon {
         font-size: 80px;
-        color: #ff4d4f;
+        color: rgb(26,148,255);
         margin-bottom: 20px;
     }
 
