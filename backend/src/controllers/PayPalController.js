@@ -33,8 +33,8 @@ class PayPalController {
                     description: `Order #${orderId}`
                 }],
                 application_context: {
-                    return_url: 'http://localhost:3000/payment-success',
-                    cancel_url: 'http://localhost:3000/checkout',
+                    return_url: 'https://electronic-commerce-web.vercel.app/payment-success',
+                    cancel_url: 'https://electronic-commerce-web.vercel.app/checkout',
                     brand_name: 'Your Store Name',
                     landing_page: 'BILLING',
                     user_action: 'PAY_NOW'
