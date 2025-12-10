@@ -57,8 +57,10 @@ const loginUser = async (req, res) => {
         // console.log("response:", response)
         res.cookie('refresh_token', refresh_token, {
             httpOnly: true,
-            secure: false,
-            samesite: 'strict'
+            secure: true,
+            sameSite: 'none',
+            path: '/',
+            maxAge: 365 * 24 * 60 * 60 * 1000 // 1 năm
         })
         return res.status(200).json(newResponse);
     } catch (e) {
