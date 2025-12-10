@@ -9,21 +9,27 @@ const http = require('http');
 const { Server } = require('socket.io');
 dotenv.config()
 
+
 const app = express()
 const server = http.createServer(app)
+const allowedOrigins = [
+    "https://electronic-commerce-web.vercel.app",
+    "https://electronic-commerce-web.onrender.com"
+];
 const io = new Server(server, {
     cors: {
-        origin: [
-            "https://electronic-commerce-web.vercel.app",
-            "https://electronic-commerce-web.onrender.com"
-        ],
-        methods: ["GET", "POST"]
+        origin: allowedOrigins,
+        methods: ["GET", "POST"],
+        credentials: true
     }
 })
 
 const port = process.env.PORT || 3001
 
-app.use(cors())
+app.use(cors({
+    origin: allowedOrigins,
+    credentials: true
+}))
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb' }));
 app.use(bodyParser.json())
