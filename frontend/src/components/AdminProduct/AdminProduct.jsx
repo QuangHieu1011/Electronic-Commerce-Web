@@ -319,6 +319,21 @@ const AdminProduct = (props) => {
         }
     })
 
+    const handleCancel = React.useCallback(() => {
+        setIsModalOpen(false);
+        setStateProduct({
+            name: '',
+            type: '',
+            countInStock: '',
+            price: '',
+            rating: '',
+            description: '',
+            image: ''
+        })
+        setTypeSelect('');
+        form.resetFields();
+    }, [form]);
+
 
 
     useEffect(() => {
@@ -330,7 +345,7 @@ const AdminProduct = (props) => {
         else if (isError) {
             message.error('Thêm sản phẩm thất bại!');
         }
-    }, [isSuccess, isError, data, refetch])
+    }, [isSuccess, isError, data, refetch, handleCancel])
 
     useEffect(() => {
         if (isSuccessDeletedMany && dataDeletedMany?.status === 'OK') {
@@ -342,7 +357,7 @@ const AdminProduct = (props) => {
         }
     }, [isSuccessDeletedMany, isErrorDeletedMany, dataDeletedMany, refetch])
 
-    const handleCloseDrawer = () => {
+    const handleCloseDrawer = React.useCallback(() => {
         setIsOpenDrawer(false);
         setStateProductDetails({
             name: '',
@@ -352,9 +367,10 @@ const AdminProduct = (props) => {
             rating: '',
             description: '',
             image: ''
-        })
+        });
         formDetails.resetFields();
-    }
+    }, [formDetails]);
+
     const handleCancelDelete = () => {
         setIsModalOpenDelete(false);
     }
@@ -397,20 +413,7 @@ const AdminProduct = (props) => {
     }, [isSuccessDeleted, isErrorDeleted, dataDeleted, refetch])
 
 
-    const handleCancel = () => {
-        setIsModalOpen(false);
-        setStateProduct({
-            name: '',
-            type: '',
-            countInStock: '',
-            price: '',
-            rating: '',
-            description: '',
-            image: ''
-        })
-        setTypeSelect('');
-        form.resetFields();
-    };
+
     const onFinish = () => {
         mutation.mutate(stateProduct);
     }

@@ -66,7 +66,7 @@ const AdminUser = (props) => {
 
   const { data: dataUpdated, isPending: isPendingUpdated, isSuccess: isSuccessUpdated, isError: isErrorUpdated } = mutationUpdate
   const { data: dataDeleted, isPending: isPendingDeleted, isSuccess: isSuccessDeleted, isError: isErrorDeleted } = mutationDeleted
-  const { data: dataDeletedMany, isPending: isPendingDeletedMany, isSuccess: isSuccessDeletedMany, isError: isErrorDeletedMany } = mutationDeletedMany
+  const { data: dataDeletedMany, isSuccess: isSuccessDeletedMany, isError: isErrorDeletedMany } = mutationDeletedMany
 
   const getAllUsers = async () => {
     let access_token = localStorage.getItem('access_token');
@@ -282,6 +282,18 @@ const AdminUser = (props) => {
 
 
 
+  const handleCloseDrawer = React.useCallback(() => {
+    setIsOpenDrawer(false);
+    setStateUserDetails({
+      name: '',
+      email: '',
+      phone: '',
+      isAdmin: false,
+    });
+    formDetails.resetFields();
+  }, [formDetails]);
+
+
   useEffect(() => {
     if (isSuccessUpdated && dataUpdated?.status === 'OK') {
       message.success('Cập nhật người dùng thành công!');
@@ -292,7 +304,7 @@ const AdminUser = (props) => {
     else if (isErrorUpdated) {
       message.error('Cập nhật người dùng thất bại!');
     }
-  }, [isSuccessUpdated, isErrorUpdated, dataUpdated, refetch])
+  }, [isSuccessUpdated, isErrorUpdated, dataUpdated, refetch, handleCloseDrawer])
 
   useEffect(() => {
     if (isSuccessDeleted && dataDeleted?.status === 'OK') {
@@ -318,16 +330,6 @@ const AdminUser = (props) => {
 
 
 
-  const handleCloseDrawer = () => {
-    setIsOpenDrawer(false);
-    setStateUserDetails({
-      name: '',
-      email: '',
-      phone: '',
-      isAdmin: false,
-    })
-    formDetails.resetFields();
-  }
   const handleCancelDelete = () => {
     setIsModalOpenDelete(false);
   }
@@ -436,7 +438,16 @@ const AdminUser = (props) => {
               name="avatar"
               rules={[{ required: true, message: 'Please input your avatar!' }]}
             >
-              <WrapperUploadFile onChange={handleOnchangeAvatarDetails} maxCount={1}>
+              <WrapperUploadFile
+                onChange={handleOnchangeAvatarDetails}
+                maxCount={1}
+                fileList={stateUserDetails.avatar ? [{
+                  uid: '-1',
+                  name: 'avatar.png',
+                  status: 'done',
+                  url: stateUserDetails.avatar,
+                }] : []}
+              >
                 <Button>Select File</Button>
                 {stateUserDetails?.avatar && (
                   <img src={stateUserDetails?.avatar} style={{

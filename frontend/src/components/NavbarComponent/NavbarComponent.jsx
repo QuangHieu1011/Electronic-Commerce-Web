@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { WrapperContent, WrapperLableText, WrapperTextPrice, WrapperTextValue } from './style'
+import React, { useState } from 'react'
+import { WrapperContent, WrapperLableText, WrapperTextValue } from './style'
 import { Checkbox, Rate, Slider, Button } from 'antd'
 import * as ProductService from '../../service/ProductService'
 import { useQuery } from '@tanstack/react-query'

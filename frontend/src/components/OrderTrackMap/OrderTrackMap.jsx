@@ -60,7 +60,7 @@ const OrderTrackMap = ({ orderStatus, createdAt }) => {
       const targetPosition = locations[step].position;
       setShipperPosition(targetPosition);
     }
-  }, [orderStatus]);
+  }, [orderStatus, locations]);
 
   // Calculate estimated time
   const getEstimatedTime = (step) => {

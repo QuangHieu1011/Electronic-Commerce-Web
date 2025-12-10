@@ -1,5 +1,5 @@
 
-import React, { Fragment, useEffect,} from 'react'
+import React, { Fragment, useEffect, } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { routes } from './routes'
 import DefaultComponent from './components/DefaultComponent/DefaultComponent'
@@ -18,12 +18,12 @@ function App() {
   const [isLoadingUser, setIsLoadingUser] = React.useState(true);
   const user = useSelector((state) => state.user);
 
-  const handleGetDetailsUser = async (id, token) => {
+  const handleGetDetailsUser = React.useCallback(async (id, token) => {
     setIsLoadingUser(true);
     const res = await UserService.getDetailsUser(id, token);
     dispatch(updateUser({ ...res?.data, access_token: token }));
     setIsLoadingUser(false);
-  }
+  }, [dispatch]);
   // Tự động refresh token khi load lại trang
   useEffect(() => {
     const { storageData, decoded } = handleDecoded();
@@ -52,7 +52,7 @@ function App() {
     } else {
       setIsLoadingUser(false);
     }
-  }, [dispatch]);
+  }, [dispatch, handleGetDetailsUser]);
 
   const handleDecoded = () => {
     let storageData = localStorage.getItem('access_token');

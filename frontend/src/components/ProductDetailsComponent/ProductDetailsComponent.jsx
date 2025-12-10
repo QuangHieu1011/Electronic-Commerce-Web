@@ -1,7 +1,6 @@
-import { Button, Col, Image, InputNumber, Rate, Row } from 'antd'
+import { Button, Col, Image,Rate, Row } from 'antd'
 import React, { useState } from 'react'
-import imageProduct from '../../assets/images/Iphone.png'
-import imageProductSmall from '../../assets/images/Iphonesmall.png'
+
 import { MinusOutlined, PlusOutlined, StarFilled } from '@ant-design/icons'
 import {
   WrapperStyleColImage,
@@ -14,8 +13,7 @@ import {
   WrapperPriceTextProduct,
   WrapperAddressProduct,
   WrapperQualityProduct,
-  WrapperInputNumber,
-  WrapperBtnQualityProduct
+  WrapperInputNumber
 } from './style'
 import * as ProductService from '../../service/ProductService'
 import { useQuery } from '@tanstack/react-query'
