@@ -22,6 +22,7 @@ const ButtonInputSearch = (props) => {
           outline: 'none',
         }}
         {...props}
+        // Xóa prop textButton khỏi InputComponent
       />
       <ButtonComponent
         size={size}
