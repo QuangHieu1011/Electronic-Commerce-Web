@@ -1,5 +1,5 @@
 
-import React, { Fragment, use, useEffect, useState } from 'react'
+import React, { Fragment, useEffect,} from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { routes } from './routes'
 import DefaultComponent from './components/DefaultComponent/DefaultComponent'
@@ -8,7 +8,6 @@ import { jwtDecode } from 'jwt-decode'
 import * as UserService from './service/UserService'
 import { useDispatch, useSelector } from 'react-redux'
 import { updateUser, updateAccessToken } from './redux/slides/userSlide'
-import axios from 'axios'
 import Loading from './components/LoadingComponent/Loading'
 
 
@@ -53,7 +52,7 @@ function App() {
     } else {
       setIsLoadingUser(false);
     }
-  }, []);
+  }, [dispatch]);
 
   const handleDecoded = () => {
     let storageData = localStorage.getItem('access_token');

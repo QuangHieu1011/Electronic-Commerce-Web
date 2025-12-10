@@ -1,7 +1,7 @@
-import React, { use, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons'
 import { WrapperHeader, WrapperUploadFile } from './style'
-import { Button, Checkbox, Form, Input, Modal, Select, Space } from 'antd'
+import { Button, Form, Select, Space } from 'antd'
 import TableComponent from '../TableComponent/TableComponent'
 import InputComponent from '../InputComponent/InputComponent'
 import { getBase64, renderOption } from '../../utils'
@@ -27,8 +27,7 @@ const AdminProduct = (props) => {
     const [isModalOpenDelete, setIsModalOpenDelete] = useState(false);
     const [typeSelect, setTypeSelect] = useState('');
 
-    const [searchText, setSearchText] = useState('');
-    const [searchedColumn, setSearchedColumn] = useState('');
+
     const searchInput = useRef(null);
 
 
@@ -92,11 +91,11 @@ const AdminProduct = (props) => {
     const { data, isPending, isSuccess, isError } = mutation
     const { data: dataUpdated, isPending: isPendingUpdated, isSuccess: isSuccessUpdated, isError: isErrorUpdated } = mutationUpdate
     const { data: dataDeleted, isPending: isPendingDeleted, isSuccess: isSuccessDeleted, isError: isErrorDeleted } = mutationDeleted
-    const { data: dataDeletedMany, isPending: isPendingDeletedMany, isSuccess: isSuccessDeletedMany, isError: isErrorDeletedMany } = mutationDeletedMany
+    const { data: dataDeletedMany, isSuccess: isSuccessDeletedMany, isError: isErrorDeletedMany } = mutationDeletedMany
 
 
     const getAllProducts = async () => {
-        const res = await ProductService.getAllProduct('', 1000) 
+        const res = await ProductService.getAllProduct('', 1000)
         return res;
     }
     const fetchAllTypeProduct = async () => {
@@ -343,32 +342,6 @@ const AdminProduct = (props) => {
         }
     }, [isSuccessDeletedMany, isErrorDeletedMany, dataDeletedMany, refetch])
 
-    useEffect(() => {
-        if (isSuccessUpdated && dataUpdated?.status === 'OK') {
-            message.success('Cập nhật sản phẩm thành công!');
-            handleCloseDrawer();
-            setRowSelected('');
-            refetch();
-        }
-        else if (isErrorUpdated) {
-            message.error('Cập nhật sản phẩm thất bại!');
-        }
-    }, [isSuccessUpdated, isErrorUpdated, dataUpdated, refetch])
-
-    useEffect(() => {
-        if (isSuccessDeleted && dataDeleted?.status === 'OK') {
-            message.success('Xóa sản phẩm thành công!');
-            handleCancelDelete();
-            setRowSelected('');
-            refetch();
-        }
-        else if (isErrorDeleted) {
-            message.error('Xóa sản phẩm thất bại!');
-        }
-    }, [isSuccessDeleted, isErrorDeleted, dataDeleted, refetch])
-
-
-
     const handleCloseDrawer = () => {
         setIsOpenDrawer(false);
         setStateProductDetails({
@@ -398,6 +371,32 @@ const AdminProduct = (props) => {
     }
 
 
+
+    useEffect(() => {
+        if (isSuccessUpdated && dataUpdated?.status === 'OK') {
+            message.success('Cập nhật sản phẩm thành công!');
+            handleCloseDrawer();
+            setRowSelected('');
+            refetch();
+        }
+        else if (isErrorUpdated) {
+            message.error('Cập nhật sản phẩm thất bại!');
+        }
+    }, [isSuccessUpdated, isErrorUpdated, dataUpdated, refetch, handleCloseDrawer])
+
+    useEffect(() => {
+        if (isSuccessDeleted && dataDeleted?.status === 'OK') {
+            message.success('Xóa sản phẩm thành công!');
+            handleCancelDelete();
+            setRowSelected('');
+            refetch();
+        }
+        else if (isErrorDeleted) {
+            message.error('Xóa sản phẩm thất bại!');
+        }
+    }, [isSuccessDeleted, isErrorDeleted, dataDeleted, refetch])
+
+
     const handleCancel = () => {
         setIsModalOpen(false);
         setStateProduct({
@@ -409,7 +408,7 @@ const AdminProduct = (props) => {
             description: '',
             image: ''
         })
-        setTypeSelect(''); 
+        setTypeSelect('');
         form.resetFields();
     };
     const onFinish = () => {
@@ -463,18 +462,18 @@ const AdminProduct = (props) => {
         console.log('Selected value:', value);
 
         if (value !== 'add-type') {
-        
+
             setStateProduct({
                 ...stateProduct,
                 type: value
             });
-            setTypeSelect(''); 
+            setTypeSelect('');
         } else {
-            
+
             setTypeSelect(value);
             setStateProduct({
                 ...stateProduct,
-                type: '' 
+                type: ''
             });
         }
     }
@@ -495,7 +494,7 @@ const AdminProduct = (props) => {
                         description: '',
                         image: ''
                     });
-                    setTypeSelect(''); 
+                    setTypeSelect('');
                     form.resetFields();
                 }}> <PlusOutlined style={{ fontSize: '60px' }} /> </Button>
             </div>

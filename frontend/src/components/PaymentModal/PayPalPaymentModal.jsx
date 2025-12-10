@@ -73,7 +73,7 @@ const PayPalPaymentModal = ({
     // PayPal SANDBOX Test Client ID - KHÔNG TRỪ TIỀN THẬT
     const [clientId, setClientId] = useState("AZDxjDScFpQtjWTOUtWKbyN_bDt4OgqaF4eYXlewfBP4-8aqX3PiV8e1GWU6liB2CUXlkA59kJXE7M6R")
 
-    const { Title, Text } = Typography
+    // Xóa Title, Text (không sử dụng)
 
     // Lấy PayPal Client ID từ backend
     React.useEffect(() => {

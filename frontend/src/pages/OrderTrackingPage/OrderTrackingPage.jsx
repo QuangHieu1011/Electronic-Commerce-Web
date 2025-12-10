@@ -4,7 +4,7 @@ import {
     WrapperHeader,
     WrapperProductInfo,
     WrapperProductImage,
-    WrapperProductDetails,
+    // WrapperProductDetails (không sử dụng)
     WrapperEmpty
 } from './style'
 import { Button, Tag, Popconfirm, Image, Input, Select, Spin } from 'antd'

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Timeline, Progress } from 'antd';
-import { EnvironmentOutlined, CheckCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import './OrderTrackMap.css';
 
 const OrderTrackMap = ({ orderStatus, createdAt }) => {
@@ -8,40 +8,40 @@ const OrderTrackMap = ({ orderStatus, createdAt }) => {
   const [shipperPosition, setShipperPosition] = useState(0);
 
   // Định nghĩa các điểm dừng
-  const locations = [
-    { 
-      id: 1, 
-      name: 'Kho hàng', 
+  const locations = React.useMemo(() => [
+    {
+      id: 1,
+      name: 'Kho hàng',
       address: 'TechStore - Quận 1, TP.HCM',
       status: 'pending',
       icon: '🏢',
       position: 8
     },
-    { 
-      id: 2, 
-      name: 'Trung tâm', 
+    {
+      id: 2,
+      name: 'Trung tâm',
       address: 'Phân phối - Quận 3',
       status: 'confirmed',
       icon: '📦',
       position: 38
     },
-    { 
-      id: 3, 
-      name: 'Đang giao', 
+    {
+      id: 3,
+      name: 'Đang giao',
       address: 'Trên đường đến bạn',
       status: 'shipping',
       icon: '🚚',
       position: 68
     },
-    { 
-      id: 4, 
-      name: 'Đã giao', 
+    {
+      id: 4,
+      name: 'Đã giao',
       address: 'Giao hàng thành công',
       status: 'delivered',
       icon: '✅',
       position: 92
     }
-  ];
+  ], []);
 
   // Map order status to step
   useEffect(() => {
@@ -54,7 +54,7 @@ const OrderTrackMap = ({ orderStatus, createdAt }) => {
     };
     const step = statusMap[orderStatus] || 0;
     setCurrentStep(step);
-    
+
     // Set shipper position based on step
     if (step >= 0 && step < 4) {
       const targetPosition = locations[step].position;
@@ -119,10 +119,10 @@ const OrderTrackMap = ({ orderStatus, createdAt }) => {
         <div className="map-background">
           {/* Route line */}
           <div className={`route-line ${orderStatus}`} />
-          
+
           {/* Location markers */}
           {locations.map((loc, index) => (
-            <div 
+            <div
               key={loc.id}
               className={`location-marker ${index <= currentStep ? 'active' : ''}`}
               style={{ left: `${loc.position}%` }}
@@ -131,10 +131,10 @@ const OrderTrackMap = ({ orderStatus, createdAt }) => {
               <div className="marker-label">{loc.name}</div>
             </div>
           ))}
-          
+
           {/* Shipper animated icon */}
           {currentStep >= 0 && currentStep < 4 && (
-            <div 
+            <div
               className="shipper-icon"
               style={{ left: `${shipperPosition}%` }}
             >
@@ -145,8 +145,8 @@ const OrderTrackMap = ({ orderStatus, createdAt }) => {
 
         {/* Progress bar */}
         <div style={{ marginTop: 20 }}>
-          <Progress 
-            percent={getProgressPercent()} 
+          <Progress
+            percent={getProgressPercent()}
             status={orderStatus === 'cancelled' ? 'exception' : 'active'}
             strokeColor={{
               '0%': '#1890ff',
@@ -188,8 +188,8 @@ const OrderTrackMap = ({ orderStatus, createdAt }) => {
 
       {/* Thông tin shipper (nếu đang giao) */}
       {orderStatus === 'shipping' && (
-        <Card 
-          size="small" 
+        <Card
+          size="small"
           title="👤 Thông tin người giao hàng"
           className="shipper-info-card"
         >
@@ -208,10 +208,10 @@ const OrderTrackMap = ({ orderStatus, createdAt }) => {
       )}
 
       {/* Note */}
-      <div style={{ 
-        marginTop: 16, 
-        padding: 12, 
-        background: '#f0f7ff', 
+      <div style={{
+        marginTop: 16,
+        padding: 12,
+        background: '#f0f7ff',
         borderRadius: 6,
         fontSize: 12,
         color: '#666'

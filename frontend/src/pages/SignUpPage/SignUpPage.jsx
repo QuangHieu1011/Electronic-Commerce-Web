@@ -5,7 +5,6 @@ import InputForm from '../../components/InputForm/InputForm'
 import { Button, Image, message as antdMessage } from 'antd'
 import imageLogo from '../../assets/images/Logo_Login.png'
 import { useNavigate } from 'react-router-dom'
-import * as UserService from '../../service/UserService'
 import * as OTPService from '../../service/OTPService'
 import { useMutationHooks } from '../../hooks/useMutationHook';
 import Loading from '../../components/LoadingComponent/Loading';
@@ -26,9 +25,9 @@ const SignUpPage = () => {
 
   const navigate = useNavigate()
 
-  const handleNavigateSignin = () => {
+  const handleNavigateSignin = React.useCallback(() => {
     navigate('/sign-in')
-  }
+  }, [navigate]);
 
 
   const mutation = useMutationHooks(
@@ -48,7 +47,7 @@ const SignUpPage = () => {
     } else if (isError) {
       message.error(data?.message || 'Error');
     }
-  }, [isSuccess, isError, handleNavigateSignin]);
+  }, [isSuccess, isError, handleNavigateSignin, data?.message, data?.status]);
 
 
   const handleOnchangeEmail = (value) => {

@@ -1,17 +1,17 @@
-import { useMutation } from "@tanstack/react-query"
+// import { useMutation } from "@tanstack/react-query" (không sử dụng)
 import { useEffect, useState } from "react"
 
-export const useDebounce = (value,delay) => {
+export const useDebounce = (value, delay) => {
     const [valueDebounce, setValueDebounce] = useState('')
     useEffect(() => {
         const handle = setTimeout(() => {
             setValueDebounce(value)
-        }, [delay])
+        }, delay)
         return () => {
             clearTimeout(handle)
         }
-    },[value])
+    }, [value, delay])
     return valueDebounce
 
-   
+
 }

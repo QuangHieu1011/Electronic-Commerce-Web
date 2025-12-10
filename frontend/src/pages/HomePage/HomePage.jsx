@@ -1,4 +1,4 @@
-import React, { use, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import TypeProduct from '../../components/TypeProduct/TypeProduct'
 import { WrapperButtonMore, WrapperProducts, WrapperTypeProduct } from './style'
 import SliderComponent from '../../components/SliderComponent/SliderComponent'
@@ -20,10 +20,9 @@ const HomePage = () => {
   const searchProduct = useSelector((state) => state?.product?.search);
   const user = useSelector((state) => state?.user);
   const searchDebounce = useDebounce(searchProduct, 1000);
-  const [loading, setLoading] = useState(false)
   const [limit, setLimit] = useState(6)
   const [typeProducts, setTypeProducts] = useState([])
-  
+
 
   const fetchProductAll = async (context) => {
     const limit = context?.queryKey && context?.queryKey[1]
@@ -34,11 +33,10 @@ const HomePage = () => {
 
   const fetchAllTypeProduct = async () => {
     const res = await ProductService.getAllTypeProduct()
-    if(res.status === 'OK')
-      {
-    setTypeProducts(res?.data)
-  }
-    
+    if (res.status === 'OK') {
+      setTypeProducts(res?.data)
+    }
+
   }
 
   const { isPending, data: products } = useQuery({
@@ -51,7 +49,7 @@ const HomePage = () => {
 
   useEffect(() => {
     fetchAllTypeProduct()
-  },[])
+  }, [])
 
   // Initialize chatbot with user identity
   useEffect(() => {
@@ -77,7 +75,7 @@ const HomePage = () => {
 
 
   return (
-    <Loading isLoading={loading || isPending}>
+    <Loading isLoading={isPending}>
       {/* Decorative Shapes */}
       <div style={{
         position: 'fixed',
@@ -101,7 +99,7 @@ const HomePage = () => {
           filter: 'blur(60px)',
           animation: 'float 20s ease-in-out infinite'
         }} />
-        
+
         {/* Top Right Blob */}
         <div style={{
           position: 'absolute',
@@ -159,8 +157,8 @@ const HomePage = () => {
         }
       `}</style>
 
-      <div style={{ 
-        padding: '0 120px', 
+      <div style={{
+        padding: '0 120px',
         fontSize: '16px',
         maxWidth: '1440px',
         margin: '0 auto',
@@ -176,10 +174,10 @@ const HomePage = () => {
         </WrapperTypeProduct>
       </div>
 
-      <div id="container" style={{ 
-        backgroundColor: '#efefef', 
-        padding: '0 120px', 
-        minHeight: '100vh', 
+      <div id="container" style={{
+        backgroundColor: '#efefef',
+        padding: '0 120px',
+        minHeight: '100vh',
         paddingBottom: '50px',
         maxWidth: '1440px',
         margin: '0 auto',

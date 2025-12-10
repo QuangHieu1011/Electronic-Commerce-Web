@@ -6,7 +6,7 @@ import ButtonComponent from '../ButtonComponent/ButtonComponent';
 const ButtonInputSearch = (props) => {
     const {
       size,placeholder,textButton,
-      bordered,backgroundColorInput='#fff',
+      backgroundColorInput='#fff',
       backgroundColorButton='rgb(13,92,182)',
       colorButton='#fff'
     } = props

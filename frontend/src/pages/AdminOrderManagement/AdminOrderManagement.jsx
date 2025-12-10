@@ -2,9 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react'
 import {
     WrapperContainer,
     WrapperHeader,
-    WrapperProductInfo,
-    WrapperProductImage,
-    WrapperEmpty,
     WrapperStats
 } from './style'
 import {
@@ -32,7 +29,7 @@ import {
     SearchOutlined,
     FilterOutlined,
     EyeOutlined,
-    EditOutlined,
+    // EditOutlined (không sử dụng)
     DollarOutlined,
     ShoppingCartOutlined
 } from '@ant-design/icons'

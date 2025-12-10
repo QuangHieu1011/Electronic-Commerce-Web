@@ -1,7 +1,7 @@
-import React, { use, useEffect, useState } from 'react'
-import { Badge, Button, Col, Popover } from 'antd';
+import React, { useEffect, useState } from 'react'
+import { Badge, Col, Popover } from 'antd';
 import { WrapperContentPopup, WrapperHeader, WrapperHeaderAccount, WrapperText, WrapperTextHeader } from './style';
-import Search from 'antd/es/transfer/search';
+// import Search from 'antd/es/transfer/search'; (không sử dụng)
 import {
   UserOutlined,
   CaretDownOutlined,
@@ -50,13 +50,11 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
 
   const [userName, setUserName] = useState(user?.name || user?.email || 'User');
   const [userAvatar, setUserAvatar] = useState('');
-  const [search, setSearch] = useState('');
 
   useEffect(() => {
     setUserName(user?.name || user?.email || 'User');
     setUserAvatar(user?.avatar || '');
-  }, [user?.name, user?.email]);
-
+  }, [user?.name, user?.email, user?.avatar]);
 
   const content = (
     <div>
@@ -71,7 +69,6 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
     </div>
   );
   const onSearch = (e) => {
-    setSearch(e.target.value);
     dispatch(searchProduct(e.target.value));
   }
 

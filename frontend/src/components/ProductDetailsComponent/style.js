@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Col, Image, InputNumber } from "antd";
+import { Image, InputNumber } from "antd";
 
 export const WrapperContainerImage = styled.div`
   display: flex;

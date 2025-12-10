@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react'
-import { 
+import {
     WrapperContainer,
-    WrapperContentProfile, 
-    WrapperHeader, 
-    WrapperInput, 
-    WrapperLabel, 
+    WrapperContentProfile,
+    WrapperHeader,
+    WrapperInput,
+    WrapperLabel,
     WrapperUploadFile,
     WrapperAvatarSection,
     WrapperInfoGrid,
     WrapperInfoCard,
     WrapperActionButtons
 } from './style'
-import InputForm from '../../components/InputForm/InputForm'
-import { Button, Upload, Input, Divider } from 'antd';
+
+import { Button, Input } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import * as UserService from '../../service/UserService'
@@ -20,7 +20,7 @@ import { useMutationHooks } from '../../hooks/useMutationHook';
 import Loading from '../../components/LoadingComponent/Loading';
 import * as message from '../../components/Message/Message'
 import { updateUser } from '../../redux/slides/userSlide'
-import { UploadOutlined, UserOutlined, MailOutlined, PhoneOutlined, HomeOutlined, SaveOutlined, CameraOutlined } from '@ant-design/icons';
+import { UserOutlined, MailOutlined, PhoneOutlined, HomeOutlined, SaveOutlined, CameraOutlined } from '@ant-design/icons';
 import { getBase64 } from '../../utils';
 
 const ProfilePage = () => {
@@ -52,7 +52,7 @@ const ProfilePage = () => {
             UserService.updateUser(id, rests, access_token)
         }
     )
-    const { data, isPending, isSuccess, isError } = mutation
+    const { isPending, isSuccess, isError } = mutation
 
 
     const handleOnchangeEmail = (value) => {
@@ -77,11 +77,10 @@ const ProfilePage = () => {
     const handleUpdate = () => {
         mutation.mutate({ id: user?.id, name, email, phone, address, avatar, access_token: user?.access_token });
     }
-    const handleGetDetailsUser = async (id, token) => {
-        const res = await UserService.getDetailsUser(id, token)
-        dispatch(updateUser({ ...res?.data, access_token: token }))
-
-    }
+    const handleGetDetailsUser = React.useCallback(async (id, token) => {
+        const res = await UserService.getDetailsUser(id, token);
+        dispatch(updateUser({ ...res?.data, access_token: token }));
+    }, [dispatch]);
     useEffect(() => {
         setEmail(user?.email);
         setName(user?.name);
@@ -98,7 +97,7 @@ const ProfilePage = () => {
         else if (isError) {
             message.error();
         }
-    }, [isSuccess, isError]);
+    }, [isSuccess, isError, handleGetDetailsUser, user?.id, user?.access_token]);
 
 
     return (
@@ -113,15 +112,15 @@ const ProfilePage = () => {
                     <WrapperAvatarSection>
                         <div className="avatar-wrapper">
                             {avatar ? (
-                                <img 
-                                    src={avatar} 
+                                <img
+                                    src={avatar}
                                     style={{
                                         height: '140px',
                                         width: '140px',
                                         borderRadius: '50%',
                                         objectFit: 'cover'
-                                    }} 
-                                    alt="avatar" 
+                                    }}
+                                    alt="avatar"
                                 />
                             ) : (
                                 <div style={{
@@ -140,9 +139,9 @@ const ProfilePage = () => {
                                 </div>
                             )}
                         </div>
-                        
+
                         <WrapperUploadFile onChange={handleOnchangeAvatar} maxCount={1} showUploadList={false}>
-                            <Button 
+                            <Button
                                 icon={<CameraOutlined />}
                                 size="large"
                                 style={{
@@ -254,14 +253,14 @@ const ProfilePage = () => {
 
                     {/* Action Buttons */}
                     <WrapperActionButtons>
-                        <Button 
+                        <Button
                             className="primary"
                             icon={<SaveOutlined />}
                             onClick={handleUpdate}
                         >
                             Lưu tất cả thay đổi
                         </Button>
-                        <Button 
+                        <Button
                             className="secondary"
                             onClick={() => navigate('/')}
                         >
