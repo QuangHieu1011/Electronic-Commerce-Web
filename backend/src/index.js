@@ -13,8 +13,9 @@ dotenv.config()
 const app = express()
 const server = http.createServer(app)
 const allowedOrigins = [
+    "http://localhost:3000",
     "https://electronic-commerce-web.vercel.app",
-    "https://electronic-commerce-web.onrender.com"
+    "https://electronic-commerce-web.onrender.com",
 ];
 const io = new Server(server, {
     cors: {
@@ -27,9 +28,19 @@ const io = new Server(server, {
 const port = process.env.PORT || 3001
 
 app.use(cors({
-    origin: allowedOrigins,
-    credentials: true
-}))
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    optionsSuccessStatus: 200
+}));
+
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb' }));
 app.use(bodyParser.json())
