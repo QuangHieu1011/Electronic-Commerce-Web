@@ -39,6 +39,7 @@ import socketService from '../../service/SocketService'
 import { updateOrderStatus, updatePaymentStatus, cancelOrder, deleteOrderPermanently, syncOrdersFromAPI, restoreOrderForUser, clearOrders } from '../../redux/slides/orderSlice'
 import { message } from 'antd'
 import * as OrderService from '../../service/OrderService'
+import { formatPrice } from '../../utils'
 
 const { Option } = Select
 
@@ -129,14 +130,6 @@ const AdminOrderManagement = () => {
             socketService.off('paymentStatusUpdate', handlePaymentStatusUpdate)
         }
     }, [dispatch])
-
-    // Format price function
-    const formatPrice = (price) => {
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
-        }).format(price)
-    }
 
     // Get order status info
     const getOrderStatusInfo = (status) => {

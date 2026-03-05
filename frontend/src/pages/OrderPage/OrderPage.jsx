@@ -13,6 +13,7 @@ import { MinusOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { updateQuantity, removeFromCart } from '../../redux/slides/cartSlice'
+import { formatPrice } from '../../utils'
 
 const OrderPage = () => {
   const [selectedItems, setSelectedItems] = useState({});
@@ -49,14 +50,6 @@ const OrderPage = () => {
     const allSelected = cart.cartItems.length > 0 && cart.cartItems.every(item => selectedItems[item.product._id]);
     setSelectAll(allSelected);
   }, [cart.cartItems, selectedItems]);
-
-  // Format price function
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
-    }).format(price);
-  };
 
   // Calculate discounted price
   const calculateDiscountedPrice = (product) => {

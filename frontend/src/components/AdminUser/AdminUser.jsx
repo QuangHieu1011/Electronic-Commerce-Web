@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { DeleteOutlined, EditOutlined, SearchOutlined } from '@ant-design/icons'
-import { WrapperHeader, WrapperUploadFile } from './style'
+import { WrapperHeader, WrapperUploadFile, WrapperContainer } from './style'
 import { Button, Form, Space } from 'antd'
 import TableComponent from '../TableComponent/TableComponent'
 import InputComponent from '../InputComponent/InputComponent'
@@ -378,8 +378,8 @@ const AdminUser = (props) => {
     })
   }
   return (
-    <div>
-      <WrapperHeader> Quản lí Người Dùng</WrapperHeader>
+    <WrapperContainer>
+      <WrapperHeader>Quản lí Người Dùng</WrapperHeader>
 
       <div style={{ marginTop: '10px' }}>
         <TableComponent handleDeleteManyUsers={handleDeleteManyUsers} columns={columns} data={dataTable} isLoading={isLoadingUsers} onRow={(record, rowIndex) => {
@@ -484,7 +484,7 @@ const AdminUser = (props) => {
           </div>
         </Loading>
       </ModalComponent>
-    </div>
+    </WrapperContainer>
   )
 }
 

@@ -25,6 +25,7 @@ import { message } from 'antd'
 import * as OrderService from '../../service/OrderService'
 import socketService from '../../service/SocketService'
 import OrderTrackMap from '../../components/OrderTrackMap/OrderTrackMap'
+import { formatPrice } from '../../utils'
 
 const { Option } = Select
 
@@ -180,14 +181,6 @@ const OrderTrackingPage = () => {
         // If not logged in, show guest orders (fallback)
         return order.userId === 'guest'
     })
-
-    // Format price function
-    const formatPrice = (price) => {
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
-        }).format(price)
-    }
 
     // Get order status color and text
     const getOrderStatusInfo = (status) => {

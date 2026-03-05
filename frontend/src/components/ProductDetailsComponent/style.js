@@ -129,16 +129,16 @@ export const WrapperStyleTextSell=styled.span`
 `
 
 export const WrapperPriceProduct=styled.div`
-    background: linear-gradient(135deg, #fff5f5 0%, #ffe7e7 100%);
+    background: #fff;
     border-radius: 12px;
     padding: 4px;
     margin: 20px 0;
-    box-shadow: 0 2px 8px rgba(255, 77, 79, 0.1);
+    border: 2px solid #1a94ff;
+    box-shadow: 0 2px 8px rgba(26, 148, 255, 0.1);
     transition: all 0.3s ease;
 
     &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(255, 77, 79, 0.2);
+        box-shadow: 0 4px 12px rgba(26, 148, 255, 0.15);
     }
 
     @media (max-width: 768px) {
@@ -154,8 +154,7 @@ export const WrapperPriceTextProduct=styled.h1`
     padding: 12px 16px;
     margin-top: 0;
     margin-bottom: 0;
-    color: #ff4d4f;
-    text-shadow: 0 2px 4px rgba(255, 77, 79, 0.1);
+    color: #1a94ff;
 
     @media (max-width: 768px) {
         font-size: 28px;

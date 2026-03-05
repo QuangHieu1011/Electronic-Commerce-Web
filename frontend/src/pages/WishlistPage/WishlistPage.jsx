@@ -32,12 +32,11 @@ const WishlistPage = () => {
                     >
                         Về trang chủ
                     </Button>
-                    <h2>❤️ Sản Phẩm Yêu Thích</h2>
+                    <h2>Sản Phẩm Yêu Thích</h2>
                     <div style={{ width: '100px' }}></div>
                 </WrapperHeader>
 
                 <WrapperEmpty>
-                    <div className="empty-icon">💔</div>
                     <div className="empty-title">Chưa có sản phẩm yêu thích</div>
                     <div className="empty-description">
                         Hãy thêm sản phẩm yêu thích để dễ dàng tìm lại sau này
@@ -60,7 +59,7 @@ const WishlistPage = () => {
                 >
                     Về trang chủ
                 </Button>
-                <h2>❤️ Sản Phẩm Yêu Thích ({wishlistItems.length})</h2>
+                <h2>Sản Phẩm Yêu Thích ({wishlistItems.length})</h2>
                 <Button
                     icon={<DeleteOutlined />}
                     onClick={handleClearAll}
