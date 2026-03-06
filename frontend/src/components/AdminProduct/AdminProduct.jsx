@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons'
-import { WrapperHeader, WrapperUploadFile } from './style'
+import { WrapperHeader, WrapperUploadFile, WrapperContainer } from './style'
 import { Button, Form, Select, Space } from 'antd'
 import TableComponent from '../TableComponent/TableComponent'
 import InputComponent from '../InputComponent/InputComponent'
-import { getBase64, renderOption } from '../../utils'
+import { getBase64, renderOption, formatPrice } from '../../utils'
 import * as ProductService from '../../service/ProductService'
 import { useMutationHooks } from '../../hooks/useMutationHook'
 import Loading from '../LoadingComponent/Loading'
@@ -271,13 +271,13 @@ const AdminProduct = (props) => {
                     value: '<=',
                 },
             ],
-
             onFilter: (value, record) => {
                 if (value === '>=') {
                     return record.price >= 50;
                 }
                 return record.price <= 50;
             },
+            render: (price) => formatPrice(price)
         },
         {
             title: 'Rating',
@@ -483,8 +483,8 @@ const AdminProduct = (props) => {
 
 
     return (
-        <div>
-            <WrapperHeader> Quản lí Sản Phẩm</WrapperHeader>
+        <WrapperContainer>
+            <WrapperHeader>Quản lí Sản Phẩm</WrapperHeader>
             <div style={{ marginTop: '10px' }}>
                 <Button style={{ height: '150px', width: '150px', borderRadius: '6px', borderStyle: 'dashed' }} onClick={() => {
                     setIsModalOpen(true);
@@ -720,7 +720,7 @@ const AdminProduct = (props) => {
                     </div>
                 </Loading>
             </ModalComponent>
-        </div>
+        </WrapperContainer>
     )
 }
 

@@ -9,6 +9,7 @@ import * as UserService from './service/UserService'
 import { useDispatch, useSelector } from 'react-redux'
 import { updateUser, updateAccessToken } from './redux/slides/userSlide'
 import Loading from './components/LoadingComponent/Loading'
+import ChatBot from './components/ChatBot/ChatBot'
 
 
 
@@ -89,23 +90,26 @@ function App() {
         <Loading isLoading={true}>
         </Loading>
       ) : (
-        <Router>
-          <Routes>
-            {routes.map((route) => {
-              const ischeckAuth = !route.isPrivate || user.isAdmin;
-              if (typeof route.path !== 'string' || !ischeckAuth) return null;
-              const Page = route.page;
-              const Layout = route.isShowHeader ? DefaultComponent : Fragment;
-              return (
-                <Route key={route.path} path={route.path} element={
-                  <Layout>
-                    <Page />
-                  </Layout>
-                } />
-              );
-            })}
-          </Routes>
-        </Router>
+        <>
+          <Router>
+            <Routes>
+              {routes.map((route) => {
+                const ischeckAuth = !route.isPrivate || user.isAdmin;
+                if (typeof route.path !== 'string' || !ischeckAuth) return null;
+                const Page = route.page;
+                const Layout = route.isShowHeader ? DefaultComponent : Fragment;
+                return (
+                  <Route key={route.path} path={route.path} element={
+                    <Layout>
+                      <Page />
+                    </Layout>
+                  } />
+                );
+              })}
+            </Routes>
+          </Router>
+          <ChatBot />
+        </>
       )}
     </div>
   )

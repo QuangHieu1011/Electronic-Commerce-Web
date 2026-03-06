@@ -22,6 +22,8 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { addToCart } from '../../redux/slides/cartSlice'
 import { message } from 'antd'
+import CardComponent from '../CardComponent/CardComponent'
+import { formatPrice } from '../../utils'
 
 
 const ProductDetailsComponent = ({ idProduct }) => {
@@ -79,6 +81,22 @@ const ProductDetailsComponent = ({ idProduct }) => {
     enabled: !!idProduct,
   })
 
+  // Fetch similar products based on type
+  const fetchSimilarProducts = async () => {
+    if (productDetails?.type) {
+      const res = await ProductService.getAllProduct('', 8, 0, null, ['type', productDetails.type])
+      // Filter out current product
+      return res.data.filter(item => item._id !== idProduct)
+    }
+    return []
+  }
+
+  const { data: similarProducts = [] } = useQuery({
+    queryKey: ['similar-products', productDetails?.type, idProduct],
+    queryFn: fetchSimilarProducts,
+    enabled: !!productDetails?.type,
+  })
+
   // Khởi tạo selectedImage khi productDetails load xong
   React.useEffect(() => {
     if (productDetails?.image) {
@@ -99,7 +117,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
 
   return (
     <Loading isLoading={isPending}>
-      <Row style={{ padding: '16px', background: '#fff', borderRadius: '4px' }}>
+      <Row style={{ padding: '24px', background: '#fff', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.06)' }}>
 
         <Col span={10} style={{ borderRight: '1px solid #e5e5e5', paddingRight: '10px' }}>
           <WrapperContainerImage>
@@ -145,7 +163,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
             <WrapperStyleTextSell>| Đã bán 1000+</WrapperStyleTextSell>
           </div>
           <WrapperPriceProduct>
-            <WrapperPriceTextProduct>{productDetails?.price}</WrapperPriceTextProduct>
+            <WrapperPriceTextProduct>{formatPrice(productDetails?.price)}</WrapperPriceTextProduct>
           </WrapperPriceProduct>
           <WrapperAddressProduct>
             <span>Giao đến </span>
@@ -170,16 +188,19 @@ const ProductDetailsComponent = ({ idProduct }) => {
             <Button
               onClick={handleAddToCart}
               style={{
-                backgroundColor: 'rgb(255, 57, 69)',
+                backgroundColor: '#1a94ff',
                 height: '48px',
                 width: '220px',
                 border: 'none',
-                borderRadius: '4px',
+                borderRadius: '8px',
                 color: '#fff',
                 fontSize: '15px',
-                fontWeight: '700',
-                margin: '26px 0 10px'
+                fontWeight: '600',
+                margin: '26px 0 10px',
+                transition: 'all 0.3s ease'
               }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0d7de8'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#1a94ff'}
             >
               Chọn mua
             </Button>
@@ -189,12 +210,21 @@ const ProductDetailsComponent = ({ idProduct }) => {
                 backgroundColor: '#fff',
                 height: '48px',
                 width: '220px',
-                border: '1px solid rgb(13, 92, 182)',
-                borderRadius: '4px',
-                color: 'rgb(13, 92, 182)',
+                border: '2px solid #1a94ff',
+                borderRadius: '8px',
+                color: '#1a94ff',
                 fontSize: '15px',
-                fontWeight: '500',
-                margin: '26px 0 10px'
+                fontWeight: '600',
+                margin: '26px 0 10px',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#1a94ff';
+                e.currentTarget.style.color = '#fff';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#fff';
+                e.currentTarget.style.color = '#1a94ff';
               }}
             >
               Mua trả sau
@@ -205,16 +235,17 @@ const ProductDetailsComponent = ({ idProduct }) => {
       </Row>
 
       {/* Mô tả sản phẩm */}
-      <Row style={{ padding: '24px', background: '#fff', borderRadius: '12px', marginTop: '20px' }}>
+      <Row style={{ padding: '24px', background: '#fff', borderRadius: '8px', marginTop: '20px', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.06)' }}>
         <Col span={24}>
           <h2 style={{ 
-            fontSize: '22px', 
-            fontWeight: '700', 
+            fontSize: '20px', 
+            fontWeight: '600', 
             marginBottom: '20px',
-            borderBottom: '2px solid #1890ff',
-            paddingBottom: '12px'
+            color: '#262626',
+            borderLeft: '4px solid #1a94ff',
+            paddingLeft: '16px'
           }}>
-            📝 Mô tả sản phẩm
+            Mô tả sản phẩm
           </h2>
           <div style={{ 
             fontSize: '15px', 
@@ -228,16 +259,17 @@ const ProductDetailsComponent = ({ idProduct }) => {
       </Row>
 
       {/* Đánh giá và bình luận */}
-      <Row style={{ padding: '24px', background: '#fff', borderRadius: '12px', marginTop: '20px' }}>
+      <Row style={{ padding: '24px', background: '#fff', borderRadius: '8px', marginTop: '20px', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.06)' }}>
         <Col span={24}>
           <h2 style={{ 
-            fontSize: '22px', 
-            fontWeight: '700', 
+            fontSize: '20px', 
+            fontWeight: '600', 
             marginBottom: '20px',
-            borderBottom: '2px solid #1890ff',
-            paddingBottom: '12px'
+            color: '#262626',
+            borderLeft: '4px solid #1a94ff',
+            paddingLeft: '16px'
           }}>
-            ⭐ Đánh giá & Nhận xét
+            Đánh giá & Nhận xét
           </h2>
 
           {/* Tổng quan đánh giá */}
@@ -307,7 +339,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
                     width: '48px',
                     height: '48px',
                     borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    background: '#1a94ff',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -334,7 +366,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
                     </div>
                     <div style={{ fontSize: '14px', lineHeight: '1.6', color: '#595959' }}>
                       Sản phẩm rất tốt, chất lượng đúng như mô tả. Shop phục vụ nhiệt tình, 
-                      giao hàng nhanh. Mình sẽ [综 tiếp ủng hộ shop! 👍
+                      giao hàng nhanh. Mình sẽ tiếp tục ủng hộ shop!
                     </div>
                     <div style={{ 
                       marginTop: '12px',
@@ -348,13 +380,14 @@ const ProductDetailsComponent = ({ idProduct }) => {
                           height: '80px',
                           background: '#f5f5f5',
                           borderRadius: '8px',
+                          border: '1px solid #e5e7eb',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           fontSize: '12px',
                           color: '#8c8c8c'
                         }}>
-                          📷
+                          Ảnh {imgIndex}
                         </div>
                       ))}
                     </div>
@@ -372,7 +405,9 @@ const ProductDetailsComponent = ({ idProduct }) => {
                 borderRadius: '8px',
                 padding: '0 40px',
                 height: '44px',
-                fontWeight: '600'
+                fontWeight: '600',
+                border: '1px solid #1a94ff',
+                color: '#1a94ff'
               }}
             >
               Xem thêm đánh giá
@@ -380,6 +415,46 @@ const ProductDetailsComponent = ({ idProduct }) => {
           </div>
         </Col>
       </Row>
+
+      {/* Sản phẩm tương tự */}
+      {similarProducts.length > 0 && (
+        <Row style={{ padding: '24px', background: '#fff', borderRadius: '8px', marginTop: '20px', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.06)' }}>
+          <Col span={24}>
+            <h2 style={{ 
+              fontSize: '20px', 
+              fontWeight: '600', 
+              marginBottom: '24px',
+              color: '#262626',
+              borderLeft: '4px solid #1a94ff',
+              paddingLeft: '16px'
+            }}>
+              Có thể bạn cũng thích
+            </h2>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+              gap: '20px',
+              justifyItems: 'center'
+            }}>
+              {similarProducts.slice(0, 6).map((product) => (
+                <CardComponent
+                  key={product._id}
+                  countInStock={product.countInStock}
+                  description={product.description}
+                  image={product.image}
+                  name={product.name}
+                  price={product.price}
+                  rating={product.rating}
+                  type={product.type}
+                  selled={product.selled}
+                  discount={product.discount}
+                  id={product._id}
+                />
+              ))}
+            </div>
+          </Col>
+        </Row>
+      )}
     </Loading>
   )
 }

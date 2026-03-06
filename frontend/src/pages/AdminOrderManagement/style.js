@@ -3,55 +3,71 @@ import styled from 'styled-components'
 export const WrapperContainer = styled.div`
   max-width: 1400px;
   margin: 0 auto;
-  padding: 20px;
-  background: #f8f9fa;
+  padding: 24px;
+  background: #f5f5f5;
   min-height: 100vh;
 `
 
 export const WrapperHeader = styled.div`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: #fff;
+  color: #262626;
   padding: 24px;
-  border-radius: 12px;
+  border-radius: 8px;
   margin-bottom: 24px;
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   display: flex;
   align-items: center;
   gap: 16px;
+  border-left: 4px solid #1a94ff;
   
   h2 {
     margin: 0;
     font-size: 24px;
     font-weight: 600;
+    color: #262626;
+    flex: 1;
+  }
+
+  button {
+    border: 1px solid #1a94ff;
+    color: #1a94ff;
+    
+    &:hover {
+      background: #1a94ff;
+      color: #fff;
+    }
   }
 `
 
 export const WrapperStats = styled.div`
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   
   .ant-card {
     text-align: center;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
     
     .ant-statistic-content {
-      font-size: 20px;
+      font-size: 24px;
       font-weight: 600;
+      color: #1a94ff;
     }
     
     .ant-statistic-title {
       color: #666;
-      font-size: 12px;
+      font-size: 14px;
+      font-weight: 500;
     }
   }
 `
 
 export const WrapperProductInfo = styled.div`
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   overflow: hidden;
-  border: 1px solid #f0f0f0;
+  border: 1px solid #e5e7eb;
 `
 
 export const WrapperProductImage = styled.div`
@@ -63,6 +79,7 @@ export const WrapperProductImage = styled.div`
   background: #fafafa;
   border-radius: 8px;
   overflow: hidden;
+  border: 1px solid #e5e7eb;
   
   img {
     width: 100%;
@@ -85,14 +102,15 @@ export const WrapperProductImage = styled.div`
 export const WrapperEmpty = styled.div`
   background: white;
   padding: 60px 40px;
-  border-radius: 12px;
+  border-radius: 8px;
   text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   
   .empty-title {
     font-size: 18px;
     color: #666;
     margin-bottom: 16px;
+    font-weight: 500;
   }
   
   .empty-description {
@@ -101,11 +119,15 @@ export const WrapperEmpty = styled.div`
   }
   
   .shopping-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #1a94ff;
     border: none;
     height: 40px;
     padding: 0 24px;
     border-radius: 8px;
     font-weight: 500;
+    
+    &:hover {
+      background: #0d7de8;
+    }
   }
 `
