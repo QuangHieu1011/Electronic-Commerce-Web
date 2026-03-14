@@ -1,7 +1,5 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-
-// Khởi tạo Gemini AI
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
+const OPENROUTER_DEFAULT_MODEL = "openai/gpt-4o-mini";
 
 const ChatBotController = {
   // Xử lý tin nhắn từ user
@@ -17,16 +15,16 @@ const ChatBotController = {
       }
 
       // Kiểm tra API key
-      if (!process.env.GEMINI_API_KEY) {
-        console.error('GEMINI_API_KEY chưa được cấu hình trong .env');
+      if (!process.env.OPENROUTER_API_KEY) {
+        console.error('OPENROUTER_API_KEY chưa được cấu hình trong .env');
         return res.status(500).json({
           success: false,
           message: 'Chatbot chưa được cấu hình đúng'
         });
       }
 
-      // Xử lý với Gemini AI
-      const botReply = await processWithGemini(message);
+      // Xử lý với OpenRouter
+      const botReply = await processWithOpenRouter(message);
 
       return res.status(200).json({
         success: true,
@@ -45,25 +43,19 @@ const ChatBotController = {
   }
 };
 
-// Hàm xử lý với Gemini AI
-async function processWithGemini(userMessage) {
+// Hàm xử lý với OpenRouter API
+async function processWithOpenRouter(userMessage) {
   try {
-    // Thử các model names khác nhau
     const modelNames = [
-      "gemini-1.5-flash",
-      "gemini-1.5-pro", 
-      "gemini-pro",
-      "models/gemini-pro"
-    ];
+      process.env.OPENROUTER_MODEL,
+      OPENROUTER_DEFAULT_MODEL,
+      "openai/gpt-4.1-mini",
+      "meta-llama/llama-3.1-8b-instruct"
+    ].filter(Boolean);
     
     let lastError = null;
     
-    for (const modelName of modelNames) {
-      try {
-        const model = genAI.getGenerativeModel({ model: modelName });
-        
-        // System prompt để định hướng chatbot
-        const systemPrompt = `Bạn là trợ lý ảo thông minh của một cửa hàng điện tử trực tuyến (E-Commerce).
+    const systemPrompt = `Bạn là TechStore Chatbot - chatbot thông minh của một cửa hàng điện tử trực tuyến (E-Commerce).
 
 Nhiệm vụ của bạn:
 - Trả lời các câu hỏi về sản phẩm điện tử (laptop, điện thoại, phụ kiện, v.v.)
@@ -81,21 +73,44 @@ Thông tin về cửa hàng:
 - Giao hàng toàn quốc 2-3 ngày
 - Thanh toán qua PayPal hoặc COD
 - Bảo hành 12-24 tháng tùy sản phẩm
-- Hỗ trợ 24/7
+- Hỗ trợ 24/7`;
 
-Câu hỏi của khách hàng: ${userMessage}`;
+    for (const modelName of modelNames) {
+      try {
+        const response = await fetch(OPENROUTER_API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+            "HTTP-Referer": process.env.OPENROUTER_HTTP_REFERER || "http://localhost:3001",
+            "X-Title": process.env.OPENROUTER_APP_NAME || "TechStore Chatbot"
+          },
+          body: JSON.stringify({
+            model: modelName,
+            temperature: 0.6,
+            max_tokens: 300,
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userMessage }
+            ]
+          })
+        });
 
-        const result = await model.generateContent(systemPrompt);
-        const response = await result.response;
-        const text = response.text();
+        if (!response.ok) {
+          const errorBody = await response.text();
+          throw new Error(`OpenRouter HTTP ${response.status}: ${errorBody}`);
+        }
+
+        const data = await response.json();
+        const text = data?.choices?.[0]?.message?.content?.trim();
 
         if (text) {
-          console.log(`✅ Gemini AI success with model: ${modelName}`);
+          console.log(`OpenRouter success with model: ${modelName}`);
           return text;
         }
       } catch (err) {
         lastError = err;
-        console.log(`❌ Model ${modelName} failed, trying next...`);
+        console.log(`Model ${modelName} failed, trying next...`);
         continue;
       }
     }
@@ -104,7 +119,7 @@ Câu hỏi của khách hàng: ${userMessage}`;
     throw lastError;
 
   } catch (error) {
-    console.error('⚠️ Gemini AI không khả dụng, chuyển sang rule-based chatbot');
+    console.error('OpenRouter không khả dụng, chuyển sang rule-based chatbot');
     console.error('Error:', error.message);
     
     // Fallback: Rule-based chatbot thông minh
@@ -138,7 +153,7 @@ function getRuleBasedResponse(message) {
     'đổi trả|hoàn tiền': '🔄 Đổi trả trong 7 ngày nếu sản phẩm lỗi hoặc không đúng mô tả. Hoàn tiền 100% nếu chưa sử dụng!',
     
     // Chung
-    'xin chào|hi|hello|chào': '👋 Xin chào! Tôi là trợ lý ảo của TechStore. Tôi có thể giúp bạn tìm sản phẩm, tư vấn hoặc hỗ trợ đơn hàng. Bạn cần giúp gì?',
+    'xin chào|hi|hello|chào': '👋 Xin chào! Tôi là TechStore Chatbot. Tôi có thể giúp bạn tìm sản phẩm, tư vấn hoặc hỗ trợ đơn hàng. Bạn cần giúp gì?',
     'cảm ơn|thanks': '🙏 Rất vui được hỗ trợ bạn! Nếu cần thêm thông tin gì, đừng ngại hỏi nhé!',
     'liên hệ|hotline|số điện thoại': '📞 Hotline: 1900-xxxx (8h-22h hàng ngày)\n📧 Email: support@techstore.vn\nChúng tôi luôn sẵn sàng hỗ trợ!'
   };

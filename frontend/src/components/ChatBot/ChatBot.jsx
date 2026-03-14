@@ -5,7 +5,7 @@ const ChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     { 
-      text: 'Xin chào! Tôi là trợ lý ảo của cửa hàng. Tôi có thể giúp gì cho bạn?', 
+      text: 'Xin chào! Tôi là TechStore Chatbot. Tôi có thể giúp gì cho bạn?', 
       sender: 'bot', 
       timestamp: new Date() 
     }
@@ -33,7 +33,7 @@ const ChatBot = () => {
     setIsTyping(true);
 
     try {
-      // Gọi API backend Gemini
+      // Gọi API backend ChatBot (OpenRouter)
       const response = await fetch('http://localhost:3001/api/chatbot/message', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -77,7 +77,7 @@ const ChatBot = () => {
       <div 
         className={`chat-bubble ${isOpen ? 'open' : ''}`}
         onClick={() => setIsOpen(!isOpen)}
-        title="Trò chuyện với trợ lý ảo"
+        title="Trò chuyện với TechStore Chatbot"
       >
         {isOpen ? '✕' : '💬'}
       </div>
@@ -89,7 +89,7 @@ const ChatBot = () => {
             <div className="chat-header-content">
               <span className="chat-bot-avatar">🤖</span>
               <div className="chat-header-text">
-                <h3>Trợ lý ảo</h3>
+                <h3>TechStore Chatbot</h3>
                 <p className="chat-status">Đang hoạt động</p>
               </div>
             </div>

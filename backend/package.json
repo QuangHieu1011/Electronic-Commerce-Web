@@ -12,7 +12,6 @@
     "seed": "node src/seedProducts.js"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.24.1",
     "@paypal/checkout-server-sdk": "^1.0.3",
     "bcrypt": "^6.0.0",
     "body-parser": "^2.2.0",
