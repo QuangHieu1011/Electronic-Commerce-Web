@@ -5,12 +5,16 @@ export const WrapperTypeProduct = styled.div`
     display: flex;
     align-items: center;
     gap: 20px;
-    justify-content: flex-start;
+    justify-content: center;
     min-height: 50px;
-    padding: 10px 0;
+    padding: 20px 40px;
     overflow-x: auto;
     overflow-y: hidden;
     scrollbar-width: thin;
+    background: linear-gradient(to right, #f8f9fa 0%, #ffffff 50%, #f8f9fa 100%);
+    border-radius: 16px;
+    margin: 20px 0;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
     
     &::-webkit-scrollbar {
         height: 6px;
@@ -23,7 +27,7 @@ export const WrapperTypeProduct = styled.div`
 
     @media (max-width: 768px) {
         gap: 12px;
-        padding: 8px 0;
+        padding: 16px 20px;
         justify-content: flex-start;
     }
 `
@@ -62,29 +66,17 @@ export const WrapperButtonMore = styled(Button)`
 
 export const WrapperProducts = styled.div`
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 18px;
     margin-top: 30px;
-    animation: fadeIn 0.6s ease-out;
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
 
     @media (max-width: 1400px) {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
         gap: 16px;
     }
 
     @media (max-width: 1200px) {
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        grid-template-columns: repeat(4, 1fr);
     }
 
     @media (max-width: 992px) {

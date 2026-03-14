@@ -12,18 +12,12 @@ import {
     WrapperProductCell,
     WrapperEmpty
 } from './style'
+import { formatPrice } from '../../utils'
 
 const ComparisonPage = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const comparisonItems = useSelector((state) => state.comparison.comparisonItems)
-
-    const formatPrice = (price) => {
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
-        }).format(price)
-    }
 
     const calculateDiscountedPrice = (product) => {
         if (product.discount && product.discount > 0) {
@@ -61,7 +55,6 @@ const ComparisonPage = () => {
                 </WrapperHeader>
 
                 <WrapperEmpty>
-                    <div className="empty-icon">📊</div>
                     <div className="empty-title">Chưa có sản phẩm để so sánh</div>
                     <div className="empty-description">
                         Hãy thêm sản phẩm vào danh sách so sánh để xem sự khác biệt

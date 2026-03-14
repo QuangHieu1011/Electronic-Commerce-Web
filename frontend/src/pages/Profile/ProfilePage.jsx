@@ -127,7 +127,7 @@ const ProfilePage = () => {
                                     height: '140px',
                                     width: '140px',
                                     borderRadius: '50%',
-                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                    background: '#1a94ff',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
@@ -145,14 +145,14 @@ const ProfilePage = () => {
                                 icon={<CameraOutlined />}
                                 size="large"
                                 style={{
-                                    marginTop: '20px',
-                                    borderRadius: '24px',
-                                    padding: '0 32px',
-                                    height: '48px',
-                                    fontSize: '15px',
+                                    marginTop: '18px',
+                                    borderRadius: '8px',
+                                    padding: '0 24px',
+                                    height: '44px',
+                                    fontSize: '14px',
                                     fontWeight: '600',
-                                    border: '2px solid #667eea',
-                                    color: '#667eea'
+                                    border: '1px solid #1a94ff',
+                                    color: '#1a94ff'
                                 }}
                             >
                                 Thay đổi ảnh đại diện
