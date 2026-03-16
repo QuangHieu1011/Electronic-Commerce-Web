@@ -4,11 +4,13 @@ import { Checkbox, Rate, Slider, Button } from 'antd'
 import * as ProductService from '../../service/ProductService'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
+import { useLanguage } from '../../context/LanguageContext'
 
 const NavbarComponent = ({ type, onFilterChange }) => {
     const [selectedRating, setSelectedRating] = useState([]);
     const [priceRange, setPriceRange] = useState([0, 100000000]);
     const navigate = useNavigate();
+    const { t } = useLanguage();
 
     const handleNavigateToType = (categoryType) => {
         const encodedType = encodeURIComponent(categoryType.replace(/ /g, '_'));
@@ -88,7 +90,7 @@ const NavbarComponent = ({ type, onFilterChange }) => {
                                 <Checkbox key={index} value={option}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                         <Rate style={{ fontSize: '12px' }} disabled defaultValue={option} />
-                                        <span>{`Từ ${option} sao`}</span>
+                                        <span>{t('navbar.fromStars', { count: option })}</span>
                                     </div>
                                 </Checkbox>
                             )
@@ -146,21 +148,21 @@ const NavbarComponent = ({ type, onFilterChange }) => {
     return (
         <div>
             <div style={{ marginBottom: '20px' }}>
-                <WrapperLableText>Danh mục sản phẩm</WrapperLableText>
+                <WrapperLableText>{t('navbar.categories')}</WrapperLableText>
                 <WrapperContent>
                     {renderContent('text', allTypes || ['Laptop', 'Điện thoại', 'Tablet', 'Đồng hồ'])}
                 </WrapperContent>
             </div>
 
             <div style={{ marginBottom: '20px' }}>
-                <WrapperLableText>Đánh giá</WrapperLableText>
+                <WrapperLableText>{t('navbar.rating')}</WrapperLableText>
                 <WrapperContent>
                     {renderContent('star', [5, 4, 3])}
                 </WrapperContent>
             </div>
 
             <div style={{ marginBottom: '20px' }}>
-                <WrapperLableText>Khoảng giá (triệu VNĐ)</WrapperLableText>
+                <WrapperLableText>{t('navbar.priceRange')}</WrapperLableText>
                 <WrapperContent>
                     {renderContent('price', [])}
                 </WrapperContent>
@@ -171,7 +173,7 @@ const NavbarComponent = ({ type, onFilterChange }) => {
                 onClick={resetFilters}
                 style={{ width: '100%', marginTop: '10px' }}
             >
-                Xóa bộ lọc
+                {t('navbar.clearFilters')}
             </Button>
         </div>
     )

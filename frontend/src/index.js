@@ -8,17 +8,20 @@ import { PersistGate } from 'redux-persist/integration/react'
 import { store, persistor } from './redux/store'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Loading from './components/LoadingComponent/Loading';
+import { LanguageProvider } from './context/LanguageContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 const queryClient = new QueryClient();
 root.render(
   // <React.StrictMode>
   <QueryClientProvider client={queryClient}>
-    <Provider store={store}>
-      <PersistGate loading={<Loading isLoading={true} />} persistor={persistor}>
-        <App />
-      </PersistGate>
-    </Provider>
+    <LanguageProvider>
+      <Provider store={store}>
+        <PersistGate loading={<Loading isLoading={true} />} persistor={persistor}>
+          <App />
+        </PersistGate>
+      </Provider>
+    </LanguageProvider>
   </QueryClientProvider>
   // </React.StrictMode>
 );

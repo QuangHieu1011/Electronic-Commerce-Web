@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './ChatBot.css';
+import { useLanguage } from '../../context/LanguageContext';
 
 const ChatBot = () => {
+  const { language, t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     { 
-      text: 'Xin chào! Tôi là TechStore Chatbot. Tôi có thể giúp gì cho bạn?', 
+      text: t('chatbot.welcome'), 
       sender: 'bot', 
       timestamp: new Date() 
     }
@@ -55,7 +57,7 @@ const ChatBot = () => {
     } catch (error) {
       console.error('Error:', error);
       setMessages(prev => [...prev, { 
-        text: 'Xin lỗi, có lỗi xảy ra. Vui lòng thử lại sau.', 
+        text: t('chatbot.error'), 
         sender: 'bot',
         timestamp: new Date()
       }]);
@@ -77,7 +79,7 @@ const ChatBot = () => {
       <div 
         className={`chat-bubble ${isOpen ? 'open' : ''}`}
         onClick={() => setIsOpen(!isOpen)}
-        title="Trò chuyện với TechStore Chatbot"
+        title={t('chatbot.title')}
       >
         {isOpen ? '✕' : '💬'}
       </div>
@@ -90,7 +92,7 @@ const ChatBot = () => {
               <span className="chat-bot-avatar">🤖</span>
               <div className="chat-header-text">
                 <h3>TechStore Chatbot</h3>
-                <p className="chat-status">Đang hoạt động</p>
+                <p className="chat-status">{t('chatbot.active')}</p>
               </div>
             </div>
             <button className="chat-close-btn" onClick={() => setIsOpen(false)}>✕</button>
@@ -103,7 +105,7 @@ const ChatBot = () => {
                 <div className="message-bubble">
                   <p>{msg.text}</p>
                   <span className="message-time">
-                    {msg.timestamp.toLocaleTimeString('vi-VN', { 
+                    {msg.timestamp.toLocaleTimeString(language === 'vi' ? 'vi-VN' : 'en-US', {
                       hour: '2-digit', 
                       minute: '2-digit' 
                     })}
@@ -131,7 +133,7 @@ const ChatBot = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Nhập tin nhắn..."
+              placeholder={t('chatbot.inputPlaceholder')}
               disabled={isTyping}
               autoComplete="off"
             />

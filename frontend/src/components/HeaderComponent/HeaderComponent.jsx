@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Badge, Col, Popover } from 'antd';
+import { Badge, Col, Popover, Switch } from 'antd';
 import { WrapperContentPopup, WrapperHeader, WrapperHeaderAccount, WrapperText, WrapperTextHeader } from './style';
 // import Search from 'antd/es/transfer/search'; (không sử dụng)
 import {
@@ -16,6 +16,7 @@ import * as UserService from '../../service/UserService'
 import { resetUser } from '../../redux/slides/userSlide'
 import Loading from '../LoadingComponent/Loading';
 import { searchProduct } from '../../redux/slides/productSlide';
+import { useLanguage } from '../../context/LanguageContext';
 
 
 
@@ -29,6 +30,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
   const comparisonItems = useSelector((state) => state.comparison?.comparisonItems || []);
   const wishlistItems = useSelector((state) => state.wishlist?.wishlistItems || []);
   const dispatch = useDispatch();
+  const { language, setLanguage, t } = useLanguage();
   const handleNavigatedLogin = () => {
     navigate('/sign-in');
   }
@@ -48,24 +50,24 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
     window.location.href = '/';
   }
 
-  const [userName, setUserName] = useState(user?.name || user?.email || 'User');
+  const [userName, setUserName] = useState(user?.name || user?.email || t('common.user'));
   const [userAvatar, setUserAvatar] = useState('');
 
   useEffect(() => {
-    setUserName(user?.name || user?.email || 'User');
+    setUserName(user?.name || user?.email || t('common.user'));
     setUserAvatar(user?.avatar || '');
-  }, [user?.name, user?.email, user?.avatar]);
+  }, [user?.name, user?.email, user?.avatar, t]);
 
   const content = (
     <div>
-      <WrapperContentPopup onClick={() => navigate('/profile-user')}>Thông tin người dùng</WrapperContentPopup>
+      <WrapperContentPopup onClick={() => navigate('/profile-user')}>{t('header.userInfo')}</WrapperContentPopup>
       {!user.isAdmin && (
-        <WrapperContentPopup onClick={() => navigate('/order-tracking')}>Theo dõi đơn hàng</WrapperContentPopup>
+        <WrapperContentPopup onClick={() => navigate('/order-tracking')}>{t('header.trackOrder')}</WrapperContentPopup>
       )}
       {user.isAdmin && (
-        <WrapperContentPopup onClick={() => navigate('/system/admin')}>Quản lí hệ thống</WrapperContentPopup>
+        <WrapperContentPopup onClick={() => navigate('/system/admin')}>{t('header.adminSystem')}</WrapperContentPopup>
       )}
-      <WrapperContentPopup onClick={handleLogout}>Đăng xuất</WrapperContentPopup>
+      <WrapperContentPopup onClick={handleLogout}>{t('header.logout')}</WrapperContentPopup>
     </div>
   );
   const onSearch = (e) => {
@@ -82,8 +84,8 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
           <Col span={12}>
             <ButtonInputSearch
               size="large"
-              placeholder="Input search text"
-              textButton="Search"
+              placeholder={t('common.searchPlaceholder')}
+              textButton={t('common.searchButton')}
               onChange={onSearch}
             />
           </Col>
@@ -91,6 +93,13 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
 
         <Col span={8}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+            <Switch
+              checked={language === 'en'}
+              onChange={(checked) => setLanguage(checked ? 'en' : 'vi')}
+              checkedChildren="EN"
+              unCheckedChildren="VI"
+              style={{ backgroundColor: language === 'en' ? '#52c41a' : '#1677ff' }}
+            />
             <Loading isLoading={loading}>
               <WrapperHeaderAccount>
                 {userAvatar ? (
@@ -105,9 +114,9 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
                   </>
                 ) : (
                   <div onClick={handleNavigatedLogin} style={{ cursor: 'pointer' }}>
-                    <WrapperText>Đăng nhập / Đăng ký</WrapperText>
+                    <WrapperText>{t('header.signInSignUp')}</WrapperText>
                     <div>
-                      <WrapperText>Tài Khoản</WrapperText>
+                      <WrapperText>{t('header.account')}</WrapperText>
                       <CaretDownOutlined />
                     </div>
                   </div>
@@ -120,19 +129,19 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
                   <Badge count={comparisonItems.length} size="small" style={{ backgroundColor: '#52c41a' }}>
                     <SwapOutlined style={{ fontSize: '28px', color: '#fff' }} />
                   </Badge>
-                  <WrapperText>So sánh</WrapperText>
+                  <WrapperText>{t('header.compare')}</WrapperText>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }} onClick={() => navigate('/wishlist')}>
                   <Badge count={wishlistItems.length} size="small" style={{ backgroundColor: '#ff4d4f' }}>
                     <HeartOutlined style={{ fontSize: '28px', color: '#fff' }} />
                   </Badge>
-                  <WrapperText>Yêu thích</WrapperText>
+                  <WrapperText>{t('header.wishlist')}</WrapperText>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }} onClick={() => navigate('/order')}>
                   <Badge count={cart?.totalQuantity || 0} size="small">
                     <ShoppingCartOutlined style={{ fontSize: '28px', color: '#fff' }} />
                   </Badge>
-                  <WrapperText>Giỏ Hàng</WrapperText>
+                  <WrapperText>{t('header.cart')}</WrapperText>
                 </div>
               </div>
             )}

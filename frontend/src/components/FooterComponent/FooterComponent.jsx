@@ -15,14 +15,17 @@ import {
     InstagramOutlined,
     YoutubeOutlined
 } from '@ant-design/icons'
+import { useLanguage } from '../../context/LanguageContext'
 
 const FooterComponent = () => {
+    const { t } = useLanguage()
+
     return (
         <WrapperFooter>
             <WrapperFooterContent>
                 <WrapperFooterSection>
                     <h3>TECHSTORE</h3>
-                    <p>Cửa hàng điện tử uy tín, chất lượng hàng đầu Việt Nam</p>
+                    <p>{t('footer.description')}</p>
                     <WrapperSocialLinks>
                         <a href="#" aria-label="Facebook"><FacebookOutlined /></a>
                         <a href="#" aria-label="Twitter"><TwitterOutlined /></a>
@@ -32,27 +35,27 @@ const FooterComponent = () => {
                 </WrapperFooterSection>
 
                 <WrapperFooterSection>
-                    <h4>Về chúng tôi</h4>
+                    <h4>{t('footer.aboutUs')}</h4>
                     <ul>
-                        <li><a href="#">Giới thiệu</a></li>
-                        <li><a href="#">Tuyển dụng</a></li>
-                        <li><a href="#">Tin tức</a></li>
-                        <li><a href="#">Hệ thống cửa hàng</a></li>
+                        <li><a href="#">{t('footer.introduction')}</a></li>
+                        <li><a href="#">{t('footer.careers')}</a></li>
+                        <li><a href="#">{t('footer.news')}</a></li>
+                        <li><a href="#">{t('footer.storeSystem')}</a></li>
                     </ul>
                 </WrapperFooterSection>
 
                 <WrapperFooterSection>
-                    <h4>Chính sách</h4>
+                    <h4>{t('footer.policy')}</h4>
                     <ul>
-                        <li><a href="#">Chính sách bảo hành</a></li>
-                        <li><a href="#">Chính sách đổi trả</a></li>
-                        <li><a href="#">Chính sách bảo mật</a></li>
-                        <li><a href="#">Điều khoản sử dụng</a></li>
+                        <li><a href="#">{t('footer.warrantyPolicy')}</a></li>
+                        <li><a href="#">{t('footer.returnPolicy')}</a></li>
+                        <li><a href="#">{t('footer.privacyPolicy')}</a></li>
+                        <li><a href="#">{t('footer.terms')}</a></li>
                     </ul>
                 </WrapperFooterSection>
 
                 <WrapperFooterSection>
-                    <h4>Liên hệ</h4>
+                    <h4>{t('footer.contact')}</h4>
                     <ul className="contact">
                         <li>
                             <PhoneOutlined /> 
@@ -64,7 +67,7 @@ const FooterComponent = () => {
                         </li>
                         <li>
                             <EnvironmentOutlined /> 
-                            <span>123 Đường ABC, Quận 1, TP.HCM</span>
+                            <span>{t('footer.address')}</span>
                         </li>
                     </ul>
                 </WrapperFooterSection>

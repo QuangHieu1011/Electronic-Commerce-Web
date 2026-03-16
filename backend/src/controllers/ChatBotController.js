@@ -155,7 +155,7 @@ function getRuleBasedResponse(message) {
     // Chung
     'xin chào|hi|hello|chào': '👋 Xin chào! Tôi là TechStore Chatbot. Tôi có thể giúp bạn tìm sản phẩm, tư vấn hoặc hỗ trợ đơn hàng. Bạn cần giúp gì?',
     'cảm ơn|thanks': '🙏 Rất vui được hỗ trợ bạn! Nếu cần thêm thông tin gì, đừng ngại hỏi nhé!',
-    'liên hệ|hotline|số điện thoại': '📞 Hotline: 1900-xxxx (8h-22h hàng ngày)\n📧 Email: support@techstore.vn\nChúng tôi luôn sẵn sàng hỗ trợ!'
+    'liên hệ|hotline|số điện thoại': '📞 Hotline: Admin (8h-22h hàng ngày)\n📧 Email: support@techstore.vn\nChúng tôi luôn sẵn sàng hỗ trợ!'
   };
   
   // Tìm response phù hợp
@@ -172,7 +172,7 @@ function getRuleBasedResponse(message) {
          '🚚 Giao hàng và vận chuyển\n' +
          '💳 Thanh toán và COD\n' +
          '🛡️ Bảo hành và đổi trả\n\n' +
-         'Hoặc liên hệ hotline: 1900-xxxx để được tư vấn trực tiếp!';
+         'Hoặc liên hệ hotline Admin để được tư vấn trực tiếp!';
 }
 
 module.exports = ChatBotController;

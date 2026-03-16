@@ -9,6 +9,7 @@ import { useQuery } from '@tanstack/react-query'
 import Loading from '../../components/LoadingComponent/Loading'
 import { useSelector } from 'react-redux'
 import { useDebounce } from '../../hooks/useDebounce'
+import { useLanguage } from '../../context/LanguageContext'
 
 const { Option } = Select;
 
@@ -21,6 +22,7 @@ const TypeProductPage = () => {
   const [sortBy, setSortBy] = useState('');
   const [sortOrder, setSortOrder] = useState('');
   const [filters, setFilters] = useState({ rating: [], priceRange: [0, 100000000] });
+  const { t } = useLanguage();
 
   // Chuyển đổi type từ URL về format chuẩn
   const convertType = type ? decodeURIComponent(type).replace(/_/g, ' ') : '';
@@ -142,31 +144,31 @@ const TypeProductPage = () => {
       <WrapperContainer>
         <WrapperHeader>
           <div>
-            <h2>Sản phẩm {convertType}</h2>
+            <h2>{t('typeProduct.title', { type: convertType })}</h2>
             {products?.data && (
               <span style={{
                 color: '#666',
                 fontSize: '14px',
                 fontWeight: '400'
               }}>
-                Tìm thấy {products.total} sản phẩm
+                {t('typeProduct.foundProducts', { count: products.total })}
               </span>
             )}
           </div>
           <WrapperSort>
-            <span>Sắp xếp theo: </span>
+            <span>{t('typeProduct.sortBy')} </span>
             <Select
-              placeholder="Chọn cách sắp xếp"
+              placeholder={t('typeProduct.sortPlaceholder')}
               style={{ width: 220 }}
               onChange={handleSortChange}
               allowClear
             >
-              <Option value="price-asc">Giá tăng dần</Option>
-              <Option value="price-desc">Giá giảm dần</Option>
-              <Option value="name-asc">Tên A-Z</Option>
-              <Option value="name-desc">Tên Z-A</Option>
-              <Option value="rating-desc">Đánh giá cao nhất</Option>
-              <Option value="selled-desc">Bán chạy nhất</Option>
+              <Option value="price-asc">{t('typeProduct.priceAsc')}</Option>
+              <Option value="price-desc">{t('typeProduct.priceDesc')}</Option>
+              <Option value="name-asc">{t('typeProduct.nameAsc')}</Option>
+              <Option value="name-desc">{t('typeProduct.nameDesc')}</Option>
+              <Option value="rating-desc">{t('typeProduct.topRated')}</Option>
+              <Option value="selled-desc">{t('typeProduct.bestSelling')}</Option>
             </Select>
           </WrapperSort>
         </WrapperHeader>
@@ -221,7 +223,7 @@ const TypeProductPage = () => {
                 borderRadius: '8px'
               }}>
                 <Empty
-                  description={`Không tìm thấy sản phẩm nào cho danh mục "${convertType}"`}
+                  description={t('typeProduct.noProducts', { type: convertType })}
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
                 />
               </div>

@@ -22,8 +22,10 @@ import * as message from '../../components/Message/Message'
 import { updateUser } from '../../redux/slides/userSlide'
 import { UserOutlined, MailOutlined, PhoneOutlined, HomeOutlined, SaveOutlined, CameraOutlined } from '@ant-design/icons';
 import { getBase64 } from '../../utils';
+import { useLanguage } from '../../context/LanguageContext';
 
 const ProfilePage = () => {
+    const { t } = useLanguage();
     const user = useSelector((state) => state.user);
     const [email, setEmail] = useState('');
     const [name, setName] = useState('');
@@ -36,7 +38,7 @@ const ProfilePage = () => {
     // Kiểm tra đăng nhập ngay khi component mount
     useEffect(() => {
         if (!user?.access_token) {
-            message.error('Vui lòng đăng nhập để xem thông tin cá nhân!')
+            message.error(t('profile.loginRequired'))
             navigate('/sign-in', {
                 state: {
                     from: '/profile'
@@ -44,7 +46,7 @@ const ProfilePage = () => {
             })
             return
         }
-    }, [user?.access_token, navigate])
+    }, [user?.access_token, navigate, t])
 
     const mutation = useMutationHooks(
         (data) => {
@@ -103,7 +105,7 @@ const ProfilePage = () => {
     return (
         <WrapperContainer>
             <WrapperHeader>
-                <h1>Thông tin cá nhân</h1>
+                <h1>{t('profile.title')}</h1>
             </WrapperHeader>
 
             <Loading isLoading={isPending}>
@@ -155,7 +157,7 @@ const ProfilePage = () => {
                                     color: '#1a94ff'
                                 }}
                             >
-                                Thay đổi ảnh đại diện
+                                {t('profile.changeAvatar')}
                             </Button>
                         </WrapperUploadFile>
                     </WrapperAvatarSection>
@@ -166,19 +168,19 @@ const ProfilePage = () => {
                         <WrapperInfoCard>
                             <WrapperInput>
                                 <WrapperLabel htmlFor="name">
-                                    <UserOutlined /> Họ và tên
+                                    <UserOutlined /> {t('profile.fullName')}
                                 </WrapperLabel>
                                 <div className="input-group">
                                     <Input
                                         id="name"
                                         value={name}
                                         onChange={(e) => handleOnchangeName(e.target.value)}
-                                        placeholder="Nhập họ và tên"
+                                        placeholder={t('profile.fullNamePlaceholder')}
                                         size="large"
                                         prefix={<UserOutlined style={{ color: '#8c8c8c' }} />}
                                     />
                                     <Button onClick={handleUpdate}>
-                                        Lưu
+                                        {t('profile.save')}
                                     </Button>
                                 </div>
                             </WrapperInput>
@@ -195,12 +197,12 @@ const ProfilePage = () => {
                                         id="email"
                                         value={email}
                                         onChange={(e) => handleOnchangeEmail(e.target.value)}
-                                        placeholder="Nhập email"
+                                        placeholder={t('profile.emailPlaceholder')}
                                         size="large"
                                         prefix={<MailOutlined style={{ color: '#8c8c8c' }} />}
                                     />
                                     <Button onClick={handleUpdate}>
-                                        Lưu
+                                        {t('profile.save')}
                                     </Button>
                                 </div>
                             </WrapperInput>
@@ -210,19 +212,19 @@ const ProfilePage = () => {
                         <WrapperInfoCard>
                             <WrapperInput>
                                 <WrapperLabel htmlFor="phone">
-                                    <PhoneOutlined /> Số điện thoại
+                                    <PhoneOutlined /> {t('profile.phone')}
                                 </WrapperLabel>
                                 <div className="input-group">
                                     <Input
                                         id="phone"
                                         value={phone}
                                         onChange={(e) => handleOnchangePhone(e.target.value)}
-                                        placeholder="Nhập số điện thoại"
+                                        placeholder={t('profile.phonePlaceholder')}
                                         size="large"
                                         prefix={<PhoneOutlined style={{ color: '#8c8c8c' }} />}
                                     />
                                     <Button onClick={handleUpdate}>
-                                        Lưu
+                                        {t('profile.save')}
                                     </Button>
                                 </div>
                             </WrapperInput>
@@ -232,19 +234,19 @@ const ProfilePage = () => {
                         <WrapperInfoCard>
                             <WrapperInput>
                                 <WrapperLabel htmlFor="address">
-                                    <HomeOutlined /> Địa chỉ
+                                    <HomeOutlined /> {t('profile.address')}
                                 </WrapperLabel>
                                 <div className="input-group">
                                     <Input
                                         id="address"
                                         value={address}
                                         onChange={(e) => handleOnchangeAddress(e.target.value)}
-                                        placeholder="Nhập địa chỉ"
+                                        placeholder={t('profile.addressPlaceholder')}
                                         size="large"
                                         prefix={<HomeOutlined style={{ color: '#8c8c8c' }} />}
                                     />
                                     <Button onClick={handleUpdate}>
-                                        Lưu
+                                        {t('profile.save')}
                                     </Button>
                                 </div>
                             </WrapperInput>
@@ -258,13 +260,13 @@ const ProfilePage = () => {
                             icon={<SaveOutlined />}
                             onClick={handleUpdate}
                         >
-                            Lưu tất cả thay đổi
+                            {t('profile.saveAll')}
                         </Button>
                         <Button
                             className="secondary"
                             onClick={() => navigate('/')}
                         >
-                            Quay về trang chủ
+                            {t('profile.backHome')}
                         </Button>
                     </WrapperActionButtons>
                 </WrapperContentProfile>
