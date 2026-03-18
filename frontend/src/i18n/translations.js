@@ -11,6 +11,9 @@ export const translations = {
     header: {
       userInfo: "User information",
       trackOrder: "Track order",
+      shippingReturn: "Shipping & return",
+      utilityMessage: "Fast support every day",
+      allProducts: "All products",
       adminSystem: "System management",
       logout: "Log out",
       signInSignUp: "Sign in / Sign up",
@@ -18,6 +21,22 @@ export const translations = {
       compare: "Compare",
       wishlist: "Wishlist",
       cart: "Cart"
+    },
+    home: {
+      loadMore: "View more",
+      heroTitle: "The best home entertainment setup is here",
+      heroSubtitle: "Discover premium electronics with modern design, trusted warranty, and fast delivery nationwide.",
+      shopNow: "Shop now",
+      features: {
+        shippingTitle: "Free shipping",
+        shippingDesc: "For orders over 500,000 VND",
+        supportTitle: "Support 24/7",
+        supportDesc: "We are here whenever you need",
+        returnTitle: "Easy return",
+        returnDesc: "7-day return policy",
+        paymentTitle: "Secure payment",
+        paymentDesc: "PayPal or COD accepted"
+      }
     },
     order: {
       myCart: "My Cart",
@@ -245,6 +264,9 @@ export const translations = {
     header: {
       userInfo: "Thông tin người dùng",
       trackOrder: "Theo dõi đơn hàng",
+      shippingReturn: "Giao hàng & hoàn trả",
+      utilityMessage: "Hỗ trợ nhanh mỗi ngày",
+      allProducts: "Tất cả sản phẩm",
       adminSystem: "Quản lí hệ thống",
       logout: "Đăng xuất",
       signInSignUp: "Đăng nhập / Đăng ký",
@@ -252,6 +274,22 @@ export const translations = {
       compare: "So sánh",
       wishlist: "Yêu thích",
       cart: "Giỏ hàng"
+    },
+    home: {
+      loadMore: "Xem thêm",
+      heroTitle: "Hệ sinh thái giải trí tại gia đã sẵn sàng",
+      heroSubtitle: "Khám phá thiết bị điện tử chính hãng, bảo hành rõ ràng và giao hàng toàn quốc nhanh chóng.",
+      shopNow: "Mua ngay",
+      features: {
+        shippingTitle: "Miễn phí vận chuyển",
+        shippingDesc: "Cho đơn từ 500.000 VND",
+        supportTitle: "Hỗ trợ 24/7",
+        supportDesc: "Luôn sẵn sàng khi bạn cần",
+        returnTitle: "Đổi trả dễ dàng",
+        returnDesc: "Chính sách đổi trả 7 ngày",
+        paymentTitle: "Thanh toán an toàn",
+        paymentDesc: "Hỗ trợ PayPal và COD"
+      }
     },
     order: {
       myCart: "Giỏ hàng của tôi",

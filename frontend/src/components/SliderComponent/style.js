@@ -3,34 +3,37 @@ import Slider from 'react-slick';
 
 export const WrapperSliderStyle = styled(Slider)`
     & .slick-arrow.slick-prev {
-        left: 12px;
+        left: 14px;
         top: 50%;
         z-index: 10;
         &::before {
-            font-size: 40px;
+            font-size: 34px;
             color: #fff;
+            opacity: 0.9;
         }
     } 
     & .slick-arrow.slick-next {
-        right: 28px;
+        right: 30px;
         top: 50%;
         z-index: 10;
         &::before {
-            font-size: 40px;
+            font-size: 34px;
             color: #fff;
+            opacity: 0.9;
         }
     }
     & .slick-dots {
         z-index: 10;
-        bottom: -2px !important;
+        bottom: 8px !important;
         li {
             button {
                 &::before {
-                    color:#ff0000;
+                    color: rgba(255, 255, 255, 0.7);
+                    font-size: 9px;
                 }
             }
         }   
-        li.active {
+        li.slick-active {
             button{
                 &::before {
                 color: #fff;
@@ -40,10 +43,26 @@ export const WrapperSliderStyle = styled(Slider)`
     }
     
     .ant-image {
+        width: 100%;
+
         img {
             object-fit: cover;
             width: 100%;
-            height: 300px;
+            height: ${({ $imageHeight }) => $imageHeight || '300px'};
+            display: block;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .ant-image {
+            img {
+                height: ${({ $mobileImageHeight }) => $mobileImageHeight || '220px'};
+            }
+        }
+
+        & .slick-arrow.slick-prev,
+        & .slick-arrow.slick-next {
+            display: none !important;
         }
     }
 `

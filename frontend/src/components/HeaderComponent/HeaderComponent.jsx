@@ -1,6 +1,23 @@
 import React, { useEffect, useState } from 'react'
-import { Badge, Col, Popover, Switch } from 'antd';
-import { WrapperContentPopup, WrapperHeader, WrapperHeaderAccount, WrapperText, WrapperTextHeader } from './style';
+import { Badge, Popover, Switch } from 'antd';
+import {
+  CategoryBar,
+  CategoryContent,
+  CategoryItem,
+  HeaderShell,
+  MainBar,
+  SearchWrapper,
+  UtilityBar,
+  UtilityContent,
+  UtilityLink,
+  WrapperContentPopup,
+  WrapperHeader,
+  WrapperHeaderAccount,
+  WrapperIconGroup,
+  WrapperText,
+  WrapperTextHeader,
+  WrapperTopRight
+} from './style';
 // import Search from 'antd/es/transfer/search'; (không sử dụng)
 import {
   UserOutlined,
@@ -17,6 +34,7 @@ import { resetUser } from '../../redux/slides/userSlide'
 import Loading from '../LoadingComponent/Loading';
 import { searchProduct } from '../../redux/slides/productSlide';
 import { useLanguage } from '../../context/LanguageContext';
+import * as ProductService from '../../service/ProductService';
 
 
 
@@ -31,6 +49,8 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
   const wishlistItems = useSelector((state) => state.wishlist?.wishlistItems || []);
   const dispatch = useDispatch();
   const { language, setLanguage, t } = useLanguage();
+  const [typeProducts, setTypeProducts] = useState([]);
+
   const handleNavigatedLogin = () => {
     navigate('/sign-in');
   }
@@ -58,6 +78,23 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
     setUserAvatar(user?.avatar || '');
   }, [user?.name, user?.email, user?.avatar, t]);
 
+  useEffect(() => {
+    if (isHiddenSearch) return;
+
+    const fetchTypes = async () => {
+      try {
+        const res = await ProductService.getAllTypeProduct();
+        if (res?.status === 'OK' && Array.isArray(res.data)) {
+          setTypeProducts(res.data.slice(0, 7));
+        }
+      } catch (error) {
+        setTypeProducts([]);
+      }
+    };
+
+    fetchTypes();
+  }, [isHiddenSearch]);
+
   const content = (
     <div>
       <WrapperContentPopup onClick={() => navigate('/profile-user')}>{t('header.userInfo')}</WrapperContentPopup>
@@ -74,44 +111,59 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
     dispatch(searchProduct(e.target.value));
   }
 
-  return (
-    <div style={{ width: '100%', background: 'rgb(26,148,255)', display: 'flex' }}>
-      <WrapperHeader style={{ justifyContent: isHiddenSearch && isHiddenSearch ? 'space-between' : 'unset' }}>
-        <Col span={4}>
-          <WrapperTextHeader onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>TECHSTORE</WrapperTextHeader>
-        </Col>
-        {!isHiddenSearch && (
-          <Col span={12}>
-            <ButtonInputSearch
-              size="large"
-              placeholder={t('common.searchPlaceholder')}
-              textButton={t('common.searchButton')}
-              onChange={onSearch}
-            />
-          </Col>
-        )}
+  const handleNavigateType = (type) => {
+    const encodedType = encodeURIComponent(type.replace(/ /g, '_'));
+    navigate(`/product/${encodedType}`);
+  };
 
-        <Col span={8}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-            <Switch
-              checked={language === 'en'}
-              onChange={(checked) => setLanguage(checked ? 'en' : 'vi')}
-              checkedChildren="EN"
-              unCheckedChildren="VI"
-              style={{ backgroundColor: language === 'en' ? '#52c41a' : '#1677ff' }}
-            />
+  return (
+    <HeaderShell>
+      {!isHiddenSearch && (
+        <UtilityBar>
+          <UtilityContent>
+            <div style={{ opacity: 0.95 }}>{t('header.utilityMessage')}</div>
+            <WrapperTopRight>
+              <UtilityLink onClick={() => navigate('/order-tracking')}>{t('header.shippingReturn')}</UtilityLink>
+              <UtilityLink onClick={() => navigate('/order-tracking')}>{t('header.trackOrder')}</UtilityLink>
+              <Switch
+                checked={language === 'en'}
+                onChange={(checked) => setLanguage(checked ? 'en' : 'vi')}
+                checkedChildren="EN"
+                unCheckedChildren="VI"
+                size="small"
+                style={{ backgroundColor: language === 'en' ? '#52c41a' : '#1677ff' }}
+              />
+            </WrapperTopRight>
+          </UtilityContent>
+        </UtilityBar>
+      )}
+
+      <MainBar>
+        <WrapperHeader>
+          <WrapperTextHeader onClick={() => navigate('/')}>techstore</WrapperTextHeader>
+
+          {!isHiddenSearch && (
+            <SearchWrapper>
+              <ButtonInputSearch
+                size="large"
+                placeholder={t('common.searchPlaceholder')}
+                textButton={t('common.searchButton')}
+                onChange={onSearch}
+              />
+            </SearchWrapper>
+          )}
+
+          <WrapperIconGroup>
             <Loading isLoading={loading}>
               <WrapperHeaderAccount>
                 {userAvatar ? (
                   <img src={userAvatar} alt="avatar" style={{ height: '30px', width: '30px', borderRadius: '50%', objectFit: 'cover' }} />
                 ) : (
-                  <UserOutlined style={{ fontSize: '30px' }} />)}
+                  <UserOutlined style={{ fontSize: '26px' }} />)}
                 {user?.access_token ? (
-                  <>
-                    <Popover content={content} trigger="click">
-                      <div style={{ cursor: 'pointer' }}> {userName?.length ? userName : user?.email} </div>
-                    </Popover>
-                  </>
+                  <Popover content={content} trigger="click">
+                    <div style={{ cursor: 'pointer' }}>{userName?.length ? userName : user?.email}</div>
+                  </Popover>
                 ) : (
                   <div onClick={handleNavigatedLogin} style={{ cursor: 'pointer' }}>
                     <WrapperText>{t('header.signInSignUp')}</WrapperText>
@@ -123,32 +175,46 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
                 )}
               </WrapperHeaderAccount>
             </Loading>
+
             {!isHiddenCart && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+              <>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }} onClick={() => navigate('/comparison')}>
                   <Badge count={comparisonItems.length} size="small" style={{ backgroundColor: '#52c41a' }}>
-                    <SwapOutlined style={{ fontSize: '28px', color: '#fff' }} />
+                    <SwapOutlined style={{ fontSize: '24px', color: '#ffffff' }} />
                   </Badge>
                   <WrapperText>{t('header.compare')}</WrapperText>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }} onClick={() => navigate('/wishlist')}>
                   <Badge count={wishlistItems.length} size="small" style={{ backgroundColor: '#ff4d4f' }}>
-                    <HeartOutlined style={{ fontSize: '28px', color: '#fff' }} />
+                    <HeartOutlined style={{ fontSize: '24px', color: '#ffffff' }} />
                   </Badge>
                   <WrapperText>{t('header.wishlist')}</WrapperText>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }} onClick={() => navigate('/order')}>
                   <Badge count={cart?.totalQuantity || 0} size="small">
-                    <ShoppingCartOutlined style={{ fontSize: '28px', color: '#fff' }} />
+                    <ShoppingCartOutlined style={{ fontSize: '24px', color: '#ffffff' }} />
                   </Badge>
                   <WrapperText>{t('header.cart')}</WrapperText>
                 </div>
-              </div>
+              </>
             )}
-          </div>
-        </Col>
-      </WrapperHeader>
-    </div>
+          </WrapperIconGroup>
+        </WrapperHeader>
+      </MainBar>
+
+      {!isHiddenSearch && (
+        <CategoryBar>
+          <CategoryContent>
+            <CategoryItem onClick={() => navigate('/')}>{t('header.allProducts')}</CategoryItem>
+            {typeProducts.map((type) => (
+              <CategoryItem key={type} onClick={() => handleNavigateType(type)}>
+                {type}
+              </CategoryItem>
+            ))}
+          </CategoryContent>
+        </CategoryBar>
+      )}
+    </HeaderShell>
   )
 }
 

@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from 'react'
-import TypeProduct from '../../components/TypeProduct/TypeProduct'
-import { WrapperButtonMore, WrapperProducts, WrapperTypeProduct } from './style'
+import {
+  WrapperButtonMore,
+  WrapperFeatureItem,
+  WrapperFeatureStrip,
+  WrapperHeroBanner,
+  WrapperHeroCard,
+  WrapperHomeContainer,
+  WrapperProducts
+} from './style'
 import SliderComponent from '../../components/SliderComponent/SliderComponent'
 import slider1 from '../../assets/images/Slider 1.png'
 import slider2 from '../../assets/images/Slider 2.png'
@@ -12,16 +19,18 @@ import * as UserService from '../../service/UserService'
 import { useSelector } from 'react-redux'
 import Loading from '../../components/LoadingComponent/Loading'
 import { useDebounce } from '../../hooks/useDebounce'
+import { useLanguage } from '../../context/LanguageContext'
+import { CreditCardOutlined, CustomerServiceOutlined, SyncOutlined, TruckOutlined } from '@ant-design/icons'
 
 
 
 
 const HomePage = () => {
+  const { t } = useLanguage();
   const searchProduct = useSelector((state) => state?.product?.search);
   const user = useSelector((state) => state?.user);
   const searchDebounce = useDebounce(searchProduct, 1000);
-  const [limit, setLimit] = useState(6)
-  const [typeProducts, setTypeProducts] = useState([])
+  const [limit, setLimit] = useState(12)
 
 
   const fetchProductAll = async (context) => {
@@ -31,14 +40,6 @@ const HomePage = () => {
     return res
   }
 
-  const fetchAllTypeProduct = async () => {
-    const res = await ProductService.getAllTypeProduct()
-    if (res.status === 'OK') {
-      setTypeProducts(res?.data)
-    }
-
-  }
-
   const { isPending, data: products } = useQuery({
     queryKey: ['products', limit, searchDebounce],
     queryFn: fetchProductAll,
@@ -46,10 +47,6 @@ const HomePage = () => {
     retryDelay: 1000,
     placeholderData: (previousData) => previousData,
   })
-
-  useEffect(() => {
-    fetchAllTypeProduct()
-  }, [])
 
   // Initialize chatbot with user identity
   useEffect(() => {
@@ -76,34 +73,53 @@ const HomePage = () => {
 
   return (
     <Loading isLoading={isPending}>
-      <div style={{
-        padding: '0 40px',
-        fontSize: '16px',
-        maxWidth: '1440px',
-        margin: '0 auto',
-        position: 'relative',
-        zIndex: 1
-      }}>
-        <WrapperTypeProduct>
-          {typeProducts.map((item) => {
-            return (
-              <TypeProduct name={item} key={item} />
-            )
-          })}
-        </WrapperTypeProduct>
-      </div>
+      <WrapperHomeContainer id="container">
+        <WrapperHeroBanner>
+          <SliderComponent
+            arrImages={[slider1, slider2, slider3]}
+            imageHeight="520px"
+            mobileImageHeight="420px"
+            autoplay
+            autoplaySpeed={3200}
+          />
+          <WrapperHeroCard>
+            <h2>{t('home.heroTitle')}</h2>
+            <p>{t('home.heroSubtitle')}</p>
+            <button type="button">{t('home.shopNow')}</button>
+          </WrapperHeroCard>
+        </WrapperHeroBanner>
 
-      <div id="container" style={{
-        backgroundColor: '#efefef',
-        padding: '0 40px',
-        minHeight: '100vh',
-        paddingBottom: '50px',
-        maxWidth: '1440px',
-        margin: '0 auto',
-        position: 'relative',
-        zIndex: 1
-      }}>
-        <SliderComponent arrImages={[slider1, slider2, slider3]} />
+        <WrapperFeatureStrip>
+          <WrapperFeatureItem>
+            <TruckOutlined style={{ fontSize: '22px', color: '#0b6fd0' }} />
+            <div>
+              <h4>{t('home.features.shippingTitle')}</h4>
+              <p>{t('home.features.shippingDesc')}</p>
+            </div>
+          </WrapperFeatureItem>
+          <WrapperFeatureItem>
+            <CustomerServiceOutlined style={{ fontSize: '22px', color: '#0b6fd0' }} />
+            <div>
+              <h4>{t('home.features.supportTitle')}</h4>
+              <p>{t('home.features.supportDesc')}</p>
+            </div>
+          </WrapperFeatureItem>
+          <WrapperFeatureItem>
+            <SyncOutlined style={{ fontSize: '22px', color: '#0b6fd0' }} />
+            <div>
+              <h4>{t('home.features.returnTitle')}</h4>
+              <p>{t('home.features.returnDesc')}</p>
+            </div>
+          </WrapperFeatureItem>
+          <WrapperFeatureItem>
+            <CreditCardOutlined style={{ fontSize: '22px', color: '#0b6fd0' }} />
+            <div>
+              <h4>{t('home.features.paymentTitle')}</h4>
+              <p>{t('home.features.paymentDesc')}</p>
+            </div>
+          </WrapperFeatureItem>
+        </WrapperFeatureStrip>
+
         <WrapperProducts>
           {products?.data?.map((product) => {
             return (
@@ -131,7 +147,7 @@ const HomePage = () => {
               products?.data?.length >= products?.total ||
               (searchDebounce && products?.data?.length < limit)
             }
-            onClick={() => setLimit(limit + 6)}
+            onClick={() => setLimit(limit + 12)}
             style={{
               backgroundColor: (
                 products?.data?.length >= products?.total ||
@@ -147,10 +163,10 @@ const HomePage = () => {
               ) ? 'not-allowed' : 'pointer'
             }}
           >
-            Xem thêm
+            {t('home.loadMore')}
           </WrapperButtonMore>
         </div>
-      </div>
+      </WrapperHomeContainer>
     </Loading>
 
   )

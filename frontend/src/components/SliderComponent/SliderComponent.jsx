@@ -3,21 +3,32 @@ import React from 'react'
 import { WrapperSliderStyle } from './style';
 
 
-const SliderComponent = ({arrImages}) => {
+const SliderComponent = ({
+    arrImages,
+    imageHeight = '300px',
+    mobileImageHeight = '220px',
+    autoplay = true,
+    autoplaySpeed = 3000
+}) => {
     const settings = {
         dots: true,
         infinite: true,
-        speed: 500,
+                speed: 550,
         slidesToShow: 1,
         slidesToScroll: 1,
-        autoplay: true,
-        autoplaySpeed: 3000
+                autoplay,
+                autoplaySpeed
   };
+
   return (
-    <WrapperSliderStyle {...settings}>
+        <WrapperSliderStyle
+            {...settings}
+            $imageHeight={imageHeight}
+            $mobileImageHeight={mobileImageHeight}
+        >
         {arrImages.map((image)=> {
             return (
-                <Image key={image} src= {image} alt = "slider" preview ={false} width="100%" height="300px"/>
+                                <Image key={image} src={image} alt="slider" preview={false} width="100%" />
             )
         })}
     </WrapperSliderStyle>
