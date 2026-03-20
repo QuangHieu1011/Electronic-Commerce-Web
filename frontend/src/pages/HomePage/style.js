@@ -1,16 +1,140 @@
 import styled from 'styled-components';
 import { Button } from 'antd';
 
+export const WrapperHomeContainer = styled.div`
+    background: linear-gradient(180deg, #f5f8fc 0%, #ecf2f9 100%);
+    padding: 26px 40px 60px;
+    min-height: 100vh;
+    max-width: 1440px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+
+    @media (max-width: 992px) {
+        padding: 18px 16px 40px;
+    }
+`;
+
+export const WrapperHeroBanner = styled.section`
+    position: relative;
+    border-radius: 22px;
+    overflow: hidden;
+    min-height: 520px;
+    box-shadow: 0 20px 50px rgba(10, 48, 99, 0.18);
+    margin-bottom: 26px;
+`;
+
+export const WrapperHeroCard = styled.div`
+    position: absolute;
+    right: 8%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: min(430px, 92%);
+    background: rgba(249, 252, 255, 0.92);
+    border: 1px solid rgba(138, 176, 218, 0.35);
+    border-radius: 16px;
+    padding: 28px 28px 24px;
+    backdrop-filter: blur(4px);
+
+    h2 {
+        margin: 0;
+        font-size: clamp(28px, 3vw, 44px);
+        line-height: 1.12;
+        color: #16314f;
+        letter-spacing: -0.5px;
+    }
+
+    p {
+        margin: 14px 0 20px;
+        font-size: 16px;
+        line-height: 1.55;
+        color: #33597f;
+    }
+
+    button {
+        border: none;
+        height: 42px;
+        padding: 0 18px;
+        border-radius: 10px;
+        background: linear-gradient(120deg, #0a63c2 0%, #1a8bfd 100%);
+        color: #fff;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 8px 20px rgba(10, 99, 194, 0.34);
+    }
+
+    button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 24px rgba(10, 99, 194, 0.4);
+    }
+
+    @media (max-width: 992px) {
+        right: 14px;
+        left: 14px;
+        width: auto;
+        top: auto;
+        transform: none;
+        bottom: 14px;
+        padding: 18px;
+    }
+`;
+
+export const WrapperFeatureStrip = styled.section`
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid #dbe8f7;
+    margin: -6px auto 26px;
+    padding: 14px;
+    box-shadow: 0 8px 20px rgba(33, 95, 162, 0.08);
+
+    @media (max-width: 992px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 576px) {
+        grid-template-columns: 1fr;
+    }
+`;
+
+export const WrapperFeatureItem = styled.article`
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px;
+
+    h4 {
+        margin: 0;
+        color: #123a68;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    p {
+        margin: 2px 0 0;
+        color: #5c7998;
+        font-size: 13px;
+    }
+`;
+
 export const WrapperTypeProduct = styled.div`
     display: flex;
     align-items: center;
     gap: 20px;
-    justify-content: flex-start;
+    justify-content: center;
     min-height: 50px;
-    padding: 10px 0;
+    padding: 20px 40px;
     overflow-x: auto;
     overflow-y: hidden;
     scrollbar-width: thin;
+    background: linear-gradient(to right, #f8f9fa 0%, #ffffff 50%, #f8f9fa 100%);
+    border-radius: 16px;
+    margin: 20px 0;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
     
     &::-webkit-scrollbar {
         height: 6px;
@@ -23,7 +147,7 @@ export const WrapperTypeProduct = styled.div`
 
     @media (max-width: 768px) {
         gap: 12px;
-        padding: 8px 0;
+        padding: 16px 20px;
         justify-content: flex-start;
     }
 `
@@ -62,29 +186,17 @@ export const WrapperButtonMore = styled(Button)`
 
 export const WrapperProducts = styled.div`
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 18px;
     margin-top: 30px;
-    animation: fadeIn 0.6s ease-out;
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
 
     @media (max-width: 1400px) {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
         gap: 16px;
     }
 
     @media (max-width: 1200px) {
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        grid-template-columns: repeat(4, 1fr);
     }
 
     @media (max-width: 992px) {

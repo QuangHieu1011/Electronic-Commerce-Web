@@ -3,40 +3,40 @@ import styled from 'styled-components'
 export const WrapperContainer = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
-  background: #f8f9fa;
+  padding: 40px 20px;
+  background: #f5f5f5;
   min-height: 100vh;
 `
 
 export const WrapperHeader = styled.div`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #1a94ff;
   color: white;
-  padding: 24px;
+  padding: 28px 40px;
   border-radius: 12px;
-  margin-bottom: 24px;
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+  margin-bottom: 28px;
+  box-shadow: 0 4px 12px rgba(26, 148, 255, 0.2);
   display: flex;
   align-items: center;
   gap: 16px;
   
   h2 {
     margin: 0;
-    font-size: 24px;
-    font-weight: 600;
+    font-size: 26px;
+    font-weight: 700;
   }
 `
 
 export const WrapperProductInfo = styled.div`
   background: white;
   border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  border: 1px solid #f0f0f0;
+  border: 1px solid #e5e7eb;
   transition: all 0.3s ease;
   
   &:hover {
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
-    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    transform: translateY(-1px);
   }
   
   .product-item {
@@ -52,14 +52,15 @@ export const WrapperProductInfo = styled.div`
 `
 
 export const WrapperProductImage = styled.div`
-  width: 60px;
-  height: 60px;
+  width: 70px;
+  height: 70px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #fafafa;
-  border-radius: 8px;
+  border-radius: 10px;
   overflow: hidden;
+  border: 1px solid #e5e7eb;
   
   img {
     width: 100%;

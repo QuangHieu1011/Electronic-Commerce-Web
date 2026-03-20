@@ -28,6 +28,7 @@ import { createOrder } from '../../redux/slides/orderSlice'
 import { removeFromCart } from '../../redux/slides/cartSlice'
 import { updateAccessToken } from '../../redux/slides/userSlide'
 import * as OrderService from '../../service/OrderService'
+import { formatPrice } from '../../utils'
 import PayPalPaymentModal from '../../components/PaymentModal/PayPalPaymentModal'
 import VoucherModal from '../../components/PaymentModal/VoucherModal'
 import {
@@ -144,14 +145,6 @@ const CheckoutPage = () => {
         }
         return total;
     }, [totalAfterLoyalty, shippingFee, appliedVoucher])
-
-    // Format giá tiền
-    const formatPrice = (price) => {
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
-        }).format(price)
-    }
 
     // Xử lý áp dụng voucher
     const handleApplyVoucher = (voucher) => {

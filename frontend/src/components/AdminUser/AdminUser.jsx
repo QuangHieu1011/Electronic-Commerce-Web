@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { DeleteOutlined, EditOutlined, SearchOutlined } from '@ant-design/icons'
-import { WrapperHeader, WrapperUploadFile } from './style'
+import { WrapperHeader, WrapperUploadFile, WrapperContainer } from './style'
 import { Button, Form, Space } from 'antd'
 import TableComponent from '../TableComponent/TableComponent'
 import InputComponent from '../InputComponent/InputComponent'
@@ -13,9 +13,11 @@ import { useMutationHooks } from '../../hooks/useMutationHook'
 import * as UserService from '../../service/UserService'
 import { useQuery } from '@tanstack/react-query'
 import { getBase64 } from '../../utils'
+import { useLanguage } from '../../context/LanguageContext'
 
 
 const AdminUser = (props) => {
+  const { t } = useLanguage();
   const [rowSelected, setRowSelected] = useState('');
   const [isOpenDrawer, setIsOpenDrawer] = useState(false);
   const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
@@ -122,7 +124,7 @@ const AdminUser = (props) => {
       await fetchGetDetailsUser(userId);
       setIsOpenDrawer(true);
     } else {
-      console.log('Không có người dùng được chọn');
+      console.log('No user selected');
     }
   }
 
@@ -296,37 +298,37 @@ const AdminUser = (props) => {
 
   useEffect(() => {
     if (isSuccessUpdated && dataUpdated?.status === 'OK') {
-      message.success('Cập nhật người dùng thành công!');
+      message.success(t('adminUser.updateSuccess'));
       handleCloseDrawer();
       setRowSelected('');
       refetch();
     }
     else if (isErrorUpdated) {
-      message.error('Cập nhật người dùng thất bại!');
+      message.error(t('adminUser.updateError'));
     }
-  }, [isSuccessUpdated, isErrorUpdated, dataUpdated, refetch, handleCloseDrawer])
+  }, [isSuccessUpdated, isErrorUpdated, dataUpdated, refetch, handleCloseDrawer, t])
 
   useEffect(() => {
     if (isSuccessDeleted && dataDeleted?.status === 'OK') {
-      message.success('Xóa người dùng thành công!');
+      message.success(t('adminUser.deleteSuccess'));
       handleCancelDelete();
       setRowSelected('');
       refetch();
     }
     else if (isErrorDeleted) {
-      message.error('Xóa người dùng thất bại!');
+      message.error(t('adminUser.deleteError'));
     }
-  }, [isSuccessDeleted, isErrorDeleted, dataDeleted, refetch])
+  }, [isSuccessDeleted, isErrorDeleted, dataDeleted, refetch, t])
 
   useEffect(() => {
     if (isSuccessDeletedMany && dataDeletedMany?.status === 'OK') {
-      message.success('Xóa nhiều người dùng thành công!');
+      message.success(t('adminUser.deleteManySuccess'));
       refetch();
     }
     else if (isErrorDeletedMany) {
-      message.error('Xóa nhiều người dùng thất bại!');
+      message.error(t('adminUser.deleteManyError'));
     }
-  }, [isSuccessDeletedMany, isErrorDeletedMany, dataDeletedMany, refetch])
+  }, [isSuccessDeletedMany, isErrorDeletedMany, dataDeletedMany, refetch, t])
 
 
 
@@ -378,8 +380,8 @@ const AdminUser = (props) => {
     })
   }
   return (
-    <div>
-      <WrapperHeader> Quản lí Người Dùng</WrapperHeader>
+    <WrapperContainer>
+      <WrapperHeader>{t('adminUser.title')}</WrapperHeader>
 
       <div style={{ marginTop: '10px' }}>
         <TableComponent handleDeleteManyUsers={handleDeleteManyUsers} columns={columns} data={dataTable} isLoading={isLoadingUsers} onRow={(record, rowIndex) => {
@@ -391,7 +393,7 @@ const AdminUser = (props) => {
         }} />
       </div>
 
-      <DrawerComponent title='Chi tiết người dùng ' isOpen={isOpenDrawer} onClose={() => setIsOpenDrawer(false)} width="90%">
+      <DrawerComponent title={t('adminUser.detailsTitle')} isOpen={isOpenDrawer} onClose={() => setIsOpenDrawer(false)} width="90%">
         <Loading isLoading={isLoadingUpdate || isPendingUpdated}>
           <Form
             name="updateUser"
@@ -473,18 +475,18 @@ const AdminUser = (props) => {
         </Loading>
       </DrawerComponent>
       <ModalComponent
-        title="Xóa người dùng"
+        title={t('adminUser.deleteTitle')}
         isOpen={isModalOpenDelete}
         onCancel={handleCancelDelete}
         onOk={handleDeleteUser}
       >
         <Loading isLoading={isPendingDeleted}>
           <div>
-            Bạn có chắc chắn muốn xóa tài khoản này không?
+            {t('adminUser.deleteConfirm')}
           </div>
         </Loading>
       </ModalComponent>
-    </div>
+    </WrapperContainer>
   )
 }
 

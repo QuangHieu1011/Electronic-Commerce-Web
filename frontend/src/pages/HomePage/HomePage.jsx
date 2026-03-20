@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from 'react'
-import TypeProduct from '../../components/TypeProduct/TypeProduct'
-import { WrapperButtonMore, WrapperProducts, WrapperTypeProduct } from './style'
+import {
+  WrapperButtonMore,
+  WrapperFeatureItem,
+  WrapperFeatureStrip,
+  WrapperHeroBanner,
+  WrapperHeroCard,
+  WrapperHomeContainer,
+  WrapperProducts
+} from './style'
 import SliderComponent from '../../components/SliderComponent/SliderComponent'
 import slider1 from '../../assets/images/Slider 1.png'
 import slider2 from '../../assets/images/Slider 2.png'
@@ -12,16 +19,18 @@ import * as UserService from '../../service/UserService'
 import { useSelector } from 'react-redux'
 import Loading from '../../components/LoadingComponent/Loading'
 import { useDebounce } from '../../hooks/useDebounce'
+import { useLanguage } from '../../context/LanguageContext'
+import { CreditCardOutlined, CustomerServiceOutlined, SyncOutlined, TruckOutlined } from '@ant-design/icons'
 
 
 
 
 const HomePage = () => {
+  const { t } = useLanguage();
   const searchProduct = useSelector((state) => state?.product?.search);
   const user = useSelector((state) => state?.user);
   const searchDebounce = useDebounce(searchProduct, 1000);
-  const [limit, setLimit] = useState(6)
-  const [typeProducts, setTypeProducts] = useState([])
+  const [limit, setLimit] = useState(12)
 
 
   const fetchProductAll = async (context) => {
@@ -31,14 +40,6 @@ const HomePage = () => {
     return res
   }
 
-  const fetchAllTypeProduct = async () => {
-    const res = await ProductService.getAllTypeProduct()
-    if (res.status === 'OK') {
-      setTypeProducts(res?.data)
-    }
-
-  }
-
   const { isPending, data: products } = useQuery({
     queryKey: ['products', limit, searchDebounce],
     queryFn: fetchProductAll,
@@ -46,10 +47,6 @@ const HomePage = () => {
     retryDelay: 1000,
     placeholderData: (previousData) => previousData,
   })
-
-  useEffect(() => {
-    fetchAllTypeProduct()
-  }, [])
 
   // Initialize chatbot with user identity
   useEffect(() => {
@@ -76,115 +73,53 @@ const HomePage = () => {
 
   return (
     <Loading isLoading={isPending}>
-      {/* Decorative Shapes */}
-      <div style={{
-        position: 'fixed',
-        width: '100%',
-        height: '100%',
-        top: 0,
-        left: 0,
-        pointerEvents: 'none',
-        zIndex: 0,
-        overflow: 'hidden'
-      }}>
-        {/* Top Left Blob */}
-        <div style={{
-          position: 'absolute',
-          top: '-100px',
-          left: '-100px',
-          width: '300px',
-          height: '300px',
-          background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.12) 0%, rgba(118, 75, 162, 0.12) 100%)',
-          borderRadius: '50%',
-          filter: 'blur(60px)',
-          animation: 'float 20s ease-in-out infinite'
-        }} />
+      <WrapperHomeContainer id="container">
+        <WrapperHeroBanner>
+          <SliderComponent
+            arrImages={[slider1, slider2, slider3]}
+            imageHeight="520px"
+            mobileImageHeight="420px"
+            autoplay
+            autoplaySpeed={3200}
+          />
+          <WrapperHeroCard>
+            <h2>{t('home.heroTitle')}</h2>
+            <p>{t('home.heroSubtitle')}</p>
+            <button type="button">{t('home.shopNow')}</button>
+          </WrapperHeroCard>
+        </WrapperHeroBanner>
 
-        {/* Top Right Blob */}
-        <div style={{
-          position: 'absolute',
-          top: '100px',
-          right: '-150px',
-          width: '400px',
-          height: '400px',
-          background: 'linear-gradient(135deg, rgba(26, 148, 255, 0.1) 0%, rgba(102, 126, 234, 0.1) 100%)',
-          borderRadius: '50%',
-          filter: 'blur(80px)',
-          animation: 'float 25s ease-in-out infinite reverse'
-        }} />
+        <WrapperFeatureStrip>
+          <WrapperFeatureItem>
+            <TruckOutlined style={{ fontSize: '22px', color: '#0b6fd0' }} />
+            <div>
+              <h4>{t('home.features.shippingTitle')}</h4>
+              <p>{t('home.features.shippingDesc')}</p>
+            </div>
+          </WrapperFeatureItem>
+          <WrapperFeatureItem>
+            <CustomerServiceOutlined style={{ fontSize: '22px', color: '#0b6fd0' }} />
+            <div>
+              <h4>{t('home.features.supportTitle')}</h4>
+              <p>{t('home.features.supportDesc')}</p>
+            </div>
+          </WrapperFeatureItem>
+          <WrapperFeatureItem>
+            <SyncOutlined style={{ fontSize: '22px', color: '#0b6fd0' }} />
+            <div>
+              <h4>{t('home.features.returnTitle')}</h4>
+              <p>{t('home.features.returnDesc')}</p>
+            </div>
+          </WrapperFeatureItem>
+          <WrapperFeatureItem>
+            <CreditCardOutlined style={{ fontSize: '22px', color: '#0b6fd0' }} />
+            <div>
+              <h4>{t('home.features.paymentTitle')}</h4>
+              <p>{t('home.features.paymentDesc')}</p>
+            </div>
+          </WrapperFeatureItem>
+        </WrapperFeatureStrip>
 
-        {/* Bottom Left Shape */}
-        <div style={{
-          position: 'absolute',
-          bottom: '-80px',
-          left: '-80px',
-          width: '250px',
-          height: '250px',
-          background: 'linear-gradient(135deg, rgba(255, 107, 107, 0.12) 0%, rgba(255, 142, 83, 0.12) 100%)',
-          borderRadius: '50%',
-          filter: 'blur(50px)',
-          animation: 'pulse 15s ease-in-out infinite'
-        }} />
-
-        {/* Bottom Right Shape */}
-        <div style={{
-          position: 'absolute',
-          bottom: '150px',
-          right: '-50px',
-          width: '200px',
-          height: '200px',
-          background: 'linear-gradient(135deg, rgba(67, 233, 123, 0.1) 0%, rgba(56, 249, 215, 0.1) 100%)',
-          borderRadius: '30% 70% 70% 30% / 30% 30% 70% 70%',
-          filter: 'blur(40px)',
-          animation: 'rotate 30s linear infinite'
-        }} />
-      </div>
-
-      <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0) translateX(0) scale(1); }
-          25% { transform: translateY(-30px) translateX(20px) scale(1.05); }
-          50% { transform: translateY(-50px) translateX(-20px) scale(0.95); }
-          75% { transform: translateY(-30px) translateX(20px) scale(1.05); }
-        }
-        @keyframes pulse {
-          0%, 100% { transform: scale(1); opacity: 0.5; }
-          50% { transform: scale(1.15); opacity: 0.7; }
-        }
-        @keyframes rotate {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
-
-      <div style={{
-        padding: '0 120px',
-        fontSize: '16px',
-        maxWidth: '1440px',
-        margin: '0 auto',
-        position: 'relative',
-        zIndex: 1
-      }}>
-        <WrapperTypeProduct>
-          {typeProducts.map((item) => {
-            return (
-              <TypeProduct name={item} key={item} />
-            )
-          })}
-        </WrapperTypeProduct>
-      </div>
-
-      <div id="container" style={{
-        backgroundColor: '#efefef',
-        padding: '0 120px',
-        minHeight: '100vh',
-        paddingBottom: '50px',
-        maxWidth: '1440px',
-        margin: '0 auto',
-        position: 'relative',
-        zIndex: 1
-      }}>
-        <SliderComponent arrImages={[slider1, slider2, slider3]} />
         <WrapperProducts>
           {products?.data?.map((product) => {
             return (
@@ -212,7 +147,7 @@ const HomePage = () => {
               products?.data?.length >= products?.total ||
               (searchDebounce && products?.data?.length < limit)
             }
-            onClick={() => setLimit(limit + 6)}
+            onClick={() => setLimit(limit + 12)}
             style={{
               backgroundColor: (
                 products?.data?.length >= products?.total ||
@@ -228,10 +163,10 @@ const HomePage = () => {
               ) ? 'not-allowed' : 'pointer'
             }}
           >
-            Xem thêm
+            {t('home.loadMore')}
           </WrapperButtonMore>
         </div>
-      </div>
+      </WrapperHomeContainer>
     </Loading>
 
   )

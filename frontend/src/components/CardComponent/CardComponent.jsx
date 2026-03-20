@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { addToComparison, removeFromComparison } from '../../redux/slides/comparisonSlice'
 import { addToWishlist, removeFromWishlist } from '../../redux/slides/wishlistSlice'
+import { formatPrice } from '../../utils'
 
 const CardComponent = (props) => {
   const { countInStock, description, image, name, price, rating, type, selled, discount, id } = props
@@ -141,7 +142,7 @@ const CardComponent = (props) => {
         <span>| Đã bán {selled || 1000}+</span>
       </WrapperReporText>
       <WrapperPriceText>
-        <span style={{ marginRight: '8px' }}> {price?.toLocaleString()} </span>
+        <span style={{ marginRight: '8px' }}>{formatPrice(price)}</span>
         <WrapperDiscountText> - {discount || 10}% </WrapperDiscountText>
       </WrapperPriceText>
     </WrapperCardStyle>

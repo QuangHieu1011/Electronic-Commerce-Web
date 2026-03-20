@@ -1,25 +1,26 @@
 import styled from 'styled-components'
 
 export const WrapperContainer = styled.div`
-    padding: 20px;
+    padding: 40px 20px;
     background: #f5f5f5;
     min-height: 100vh;
 `
 
 export const WrapperHeader = styled.div`
-    background: linear-gradient(135deg, rgb(26,148,255) 0%, rgb(26,180,255) 100%);
-    padding: 20px 40px;
+    background: #1a94ff;
+    padding: 28px 40px;
     border-radius: 12px;
-    margin-bottom: 30px;
+    margin-bottom: 32px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     color: white;
+    box-shadow: 0 4px 12px rgba(26, 148, 255, 0.2);
 
     h2 {
         margin: 0;
-        font-size: 28px;
-        font-weight: 600;
+        font-size: 26px;
+        font-weight: 700;
     }
 `
 
@@ -27,32 +28,38 @@ export const WrapperProducts = styled.div`
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 20px;
-    padding: 20px;
+    padding: 24px;
     background: white;
     border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e5e7eb;
+
+    @media (max-width: 768px) {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 14px;
+        padding: 16px;
+    }
 `
 
 export const WrapperEmpty = styled.div`
     background: white;
     border-radius: 12px;
-    padding: 60px 20px;
+    padding: 60px 40px;
     text-align: center;
-
-    .empty-icon {
-        font-size: 80px;
-        color: rgb(26,148,255);
-        margin-bottom: 20px;
-    }
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e5e7eb;
 
     .empty-title {
         font-size: 20px;
         font-weight: 600;
         color: #333;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
     }
 
     .empty-description {
-        color: #999;
-        margin-bottom: 30px;
+        color: #888;
+        margin-bottom: 28px;
+        font-size: 14px;
+        line-height: 1.6;
     }
 `

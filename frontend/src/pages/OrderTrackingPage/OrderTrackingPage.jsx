@@ -25,6 +25,8 @@ import { message } from 'antd'
 import * as OrderService from '../../service/OrderService'
 import socketService from '../../service/SocketService'
 import OrderTrackMap from '../../components/OrderTrackMap/OrderTrackMap'
+import { formatPrice } from '../../utils'
+import { useLanguage } from '../../context/LanguageContext'
 
 const { Option } = Select
 
@@ -38,6 +40,7 @@ const OrderTrackingPage = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const location = useLocation()
+    const { t } = useLanguage()
 
     // Calculate discounted price
     const calculateDiscountedPrice = (product) => {
@@ -181,14 +184,6 @@ const OrderTrackingPage = () => {
         return order.userId === 'guest'
     })
 
-    // Format price function
-    const formatPrice = (price) => {
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
-        }).format(price)
-    }
-
     // Get order status color and text
     const getOrderStatusInfo = (status) => {
         const statusMap = {
@@ -285,9 +280,9 @@ const OrderTrackingPage = () => {
                     icon={<ArrowLeftOutlined />}
                     onClick={() => navigate('/')}
                 >
-                    Về trang chủ
+                    {t('orderTracking.backHome')}
                 </Button>
-                <h2>Theo dõi đơn hàng của tôi</h2>
+                <h2>{t('orderTracking.title')}</h2>
                 {(!user?.id && !user?._id) && (
                     <div style={{ marginLeft: 'auto', fontSize: '14px', color: '#fff9' }}>
                         ⚠️ Vui lòng đăng nhập để xem đầy đủ đơn hàng

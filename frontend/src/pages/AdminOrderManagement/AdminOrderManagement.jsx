@@ -39,10 +39,13 @@ import socketService from '../../service/SocketService'
 import { updateOrderStatus, updatePaymentStatus, cancelOrder, deleteOrderPermanently, syncOrdersFromAPI, restoreOrderForUser, clearOrders } from '../../redux/slides/orderSlice'
 import { message } from 'antd'
 import * as OrderService from '../../service/OrderService'
+import { formatPrice } from '../../utils'
+import { useLanguage } from '../../context/LanguageContext'
 
 const { Option } = Select
 
 const AdminOrderManagement = () => {
+    const { t, language } = useLanguage()
     const [filterStatus, setFilterStatus] = useState('all')
     const [filterPayment, setFilterPayment] = useState('all')
     const [filterHidden, setFilterHidden] = useState('all')
@@ -71,14 +74,14 @@ const AdminOrderManagement = () => {
                 }
             } catch (error) {
                 console.error('Error loading admin orders:', error)
-                message.error('Lỗi khi tải danh sách đơn hàng')
+                message.error(t('adminOrders.loadError'))
             } finally {
                 setTimeout(() => setLoading(false), 100)
             }
         } else {
             setLoading(false)
         }
-    }, [user?.access_token, user?.isAdmin, dispatch])
+    }, [user?.access_token, user?.isAdmin, dispatch, t])
 
     // Load all orders for admin
     useEffect(() => {
@@ -130,22 +133,14 @@ const AdminOrderManagement = () => {
         }
     }, [dispatch])
 
-    // Format price function
-    const formatPrice = (price) => {
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
-        }).format(price)
-    }
-
     // Get order status info
     const getOrderStatusInfo = (status) => {
         const statusMap = {
-            'pending': { color: 'orange', text: 'Chờ xác nhận', icon: <ClockCircleOutlined /> },
-            'confirmed': { color: 'blue', text: 'Đã xác nhận', icon: <CheckCircleOutlined /> },
-            'shipping': { color: 'cyan', text: 'Đang giao hàng', icon: <TruckOutlined /> },
-            'delivered': { color: 'green', text: 'Đã giao hàng', icon: <CheckCircleOutlined /> },
-            'cancelled': { color: 'red', text: 'Đã hủy', icon: <DeleteOutlined /> }
+            'pending': { color: 'orange', text: t('adminOrders.pending'), icon: <ClockCircleOutlined /> },
+            'confirmed': { color: 'blue', text: t('orderTracking.confirmed'), icon: <CheckCircleOutlined /> },
+            'shipping': { color: 'cyan', text: t('adminOrders.shipping'), icon: <TruckOutlined /> },
+            'delivered': { color: 'green', text: t('orderTracking.delivered'), icon: <CheckCircleOutlined /> },
+            'cancelled': { color: 'red', text: t('orderTracking.cancelled'), icon: <DeleteOutlined /> }
         }
         return statusMap[status] || statusMap['pending']
     }
@@ -156,35 +151,35 @@ const AdminOrderManagement = () => {
             console.log('Updating order status:', { orderId, newStatus, token: user?.access_token })
 
             if (!user?.access_token) {
-                message.error('Không có quyền truy cập. Vui lòng đăng nhập lại!')
+                message.error(t('adminOrders.noAccess'))
                 return
             }
 
             if (!user?.isAdmin) {
-                message.error('Chỉ admin mới có quyền cập nhật trạng thái đơn hàng!')
+                message.error(t('adminOrders.adminOnlyOrder'))
                 return
             }
 
-            // Tìm trạng thái hiện tại để có thể revert nếu cần
+            // Capture the current status so UI can be reverted on API failure.
             const currentOrder = orders.find(order => order._id === orderId)
             const oldStatus = currentOrder?.orderStatus
 
-            // Optimistic update: Update UI ngay lập tức
+            // Optimistic update for faster feedback.
             dispatch(updateOrderStatus({ orderId, status: newStatus }))
-            message.success('Đã cập nhật trạng thái đơn hàng!')
+            message.success(t('adminOrders.orderStatusUpdated'))
 
-            // Sau đó gọi API để sync với server
+            // Then sync with server.
             const response = await OrderService.updateOrderStatus(orderId, newStatus, user.access_token)
             console.log('API response:', response)
 
             if (response?.status !== 'OK') {
-                // Nếu API thất bại, revert lại trạng thái cũ
+                // Revert UI if API fails.
                 if (oldStatus) {
                     dispatch(updateOrderStatus({ orderId, status: oldStatus }))
                 }
-                throw new Error(response?.message || 'Phản hồi API không hợp lệ')
+                throw new Error(response?.message || t('adminOrders.invalidApiResponse'))
             } else {
-                // Broadcast update đến các tab khác bằng BroadcastChannel
+                // Broadcast update to other tabs.
                 const channel = new BroadcastChannel('orderUpdates')
                 channel.postMessage({
                     type: 'ORDER_STATUS_UPDATE',
@@ -194,7 +189,7 @@ const AdminOrderManagement = () => {
                 })
                 channel.close()
 
-                // Backup với localStorage cho browser cũ
+                // Backup for older browsers.
                 localStorage.setItem('orderUpdate', JSON.stringify({
                     type: 'ORDER_STATUS_UPDATE',
                     orderId,
@@ -204,8 +199,8 @@ const AdminOrderManagement = () => {
             }
         } catch (error) {
             console.error('Error updating order status:', error)
-            const errorMessage = error.response?.data?.message || error.message || 'Lỗi không xác định'
-            message.error('Lỗi khi cập nhật trạng thái: ' + errorMessage)
+            const errorMessage = error.response?.data?.message || error.message || t('adminOrders.unknownError')
+            message.error(`${t('adminOrders.statusUpdateError')} ${errorMessage}`)
         }
     }
 
@@ -215,35 +210,35 @@ const AdminOrderManagement = () => {
             console.log('Updating payment status:', { orderId, paymentStatus, token: user?.access_token })
 
             if (!user?.access_token) {
-                message.error('Không có quyền truy cập. Vui lòng đăng nhập lại!')
+                message.error(t('adminOrders.noAccess'))
                 return
             }
 
             if (!user?.isAdmin) {
-                message.error('Chỉ admin mới có quyền cập nhật trạng thái thanh toán!')
+                message.error(t('adminOrders.adminOnlyPayment'))
                 return
             }
 
-            // Tìm trạng thái hiện tại để có thể revert nếu cần
+            // Capture the current status so UI can be reverted on API failure.
             const currentOrder = orders.find(order => order._id === orderId)
             const oldPaymentStatus = currentOrder?.paymentStatus
 
-            // Optimistic update: Update UI ngay lập tức
+            // Optimistic update for faster feedback.
             dispatch(updatePaymentStatus({ orderId, paymentStatus }))
-            message.success('Đã cập nhật trạng thái thanh toán!')
+            message.success(t('adminOrders.paymentStatusUpdated'))
 
-            // Sau đó gọi API để sync với server
+            // Then sync with server.
             const response = await OrderService.updatePaymentStatus(orderId, paymentStatus, user.access_token)
             console.log('API response:', response)
 
             if (response?.status !== 'OK') {
-                // Nếu API thất bại, revert lại trạng thái cũ
+                // Revert UI if API fails.
                 if (oldPaymentStatus) {
                     dispatch(updatePaymentStatus({ orderId, paymentStatus: oldPaymentStatus }))
                 }
-                throw new Error(response?.message || 'Phản hồi API không hợp lệ')
+                throw new Error(response?.message || t('adminOrders.invalidApiResponse'))
             } else {
-                // Broadcast update đến các tab khác bằng BroadcastChannel
+                // Broadcast update to other tabs.
                 const channel = new BroadcastChannel('orderUpdates')
                 channel.postMessage({
                     type: 'PAYMENT_STATUS_UPDATE',
@@ -253,7 +248,7 @@ const AdminOrderManagement = () => {
                 })
                 channel.close()
 
-                // Backup với localStorage cho browser cũ
+                // Backup for older browsers.
                 localStorage.setItem('orderUpdate', JSON.stringify({
                     type: 'PAYMENT_STATUS_UPDATE',
                     orderId,
@@ -263,8 +258,8 @@ const AdminOrderManagement = () => {
             }
         } catch (error) {
             console.error('Error updating payment status:', error)
-            const errorMessage = error.response?.data?.message || error.message || 'Lỗi không xác định'
-            message.error('Lỗi khi cập nhật thanh toán: ' + errorMessage)
+            const errorMessage = error.response?.data?.message || error.message || t('adminOrders.unknownError')
+            message.error(`${t('adminOrders.paymentUpdateError')} ${errorMessage}`)
         }
     }
 
@@ -274,12 +269,12 @@ const AdminOrderManagement = () => {
             console.log('Restoring order:', { orderId, token: user?.access_token })
 
             if (!user?.access_token) {
-                message.error('Không có quyền truy cập. Vui lòng đăng nhập lại!')
+                message.error(t('adminOrders.noAccess'))
                 return
             }
 
             if (!user?.isAdmin) {
-                message.error('Chỉ admin mới có quyền khôi phục đơn hàng!')
+                message.error(t('adminOrders.adminOnlyRestore'))
                 return
             }
 
@@ -288,15 +283,15 @@ const AdminOrderManagement = () => {
 
             if (response?.status === 'OK') {
                 dispatch(restoreOrderForUser({ orderId }))
-                message.success('Đã khôi phục đơn hàng cho user!')
-                // Không cần reload, Redux đã update UI ngay lập tức
+                message.success(t('adminOrders.restoreSuccess'))
+                // No reload needed, Redux state already updates UI.
             } else {
-                throw new Error(response?.message || 'Phản hồi API không hợp lệ')
+                throw new Error(response?.message || t('adminOrders.invalidApiResponse'))
             }
         } catch (error) {
             console.error('Error restoring order:', error)
-            const errorMessage = error.response?.data?.message || error.message || 'Lỗi không xác định'
-            message.error('Lỗi khi khôi phục đơn hàng: ' + errorMessage)
+            const errorMessage = error.response?.data?.message || error.message || t('adminOrders.unknownError')
+            message.error(`${t('adminOrders.restoreError')} ${errorMessage}`)
         }
     }
 
@@ -307,23 +302,23 @@ const AdminOrderManagement = () => {
                 const response = await OrderService.cancelOrder(orderId, user.access_token)
                 if (response.status === 'OK') {
                     dispatch(cancelOrder({ orderId }))
-                    message.success('Đã hủy đơn hàng!')
+                    message.success(t('adminOrders.cancelSuccess'))
                 }
             } else {
                 // Fallback to local update
                 dispatch(cancelOrder({ orderId }))
-                message.success('Đã hủy đơn hàng (local)!')
+                message.success(t('adminOrders.cancelLocalSuccess'))
             }
         } catch (error) {
             console.error('Error cancelling order:', error)
-            message.error('Lỗi khi hủy đơn hàng: ' + (error.response?.data?.message || error.message))
+            message.error(`${t('adminOrders.cancelError')} ${error.response?.data?.message || error.message}`)
         }
     }
 
     // Handle permanent delete order (admin only)
     const handleDeleteOrder = (orderId) => {
         dispatch(deleteOrderPermanently({ orderId }))
-        message.success('Đã xóa vĩnh viễn đơn hàng!')
+        message.success(t('adminOrders.deletePermanentSuccess'))
         setModalVisible(false)
     }
 
@@ -358,7 +353,7 @@ const AdminOrderManagement = () => {
     // Table columns
     const columns = [
         {
-            title: 'Mã đơn hàng',
+            title: t('adminOrders.orderCode'),
             dataIndex: '_id',
             key: '_id',
             render: (id) => (
@@ -371,7 +366,7 @@ const AdminOrderManagement = () => {
             )
         },
         {
-            title: 'Khách hàng',
+            title: t('adminOrders.customer'),
             key: 'customer',
             render: (record) => (
                 <div>
@@ -381,26 +376,26 @@ const AdminOrderManagement = () => {
             )
         },
         {
-            title: 'Sản phẩm',
+            title: t('adminOrders.products'),
             key: 'products',
             render: (record) => (
                 <div>
-                    <div>{record.orderItems.length} sản phẩm</div>
+                    <div>{record.orderItems.length} {t('adminOrders.products').toLowerCase()}</div>
                     <div style={{ fontSize: '12px', color: '#666' }}>
                         {record.orderItems[0]?.product.name}
-                        {record.orderItems.length > 1 && ` +${record.orderItems.length - 1} khác`}
+                        {record.orderItems.length > 1 && ` +${record.orderItems.length - 1} ${t('adminOrders.others')}`}
                     </div>
                 </div>
             )
         },
         {
-            title: 'Tổng tiền',
+            title: t('adminOrders.total'),
             dataIndex: 'totalAmount',
             key: 'totalAmount',
             render: (amount) => <strong style={{ color: '#ff4d4f' }}>{formatPrice(amount)}</strong>
         },
         {
-            title: 'Trạng thái đơn hàng',
+            title: t('adminOrders.orderStatus'),
             dataIndex: 'orderStatus',
             key: 'orderStatus',
             render: (status, record) => {
@@ -417,11 +412,11 @@ const AdminOrderManagement = () => {
                                 onChange={(newStatus) => handleUpdateOrderStatus(record._id, newStatus)}
                                 style={{ width: 120, marginTop: 4 }}
                             >
-                                <Option value="pending">Chờ xác nhận</Option>
-                                <Option value="confirmed">Đã xác nhận</Option>
-                                <Option value="shipping">Đang giao</Option>
-                                <Option value="delivered">Đã giao</Option>
-                                <Option value="cancelled">Đã hủy</Option>
+                                <Option value="pending">{t('adminOrders.pending')}</Option>
+                                <Option value="confirmed">{t('orderTracking.confirmed')}</Option>
+                                <Option value="shipping">{t('adminOrders.shipping')}</Option>
+                                <Option value="delivered">{t('orderTracking.delivered')}</Option>
+                                <Option value="cancelled">{t('orderTracking.cancelled')}</Option>
                             </Select>
                         </div>
                     </div>
@@ -429,12 +424,12 @@ const AdminOrderManagement = () => {
             }
         },
         {
-            title: 'Thanh toán',
+            title: t('adminOrders.payment'),
             key: 'payment',
             render: (record) => (
                 <div>
                     <Tag color={record.paymentStatus === 'paid' ? 'green' : 'orange'}>
-                        {record.paymentStatus === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán'}
+                        {record.paymentStatus === 'paid' ? t('orderTracking.paid') : t('adminOrders.unpaid')}
                     </Tag>
                     <div>
                         <Select
@@ -443,21 +438,21 @@ const AdminOrderManagement = () => {
                             onChange={(paymentStatus) => handleUpdatePaymentStatus(record._id, paymentStatus)}
                             style={{ width: 120, marginTop: 4 }}
                         >
-                            <Option value="unpaid">Chưa thanh toán</Option>
-                            <Option value="paid">Đã thanh toán</Option>
-                            <Option value="refunded">Đã hoàn tiền</Option>
+                            <Option value="unpaid">{t('adminOrders.unpaid')}</Option>
+                            <Option value="paid">{t('orderTracking.paid')}</Option>
+                            <Option value="refunded">{t('adminOrders.refunded')}</Option>
                         </Select>
                     </div>
                 </div>
             )
         },
         {
-            title: 'Trạng thái hiển thị',
+            title: t('adminOrders.visibility'),
             key: 'visibility',
             render: (record) => (
                 <div>
                     <Tag color={record.isDeletedByUser ? 'red' : 'green'}>
-                        {record.isDeletedByUser ? 'Đã ẩn bởi user' : 'Hiển thị với user'}
+                        {record.isDeletedByUser ? t('adminOrders.hiddenByUser') : t('adminOrders.visibleToUser')}
                     </Tag>
                     {record.isDeletedByUser && (
                         <div style={{ marginTop: 4 }}>
@@ -467,7 +462,7 @@ const AdminOrderManagement = () => {
                                 onClick={() => handleRestoreOrder(record._id)}
                                 style={{ fontSize: 12, height: 24 }}
                             >
-                                Khôi phục
+                                {t('adminOrders.restore')}
                             </Button>
                         </div>
                     )}
@@ -475,13 +470,13 @@ const AdminOrderManagement = () => {
             )
         },
         {
-            title: 'Ngày đặt',
+            title: t('adminOrders.orderDate'),
             dataIndex: 'createdAt',
             key: 'createdAt',
-            render: (date) => new Date(date).toLocaleDateString('vi-VN')
+            render: (date) => new Date(date).toLocaleDateString(language === 'vi' ? 'vi-VN' : 'en-US')
         },
         {
-            title: 'Thao tác',
+            title: t('adminOrders.actions'),
             key: 'actions',
             render: (record) => (
                 <Space>
@@ -493,24 +488,24 @@ const AdminOrderManagement = () => {
                             setModalVisible(true)
                         }}
                     >
-                        Xem
+                        {t('adminOrders.view')}
                     </Button>
                     {record.orderStatus === 'cancelled' || record.orderStatus === 'delivered' ? (
                         <Popconfirm
-                            title="Xóa đơn hàng này?"
+                            title={t('adminOrders.deleteConfirm')}
                             onConfirm={() => handleDeleteOrder(record._id)}
                         >
                             <Button size="small" danger icon={<DeleteOutlined />}>
-                                Xóa
+                                {t('adminOrders.delete')}
                             </Button>
                         </Popconfirm>
                     ) : (
                         <Popconfirm
-                            title="Hủy đơn hàng này?"
+                            title={t('adminOrders.cancelConfirm')}
                             onConfirm={() => handleCancelOrder(record._id)}
                         >
                             <Button size="small" danger>
-                                Hủy
+                                {t('adminOrders.cancel')}
                             </Button>
                         </Popconfirm>
                     )}
@@ -526,12 +521,12 @@ const AdminOrderManagement = () => {
                     icon={<ArrowLeftOutlined />}
                     onClick={() => navigate('/system/admin')}
                 >
-                    Quay lại Admin
+                    {t('adminOrders.backAdmin')}
                 </Button>
-                <h2>Quản lý đơn hàng</h2>
+                <h2>{t('adminOrders.title')}</h2>
             </WrapperHeader>
 
-            <Spin spinning={loading} tip="Đang tải đơn hàng..." size="large">
+            <Spin spinning={loading} tip={t('adminOrders.loadingOrders')} size="large">
 
                 {/* Statistics */}
                 <WrapperStats>
@@ -539,7 +534,7 @@ const AdminOrderManagement = () => {
                         <Col span={4}>
                             <Card>
                                 <Statistic
-                                    title="Tổng đơn hàng"
+                                    title={t('adminOrders.totalOrders')}
                                     value={stats.total}
                                     prefix={<ShoppingCartOutlined />}
                                 />
@@ -548,7 +543,7 @@ const AdminOrderManagement = () => {
                         <Col span={4}>
                             <Card>
                                 <Statistic
-                                    title="Chờ xác nhận"
+                                    title={t('adminOrders.pending')}
                                     value={stats.pending}
                                     valueStyle={{ color: '#fa8c16' }}
                                     prefix={<ClockCircleOutlined />}
@@ -558,7 +553,7 @@ const AdminOrderManagement = () => {
                         <Col span={4}>
                             <Card>
                                 <Statistic
-                                    title="Đang giao hàng"
+                                    title={t('adminOrders.shipping')}
                                     value={stats.shipping}
                                     valueStyle={{ color: '#13c2c2' }}
                                     prefix={<TruckOutlined />}
@@ -568,7 +563,7 @@ const AdminOrderManagement = () => {
                         <Col span={4}>
                             <Card>
                                 <Statistic
-                                    title="Hoàn thành"
+                                    title={t('adminOrders.completed')}
                                     value={stats.delivered}
                                     valueStyle={{ color: '#52c41a' }}
                                     prefix={<CheckCircleOutlined />}
@@ -578,7 +573,7 @@ const AdminOrderManagement = () => {
                         <Col span={4}>
                             <Card>
                                 <Statistic
-                                    title="Chưa thanh toán"
+                                    title={t('adminOrders.unpaid')}
                                     value={stats.unpaidOrders}
                                     valueStyle={{ color: '#ff4d4f' }}
                                     prefix={<DollarOutlined />}
@@ -588,7 +583,7 @@ const AdminOrderManagement = () => {
                         <Col span={4}>
                             <Card>
                                 <Statistic
-                                    title="Doanh thu"
+                                    title={t('adminOrders.revenue')}
                                     value={stats.totalRevenue}
                                     formatter={(value) => formatPrice(value)}
                                     valueStyle={{ color: '#52c41a' }}
@@ -610,7 +605,7 @@ const AdminOrderManagement = () => {
                     <Row gutter={16} align="middle">
                         <Col flex="auto">
                             <Input
-                                placeholder="Tìm kiếm theo mã đơn hàng, tên khách hàng, tên sản phẩm..."
+                                placeholder={t('adminOrders.searchPlaceholder')}
                                 prefix={<SearchOutlined />}
                                 value={searchText}
                                 onChange={(e) => setSearchText(e.target.value)}
@@ -623,12 +618,12 @@ const AdminOrderManagement = () => {
                                 style={{ width: 150 }}
                                 suffixIcon={<FilterOutlined />}
                             >
-                                <Option value="all">Tất cả trạng thái</Option>
-                                <Option value="pending">Chờ xác nhận</Option>
-                                <Option value="confirmed">Đã xác nhận</Option>
-                                <Option value="shipping">Đang giao hàng</Option>
-                                <Option value="delivered">Đã giao hàng</Option>
-                                <Option value="cancelled">Đã hủy</Option>
+                                <Option value="all">{t('adminOrders.allStatuses')}</Option>
+                                <Option value="pending">{t('adminOrders.pending')}</Option>
+                                <Option value="confirmed">{t('orderTracking.confirmed')}</Option>
+                                <Option value="shipping">{t('adminOrders.shipping')}</Option>
+                                <Option value="delivered">{t('orderTracking.delivered')}</Option>
+                                <Option value="cancelled">{t('orderTracking.cancelled')}</Option>
                             </Select>
                         </Col>
                         <Col>
@@ -637,10 +632,10 @@ const AdminOrderManagement = () => {
                                 onChange={setFilterPayment}
                                 style={{ width: 150 }}
                             >
-                                <Option value="all">Tất cả thanh toán</Option>
-                                <Option value="unpaid">Chưa thanh toán</Option>
-                                <Option value="paid">Đã thanh toán</Option>
-                                <Option value="refunded">Đã hoàn tiền</Option>
+                                <Option value="all">{t('adminOrders.allPayments')}</Option>
+                                <Option value="unpaid">{t('adminOrders.unpaid')}</Option>
+                                <Option value="paid">{t('orderTracking.paid')}</Option>
+                                <Option value="refunded">{t('adminOrders.refunded')}</Option>
                             </Select>
                         </Col>
                         <Col>
@@ -649,9 +644,9 @@ const AdminOrderManagement = () => {
                                 onChange={setFilterHidden}
                                 style={{ width: 150 }}
                             >
-                                <Option value="all">Tất cả đơn hàng</Option>
-                                <Option value="visible">Hiển thị với user</Option>
-                                <Option value="hidden">Đã ẩn bởi user</Option>
+                                <Option value="all">{t('adminOrders.allOrders')}</Option>
+                                <Option value="visible">{t('adminOrders.visibleToUser')}</Option>
+                                <Option value="hidden">{t('adminOrders.hiddenByUser')}</Option>
                             </Select>
                         </Col>
                     </Row>
@@ -667,7 +662,7 @@ const AdminOrderManagement = () => {
                             pageSize: 10,
                             showSizeChanger: true,
                             showQuickJumper: true,
-                            showTotal: (total) => `Tổng ${total} đơn hàng`
+                            showTotal: (total) => t('adminOrders.totalWithCount', { count: total })
                         }}
                         scroll={{ x: 1200 }}
                     />
@@ -675,7 +670,7 @@ const AdminOrderManagement = () => {
 
                 {/* Order Detail Modal */}
                 <Modal
-                    title={`Chi tiết đơn hàng #${selectedOrder?._id?.slice(-8).toUpperCase()}`}
+                    title={`${t('adminOrders.detailsTitle')} #${selectedOrder?._id?.slice(-8).toUpperCase()}`}
                     open={modalVisible}
                     onCancel={() => setModalVisible(false)}
                     footer={null}
@@ -684,26 +679,26 @@ const AdminOrderManagement = () => {
                     {selectedOrder && (
                         <div>
                             {/* Order Info */}
-                            <Card title="Thông tin đơn hàng" style={{ marginBottom: 16 }}>
+                            <Card title={t('adminOrders.orderInfo')} style={{ marginBottom: 16 }}>
                                 <Row gutter={16}>
                                     <Col span={12}>
-                                        <p><strong>Khách hàng:</strong> {selectedOrder.shippingInfo?.fullName}</p>
-                                        <p><strong>Số điện thoại:</strong> {selectedOrder.shippingInfo?.phone}</p>
-                                        <p><strong>Địa chỉ:</strong> {selectedOrder.shippingInfo?.address}, {selectedOrder.shippingInfo?.ward}, {selectedOrder.shippingInfo?.district}, {selectedOrder.shippingInfo?.province}</p>
+                                        <p><strong>{t('adminOrders.customerName')}</strong> {selectedOrder.shippingInfo?.fullName}</p>
+                                        <p><strong>{t('adminOrders.phone')}</strong> {selectedOrder.shippingInfo?.phone}</p>
+                                        <p><strong>{t('adminOrders.address')}</strong> {selectedOrder.shippingInfo?.address}, {selectedOrder.shippingInfo?.ward}, {selectedOrder.shippingInfo?.district}, {selectedOrder.shippingInfo?.province}</p>
                                         {selectedOrder.shippingInfo?.note && (
-                                            <p><strong>Ghi chú:</strong> {selectedOrder.shippingInfo.note}</p>
+                                            <p><strong>{t('adminOrders.note')}</strong> {selectedOrder.shippingInfo.note}</p>
                                         )}
                                     </Col>
                                     <Col span={12}>
-                                        <p><strong>Ngày đặt:</strong> {new Date(selectedOrder.createdAt).toLocaleString('vi-VN')}</p>
-                                        <p><strong>Phương thức thanh toán:</strong> {selectedOrder.paymentMethod === 'cod' ? 'COD' : selectedOrder.paymentMethod === 'banking' ? 'Chuyển khoản' : 'Thẻ tín dụng'}</p>
-                                        <p><strong>Tổng tiền:</strong> <span style={{ color: '#ff4d4f', fontWeight: 600 }}>{formatPrice(selectedOrder.totalAmount)}</span></p>
+                                        <p><strong>{t('adminOrders.placedAt')}</strong> {new Date(selectedOrder.createdAt).toLocaleString(language === 'vi' ? 'vi-VN' : 'en-US')}</p>
+                                        <p><strong>{t('adminOrders.paymentMethod')}</strong> {selectedOrder.paymentMethod === 'cod' ? 'COD' : selectedOrder.paymentMethod === 'banking' ? t('adminOrders.bankTransfer') : t('adminOrders.creditCard')}</p>
+                                        <p><strong>{t('adminOrders.totalAmount')}</strong> <span style={{ color: '#ff4d4f', fontWeight: 600 }}>{formatPrice(selectedOrder.totalAmount)}</span></p>
                                     </Col>
                                 </Row>
                             </Card>
 
                             {/* Order Items */}
-                            <Card title="Sản phẩm">
+                            <Card title={t('adminOrders.items')}>
                                 {selectedOrder.orderItems.map((item, index) => (
                                     <div key={index} style={{
                                         display: 'flex',
@@ -727,7 +722,7 @@ const AdminOrderManagement = () => {
                                                 {item.product.name}
                                             </div>
                                             <div style={{ fontSize: 12, color: '#666' }}>
-                                                SL: {item.quantity} x {formatPrice(item.product.discount || item.product.price)}
+                                                {t('adminOrders.quantityShort')}: {item.quantity} x {formatPrice(item.product.discount || item.product.price)}
                                             </div>
                                         </div>
                                         <div style={{ fontWeight: 600, color: '#ff4d4f' }}>

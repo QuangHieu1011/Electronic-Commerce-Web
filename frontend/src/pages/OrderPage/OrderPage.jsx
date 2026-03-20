@@ -13,6 +13,8 @@ import { MinusOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { updateQuantity, removeFromCart } from '../../redux/slides/cartSlice'
+import { formatPrice } from '../../utils'
+import { useLanguage } from '../../context/LanguageContext'
 
 const OrderPage = () => {
   const [selectedItems, setSelectedItems] = useState({});
@@ -21,6 +23,7 @@ const OrderPage = () => {
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   // Khởi tạo selected items khi cart thay đổi
   useEffect(() => {
@@ -49,14 +52,6 @@ const OrderPage = () => {
     const allSelected = cart.cartItems.length > 0 && cart.cartItems.every(item => selectedItems[item.product._id]);
     setSelectAll(allSelected);
   }, [cart.cartItems, selectedItems]);
-
-  // Format price function
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
-    }).format(price);
-  };
 
   // Calculate discounted price
   const calculateDiscountedPrice = (product) => {
@@ -128,7 +123,7 @@ const OrderPage = () => {
   const handleProceedToCheckout = () => {
     const selectedProducts = cart.cartItems.filter(item => selectedItems[item.product._id]);
     if (selectedProducts.length === 0) {
-      message.warning('Vui lòng chọn sản phẩm để đặt hàng!');
+      message.warning(t('order.selectProductWarning'));
       return;
     }
 
@@ -144,22 +139,22 @@ const OrderPage = () => {
   return (
     <WrapperContainer>
       <WrapperHeader>
-        <h2>Giỏ hàng của tôi</h2>
+        <h2>{t('order.myCart')}</h2>
         <Button
           type="link"
           onClick={() => navigate('/order-tracking')}
           style={{ color: 'white', marginLeft: 'auto' }}
         >
-          Xem đơn hàng đã đặt →
+          {t('order.viewPlacedOrders')}
         </Button>
       </WrapperHeader>
 
       {cart.cartItems.length === 0 ? (
         <WrapperEmpty>
-          <div className="empty-title">Giỏ hàng của bạn đang trống</div>
-          <div className="empty-description">Hãy thêm sản phẩm vào giỏ hàng để tiếp tục mua sắm</div>
+          <div className="empty-title">{t('order.emptyTitle')}</div>
+          <div className="empty-description">{t('order.emptyDescription')}</div>
           <Button className="shopping-btn" type="primary" onClick={() => navigate('/')}>
-            Tiếp tục mua sắm
+            {t('order.continueShopping')}
           </Button>
         </WrapperEmpty>
       ) : (
@@ -184,11 +179,11 @@ const OrderPage = () => {
                   />
                 </div>
                 <div style={{ flex: 1 }}>
-                  Tất cả ({cart.cartItems.length} sản phẩm)
+                  {t('order.allItems', { count: cart.cartItems.length })}
                 </div>
-                <div style={{ width: '120px', textAlign: 'center' }}>Đơn giá</div>
-                <div style={{ width: '150px', textAlign: 'center' }}>Số lượng</div>
-                <div style={{ width: '120px', textAlign: 'center' }}>Thành tiền</div>
+                <div style={{ width: '120px', textAlign: 'center' }}>{t('order.unitPrice')}</div>
+                <div style={{ width: '150px', textAlign: 'center' }}>{t('order.quantity')}</div>
+                <div style={{ width: '120px', textAlign: 'center' }}>{t('order.totalPrice')}</div>
                 <div style={{ width: '60px' }}></div>
               </div>
 
@@ -291,37 +286,37 @@ const OrderPage = () => {
           {/* Right Column - Summary */}
           <div style={{ width: '350px' }}>
             <WrapperSummary>
-              <div className="summary-title">Tóm tắt đơn hàng</div>
+              <div className="summary-title">{t('order.summaryTitle')}</div>
 
               <div className="summary-row">
-                <span>Đã chọn:</span>
-                <span>{getSelectedCount()} sản phẩm</span>
+                <span>{t('order.selected')}</span>
+                <span>{t('order.selectedCount', { count: getSelectedCount() })}</span>
               </div>
 
               <div className="summary-row">
-                <span>Tạm tính:</span>
+                <span>{t('order.subtotal')}</span>
                 <span>{formatPrice(calculateTotal())}</span>
               </div>
 
               <div className="summary-row">
-                <span>Phí vận chuyển:</span>
-                <span>Miễn phí</span>
+                <span>{t('order.shippingFee')}</span>
+                <span>{t('order.freeShipping')}</span>
               </div>
 
 
               {(isLoyalty && loyaltyDiscount > 0) && (
                 <>
                   <div className="summary-row" style={{ color: '#1890ff', fontWeight: 600 }}>
-                    🎉 Bạn là khách hàng thân thiết! Được giảm 10% toàn bộ đơn hàng.
+                    🎉 {t('order.loyaltyBanner')}
                   </div>
                   <div className="summary-row">
-                    <span>Giảm giá thân thiết:</span>
+                    <span>{t('order.loyaltyDiscount')}</span>
                     <span>-{formatPrice(loyaltyDiscount)}</span>
                   </div>
                 </>
               )}
               <div className="summary-row total">
-                <span>Tổng cộng:</span>
+                <span>{t('order.grandTotal')}</span>
                 <span>{formatPrice(isLoyalty ? totalAfterLoyalty : calculateTotal())}</span>
               </div>
 
@@ -331,7 +326,7 @@ const OrderPage = () => {
                 onClick={handleProceedToCheckout}
                 disabled={getSelectedCount() === 0}
               >
-                Thanh toán ({getSelectedCount()})
+                {t('order.checkout', { count: getSelectedCount() })}
               </Button>
             </WrapperSummary>
           </div>

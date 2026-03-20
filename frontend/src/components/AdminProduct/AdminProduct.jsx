@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons'
-import { WrapperHeader, WrapperUploadFile } from './style'
+import { WrapperHeader, WrapperUploadFile, WrapperContainer } from './style'
 import { Button, Form, Select, Space } from 'antd'
 import TableComponent from '../TableComponent/TableComponent'
 import InputComponent from '../InputComponent/InputComponent'
-import { getBase64, renderOption } from '../../utils'
+import { getBase64, renderOption, formatPrice } from '../../utils'
 import * as ProductService from '../../service/ProductService'
 import { useMutationHooks } from '../../hooks/useMutationHook'
 import Loading from '../LoadingComponent/Loading'
@@ -12,6 +12,7 @@ import { message } from 'antd'
 import { useQuery } from '@tanstack/react-query'
 import DrawerComponent from '../DrawerComponent/DrawerComponent'
 import ModalComponent from '../ModalComponent/ModalComponent'
+import { useLanguage } from '../../context/LanguageContext'
 
 
 
@@ -20,6 +21,7 @@ import ModalComponent from '../ModalComponent/ModalComponent'
 
 
 const AdminProduct = (props) => {
+    const { t } = useLanguage();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [rowSelected, setRowSelected] = useState('');
     const [isOpenDrawer, setIsOpenDrawer] = useState(false);
@@ -150,7 +152,7 @@ const AdminProduct = (props) => {
             await fetchGetDetailsProduct(productId);
             setIsOpenDrawer(true);
         } else {
-            console.log('Không có sản phẩm được chọn');
+            console.log('No product selected');
         }
     }
     const handleDeleteManyProducts = (ids) => {
@@ -271,13 +273,13 @@ const AdminProduct = (props) => {
                     value: '<=',
                 },
             ],
-
             onFilter: (value, record) => {
                 if (value === '>=') {
                     return record.price >= 50;
                 }
                 return record.price <= 50;
             },
+            render: (price) => formatPrice(price)
         },
         {
             title: 'Rating',
@@ -338,24 +340,24 @@ const AdminProduct = (props) => {
 
     useEffect(() => {
         if (isSuccess && data?.status === 'OK') {
-            message.success('Thêm sản phẩm thành công!');
+            message.success(t('adminProduct.createSuccess'));
             handleCancel();
             refetch();
         }
         else if (isError) {
-            message.error('Thêm sản phẩm thất bại!');
+            message.error(t('adminProduct.createError'));
         }
-    }, [isSuccess, isError, data, refetch, handleCancel])
+    }, [isSuccess, isError, data, refetch, handleCancel, t])
 
     useEffect(() => {
         if (isSuccessDeletedMany && dataDeletedMany?.status === 'OK') {
-            message.success('Xóa nhiều sản phẩm thành công!');
+            message.success(t('adminProduct.deleteManySuccess'));
             refetch();
         }
         else if (isErrorDeletedMany) {
-            message.error('Xóa nhiều sản phẩm thất bại!');
+            message.error(t('adminProduct.deleteManyError'));
         }
-    }, [isSuccessDeletedMany, isErrorDeletedMany, dataDeletedMany, refetch])
+    }, [isSuccessDeletedMany, isErrorDeletedMany, dataDeletedMany, refetch, t])
 
     const handleCloseDrawer = React.useCallback(() => {
         setIsOpenDrawer(false);
@@ -390,27 +392,27 @@ const AdminProduct = (props) => {
 
     useEffect(() => {
         if (isSuccessUpdated && dataUpdated?.status === 'OK') {
-            message.success('Cập nhật sản phẩm thành công!');
+            message.success(t('adminProduct.updateSuccess'));
             handleCloseDrawer();
             setRowSelected('');
             refetch();
         }
         else if (isErrorUpdated) {
-            message.error('Cập nhật sản phẩm thất bại!');
+            message.error(t('adminProduct.updateError'));
         }
-    }, [isSuccessUpdated, isErrorUpdated, dataUpdated, refetch, handleCloseDrawer])
+    }, [isSuccessUpdated, isErrorUpdated, dataUpdated, refetch, handleCloseDrawer, t])
 
     useEffect(() => {
         if (isSuccessDeleted && dataDeleted?.status === 'OK') {
-            message.success('Xóa sản phẩm thành công!');
+            message.success(t('adminProduct.deleteSuccess'));
             handleCancelDelete();
             setRowSelected('');
             refetch();
         }
         else if (isErrorDeleted) {
-            message.error('Xóa sản phẩm thất bại!');
+            message.error(t('adminProduct.deleteError'));
         }
-    }, [isSuccessDeleted, isErrorDeleted, dataDeleted, refetch])
+    }, [isSuccessDeleted, isErrorDeleted, dataDeleted, refetch, t])
 
 
 
@@ -483,8 +485,8 @@ const AdminProduct = (props) => {
 
 
     return (
-        <div>
-            <WrapperHeader> Quản lí Sản Phẩm</WrapperHeader>
+        <WrapperContainer>
+            <WrapperHeader>{t('adminProduct.title')}</WrapperHeader>
             <div style={{ marginTop: '10px' }}>
                 <Button style={{ height: '150px', width: '150px', borderRadius: '6px', borderStyle: 'dashed' }} onClick={() => {
                     setIsModalOpen(true);
@@ -511,7 +513,7 @@ const AdminProduct = (props) => {
                 }} />
             </div>
             <ModalComponent
-                title="Thêm Sản Phẩm Mới"
+                title={t('adminProduct.addTitle')}
                 isOpen={isModalOpen}
                 onCancel={handleCancel}
                 footer={null}
@@ -544,7 +546,7 @@ const AdminProduct = (props) => {
                                 name="type"
                                 value={typeSelect === 'add-type' ? 'add-type' : stateProduct.type}
                                 onChange={handleChangeSelect}
-                                placeholder="Chọn loại sản phẩm"
+                                placeholder={t('adminProduct.selectType')}
                                 options={renderOption(typeProduct?.data?.data)}
                             />
                             {typeSelect === 'add-type' && (
@@ -552,7 +554,7 @@ const AdminProduct = (props) => {
                                     value={stateProduct.type}
                                     onChange={handleonchange}
                                     name="type"
-                                    placeholder="Nhập loại sản phẩm mới"
+                                    placeholder={t('adminProduct.newTypePlaceholder')}
                                     style={{ marginTop: '8px' }}
                                 />
                             )}
@@ -620,7 +622,7 @@ const AdminProduct = (props) => {
                     </Form>
                 </Loading>
             </ModalComponent>
-            <DrawerComponent title='Chi tiết sản phẩm ' isOpen={isOpenDrawer} onClose={() => setIsOpenDrawer(false)} width="90%">
+            <DrawerComponent title={t('adminProduct.detailsTitle')} isOpen={isOpenDrawer} onClose={() => setIsOpenDrawer(false)} width="90%">
                 <Loading isLoading={isLoadingUpdate || isPendingUpdated}>
                     <Form
                         name="updateProduct"
@@ -709,18 +711,18 @@ const AdminProduct = (props) => {
                 </Loading>
             </DrawerComponent>
             <ModalComponent
-                title="Xóa sản phẩm"
+                title={t('adminProduct.deleteTitle')}
                 isOpen={isModalOpenDelete}
                 onCancel={handleCancelDelete}
                 onOk={handleDeleteProduct}
             >
                 <Loading isLoading={isPendingDeleted}>
                     <div>
-                        Bạn có chắc chắn muốn xóa sản phẩm này không?
+                        {t('adminProduct.deleteConfirm')}
                     </div>
                 </Loading>
             </ModalComponent>
-        </div>
+        </WrapperContainer>
     )
 }
 

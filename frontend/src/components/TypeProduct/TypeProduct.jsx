@@ -1,5 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom';
+import { WrapperTypeProductItem } from './style';
 
 const TypeProduct = ({ name }) => {
   const navigate = useNavigate();
@@ -9,9 +10,9 @@ const TypeProduct = ({ name }) => {
     navigate(`/product/${encodedType}`);
   }
   return (
-    <div style={{ padding: '0 10px', cursor: 'pointer' }} onClick={() => handleNavigatetype(name)}>
+    <WrapperTypeProductItem onClick={() => handleNavigatetype(name)}>
       {name}
-    </div>
+    </WrapperTypeProductItem>
   )
 }
 
