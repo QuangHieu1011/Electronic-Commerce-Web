@@ -140,7 +140,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
 
       <MainBar>
         <WrapperHeader>
-          <WrapperTextHeader onClick={() => navigate('/')}>techstore</WrapperTextHeader>
+          <WrapperTextHeader onClick={() => navigate('/')}>TechStore</WrapperTextHeader>
 
           {!isHiddenSearch && (
             <SearchWrapper>

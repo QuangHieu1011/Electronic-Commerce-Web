@@ -60,7 +60,7 @@ const loginUser = async (req, res) => {
             secure: true,
             sameSite: 'none',
             path: '/',
-            maxAge: 365 * 24 * 60 * 60 * 1000 // 1 năm
+            maxAge: 365 * 24 * 60 * 60 * 1000 
         })
         return res.status(200).json(newResponse);
     } catch (e) {
@@ -206,7 +206,7 @@ const getChatbotToken = async (req, res) => {
     }
 };
 
-// Đăng ký với xác thực OTP
+
 const createUserWithOTP = async (req, res) => {
     try {
         const body = req.body || {};

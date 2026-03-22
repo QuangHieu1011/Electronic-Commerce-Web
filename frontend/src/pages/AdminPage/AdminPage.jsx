@@ -5,12 +5,14 @@ import { UserOutlined, AppstoreOutlined, ShoppingCartOutlined } from '@ant-desig
 import HeaderComponent from '../../components/HeaderComponent/HeaderComponent';
 import AdminUser from '../../components/AdminUser/AdminUser';
 import AdminProduct from '../../components/AdminProduct/AdminProduct';
+import AdminInventory from '../../components/AdminInventory/AdminInventory';
 
 const AdminPage = () => {
     const items = [
         getItem('Người Dùng', 'user', <UserOutlined />),
         getItem('Sản Phẩm', 'product', <AppstoreOutlined />),
         getItem('Quản lý đơn hàng', 'orders', <ShoppingCartOutlined />),
+        getItem('Quản lý kho', 'inventory', <AppstoreOutlined />),
     ];
 
     const [keySelected, setKeySelected] = useState('');
@@ -22,14 +24,13 @@ const AdminPage = () => {
             case 'product':
                 return (<AdminProduct />);
             case 'orders':
-                // Navigate to order management page
                 window.location.href = '/admin/orders';
                 return null;
+            case 'inventory':
+                return (<AdminInventory />);
             default:
-                return <></>
-
+                return <></>;
         }
-
     }
 
 

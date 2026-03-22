@@ -21,10 +21,10 @@ export const createOrder = async (data, access_token) => {
         })
         return {
             ...res.data,
-            newAccessToken: null // Không có token mới nếu request thành công
+            newAccessToken: null 
         }
     } catch (error) {
-        // Check tất cả possible 401 conditions
+    
         const is401 = error.response?.status === 401 ||
             error.status === 401 ||
             error.code === 'ERR_BAD_REQUEST' ||

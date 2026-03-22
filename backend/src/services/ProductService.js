@@ -5,18 +5,15 @@ const bcrypt = require("bcrypt");
 const createProduct = (newProduct = {}) => {
     return new Promise(async (resolve, reject) => {
         const { name, image, type, price, countInStock, rating, description } = newProduct || {};
-
         try {
-            const CheckProduct = await Product.findOne({
-                name: name
-            });
+            const CheckProduct = await Product.findOne({ name });
             if (CheckProduct != null) {
                 resolve({
                     status: 'OK',
                     message: 'The name of product is already '
                 });
+                return;
             }
-
             const newProduct = await Product.create({
                 name,
                 image,
@@ -26,7 +23,6 @@ const createProduct = (newProduct = {}) => {
                 rating,
                 description
             });
-
             if (newProduct) {
                 resolve({
                     status: 'OK',
@@ -40,6 +36,48 @@ const createProduct = (newProduct = {}) => {
             reject(e);
         }
     });
+};
+
+// Lấy tồn kho của tất cả sản phẩm
+const getInventory = async () => {
+    try {
+        const products = await Product.find({}, 'name countInStock type');
+        return {
+            status: 'OK',
+            data: products
+        };
+    } catch (e) {
+        return {
+            status: 'ERR',
+            message: e.message || e
+        };
+    }
+};
+
+// Cập nhật số lượng kho (nhập/xuất kho)
+const updateInventory = async (productId, quantity) => {
+    try {
+        const product = await Product.findById(productId);
+        if (!product) {
+            return {
+                status: 'ERR',
+                message: 'Không tìm thấy sản phẩm'
+            };
+        }
+        product.countInStock += quantity;
+        if (product.countInStock < 0) product.countInStock = 0;
+        await product.save();
+        return {
+            status: 'OK',
+            message: 'Cập nhật kho thành công',
+            data: product
+        };
+    } catch (e) {
+        return {
+            status: 'ERR',
+            message: e.message || e
+        };
+    }
 };
 const updateProduct = (id, data) => {
     return new Promise(async (resolve, reject) => {
@@ -208,7 +246,7 @@ const getFrequentlyBoughtTogether = (productId) => {
     return new Promise(async (resolve, reject) => {
         try {
             const Order = require("../models/OrderProduct");
-            
+
             // Tìm các đơn hàng có chứa sản phẩm này
             const orders = await Order.find({
                 'orderItems.product._id': productId
@@ -271,5 +309,7 @@ module.exports = {
     getAllProduct,
     deleteManyProduct,
     getAllType,
-    getFrequentlyBoughtTogether
+    getFrequentlyBoughtTogether,
+    getInventory,
+    updateInventory
 };

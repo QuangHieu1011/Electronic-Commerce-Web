@@ -8,7 +8,7 @@ class SocketService {
 
     connect() {
         if (!this.socket) {
-            this.socket = io('https://electronic-commerce-web.onrender.com', {
+            this.socket = io('http://localhost:3001', {
                 transports: ['websocket', 'polling']
             })
 

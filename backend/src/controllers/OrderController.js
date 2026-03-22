@@ -41,16 +41,43 @@ const createOrder = async (req, res) => {
             }
         }
 
-        const order = new Order(newOrderData)
-        const savedOrder = await order.save()
+        // Kiểm tra và trừ kho hàng an toàn
+        const { checkAndDecrementStock } = require('../services/OrderService');
+        const orderItems = orderData.orderItems.map(item => ({
+            productId: item.product._id,
+            quantity: item.quantity
+        }));
+        const stockResult = await checkAndDecrementStock(orderItems);
+        if (!stockResult.success) {
+            return res.status(400).json({
+                status: 'ERR',
+                message: stockResult.message,
+                insufficientProducts: stockResult.insufficientProducts
+            });
+        }
+        const order = new Order(newOrderData);
+        const savedOrder = await order.save();
 
-        console.log('Created order:', savedOrder)
+        // Gửi socket event cập nhật kho hàng real-time cho admin
+        try {
+            const io = req.app.get('io');
+            if (io) {
+                // Lấy lại danh sách sản phẩm mới nhất
+                const Product = require('../models/ProductModel');
+                const products = await Product.find({}, 'name countInStock type');
+                io.emit('inventoryUpdate', products);
+            }
+        } catch (err) {
+            console.error('Socket emit inventoryUpdate error:', err);
+        }
+
+        console.log('Created order:', savedOrder);
 
         return res.status(200).json({
             status: 'OK',
             message: 'Đặt hàng thành công',
             data: savedOrder
-        })
+        });
     } catch (e) {
         console.error('Create order error:', e)
         return res.status(500).json({

@@ -5,8 +5,6 @@ const createProduct = async (req, res) => {
     try {
         const body = req.body || {};
         const { name, image, type, price, countInStock, rating, description } = body;
-
-
         if (!name || !image || !type || !price || !countInStock || !rating) {
             return res.status(400).json({
                 status: 'ERR',
@@ -14,6 +12,39 @@ const createProduct = async (req, res) => {
             });
         }
         const response = await ProductService.createProduct(body);
+        return res.status(200).json(response);
+    } catch (e) {
+        return res.status(500).json({
+            status: 'ERR',
+            message: e.message || e
+        });
+    }
+};
+
+// Lấy tồn kho của tất cả sản phẩm
+const getInventory = async (req, res) => {
+    try {
+        const response = await ProductService.getInventory();
+        return res.status(200).json(response);
+    } catch (e) {
+        return res.status(500).json({
+            status: 'ERR',
+            message: e.message || e
+        });
+    }
+};
+
+// Cập nhật số lượng kho (nhập/xuất kho)
+const updateInventory = async (req, res) => {
+    try {
+        const { productId, quantity } = req.body;
+        if (!productId || typeof quantity !== 'number') {
+            return res.status(400).json({
+                status: 'ERR',
+                message: 'productId và quantity là bắt buộc'
+            });
+        }
+        const response = await ProductService.updateInventory(productId, quantity);
         return res.status(200).json(response);
     } catch (e) {
         return res.status(500).json({
@@ -149,5 +180,7 @@ module.exports = {
     getAllProduct,
     deleteMany,
     getAllType,
-    getFrequentlyBoughtTogether
+    getFrequentlyBoughtTogether,
+    getInventory,
+    updateInventory
 };
