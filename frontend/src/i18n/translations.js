@@ -102,6 +102,45 @@ export const translations = {
       bestSelling: "Best selling",
       noProducts: "No products found for category \"{{type}}\""
     },
+    productDetail: {
+      deliveryTo: "Deliver to",
+      changeAddress: "Change address",
+      quantityLabel: "Quantity",
+      decreaseQuantity: "Decrease quantity",
+      increaseQuantity: "Increase quantity",
+      addToCartButton: "Add to cart",
+      buyNowButton: "Buy now",
+      messages: {
+        cannotAddCart: "Cannot add this product to cart!",
+        selectQuantity: "Please select quantity!",
+        addToCartSuccess: "Added {{count}} item(s) to cart!",
+        buyNowRedirect: "Preparing checkout..."
+      }
+    },
+    productReview: {
+      sectionTitle: "Reviews & Comments",
+      similarProductsTitle: "You may also like",
+      totalReviews: "{{count}} reviews",
+      writeTitle: "Write your review",
+      loginHint: "Please sign in to submit comments and ratings.",
+      commentPlaceholder: "Share your experience with this product...",
+      pickImages: "Choose images from device",
+      imageHint: "Maximum 5 images, each image <= 1.5MB",
+      submitButton: "Submit review",
+      loading: "Loading reviews...",
+      empty: "No reviews yet",
+      guest: "Customer",
+      messages: {
+        submitSuccess: "Your review has been saved",
+        submitErrorRetry: "Unable to submit review, please try again",
+        submitError: "Unable to submit review",
+        maxImages: "Maximum 5 images per review",
+        maxImageSize: "Each image must be <= 1.5MB for stable upload",
+        readImageError: "Unable to read images from your device",
+        loginRequired: "Please sign in to submit a review",
+        commentRequired: "Please enter your review comment"
+      }
+    },
     orderTracking: {
       loginRequired: "Please sign in to view your orders!",
       backHome: "Back to home",
@@ -354,6 +393,45 @@ export const translations = {
       topRated: "Đánh giá cao nhất",
       bestSelling: "Bán chạy nhất",
       noProducts: "Không tìm thấy sản phẩm nào cho danh mục \"{{type}}\""
+    },
+    productDetail: {
+      deliveryTo: "Giao đến",
+      changeAddress: "Đổi địa chỉ",
+      quantityLabel: "Số lượng",
+      decreaseQuantity: "Giảm số lượng",
+      increaseQuantity: "Tăng số lượng",
+      addToCartButton: "Thêm vào giỏ hàng",
+      buyNowButton: "Mua ngay",
+      messages: {
+        cannotAddCart: "Không thể thêm sản phẩm vào giỏ hàng!",
+        selectQuantity: "Vui lòng chọn số lượng!",
+        addToCartSuccess: "Đã thêm {{count}} sản phẩm vào giỏ hàng!",
+        buyNowRedirect: "Đang chuyển đến trang thanh toán..."
+      }
+    },
+    productReview: {
+      sectionTitle: "Đánh giá & Nhận xét",
+      similarProductsTitle: "Có thể bạn cũng thích",
+      totalReviews: "{{count}} đánh giá",
+      writeTitle: "Viết đánh giá của bạn",
+      loginHint: "Vui lòng đăng nhập để gửi bình luận và đánh giá.",
+      commentPlaceholder: "Chia sẻ trải nghiệm của bạn về sản phẩm này...",
+      pickImages: "Chọn ảnh từ máy",
+      imageHint: "Tối đa 5 ảnh, mỗi ảnh <= 1.5MB",
+      submitButton: "Gửi đánh giá",
+      loading: "Đang tải đánh giá...",
+      empty: "Chưa có đánh giá nào",
+      guest: "Khách hàng",
+      messages: {
+        submitSuccess: "Đánh giá của bạn đã được lưu",
+        submitErrorRetry: "Không thể gửi đánh giá, vui lòng thử lại",
+        submitError: "Không thể gửi đánh giá",
+        maxImages: "Tối đa 5 ảnh cho một bình luận",
+        maxImageSize: "Mỗi ảnh tối đa 1.5MB để gửi bình luận ổn định",
+        readImageError: "Không thể đọc ảnh từ máy của bạn",
+        loginRequired: "Vui lòng đăng nhập để gửi đánh giá",
+        commentRequired: "Vui lòng nhập nội dung bình luận"
+      }
     },
     orderTracking: {
       loginRequired: "Vui lòng đăng nhập để xem đơn hàng!",

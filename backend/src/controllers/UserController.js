@@ -54,11 +54,12 @@ const loginUser = async (req, res) => {
         }
         const response = await UserService.loginUser(body);
         const { refresh_token, ...newResponse } = response;
+        const isProduction = process.env.NODE_ENV === 'production';
         // console.log("response:", response)
         res.cookie('refresh_token', refresh_token, {
             httpOnly: true,
-            secure: true,
-            sameSite: 'none',
+            secure: isProduction,
+            sameSite: isProduction ? 'none' : 'lax',
             path: '/',
             maxAge: 365 * 24 * 60 * 60 * 1000 
         })
@@ -156,7 +157,13 @@ const refreshToken = async (req, res) => {
 };
 const logoutUser = async (req, res) => {
     try {
-        res.clearCookie('refresh_token')
+        const isProduction = process.env.NODE_ENV === 'production';
+        res.clearCookie('refresh_token', {
+            httpOnly: true,
+            secure: isProduction,
+            sameSite: isProduction ? 'none' : 'lax',
+            path: '/'
+        })
         return res.status(200).json({
             status: 'OK',
             message: 'Logout successfully'

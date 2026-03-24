@@ -25,32 +25,48 @@ function App() {
     dispatch(updateUser({ ...res?.data, access_token: token }));
     setIsLoadingUser(false);
   }, [dispatch]);
-  // Tự động refresh token khi load lại trang
+
+  // Guest-first có kiểm soát: chỉ khôi phục phiên nếu user đã login hợp lệ trước đó.
   useEffect(() => {
+    const isAuthSessionActive = localStorage.getItem('auth_session') === 'active';
+
+    if (!isAuthSessionActive) {
+      localStorage.removeItem('access_token');
+      setIsLoadingUser(false);
+      return;
+    }
+
     const { storageData, decoded } = handleDecoded();
     const currentTime = new Date().getTime() / 1000;
+
     if (storageData && decoded?.exp && decoded.exp < currentTime) {
-      // Token hết hạn, gọi refresh
       UserService.refreshToken().then((data) => {
         if (data?.access_token) {
           localStorage.setItem('access_token', JSON.stringify(data.access_token));
           const newDecoded = jwtDecode(data.access_token);
-          // Cập nhật Redux user với access_token mới
           if (newDecoded?.id) {
             dispatch(updateUser({ ...newDecoded, access_token: data.access_token }));
             handleGetDetailsUser(newDecoded.id, data.access_token);
           } else {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('auth_session');
             setIsLoadingUser(false);
           }
         } else {
           localStorage.removeItem('access_token');
-          window.location.href = '/sign-in';
+          localStorage.removeItem('auth_session');
           setIsLoadingUser(false);
         }
+      }).catch(() => {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('auth_session');
+        setIsLoadingUser(false);
       });
-    } else if (decoded?.id) {
+    } else if (decoded?.id && storageData) {
       handleGetDetailsUser(decoded.id, storageData);
     } else {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('auth_session');
       setIsLoadingUser(false);
     }
   }, [dispatch, handleGetDetailsUser]);

@@ -41,6 +41,7 @@ const SignInPage = () => {
     if (isSuccess) {
       if (data?.access_token) {
         localStorage.setItem('access_token', JSON.stringify(data.access_token));
+        localStorage.setItem('auth_session', 'active');
         const decoded = jwtDecode(data.access_token);
         if (decoded?.id) {
           dispatch(updateUser({ ...decoded, access_token: data.access_token }));

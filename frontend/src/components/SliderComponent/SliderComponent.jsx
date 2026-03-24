@@ -13,11 +13,14 @@ const SliderComponent = ({
     const settings = {
         dots: true,
         infinite: true,
-                speed: 550,
+        speed: 550,
         slidesToShow: 1,
         slidesToScroll: 1,
-                autoplay,
-                autoplaySpeed
+        autoplay,
+        autoplaySpeed,
+        pauseOnHover: false,
+        pauseOnFocus: false,
+        pauseOnDotsHover: false
   };
 
   return (

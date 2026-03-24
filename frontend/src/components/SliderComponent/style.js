@@ -44,9 +44,12 @@ export const WrapperSliderStyle = styled(Slider)`
     
     .ant-image {
         width: 100%;
+        display: block;
+        background: #0f2338;
 
         img {
-            object-fit: cover;
+            object-fit: contain;
+            object-position: center;
             width: 100%;
             height: ${({ $imageHeight }) => $imageHeight || '300px'};
             display: block;

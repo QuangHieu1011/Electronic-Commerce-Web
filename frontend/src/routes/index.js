@@ -54,7 +54,8 @@ export const routes = [
     {
         path: "/admin/orders",
         page: AdminOrderManagement,
-        isShowHeader: true
+        isShowHeader: true,
+        isPrivate: true
     },
     {
         path: "/products",

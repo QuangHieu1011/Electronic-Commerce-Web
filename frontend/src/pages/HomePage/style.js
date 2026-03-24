@@ -189,6 +189,7 @@ export const WrapperProducts = styled.div`
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 18px;
     margin-top: 30px;
+    scroll-margin-top: 110px;
 
     @media (max-width: 1400px) {
         grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -208,6 +209,7 @@ export const WrapperProducts = styled.div`
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
         margin-top: 20px;
+        scroll-margin-top: 88px;
     }
 
     @media (max-width: 480px) {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {
   WrapperButtonMore,
   WrapperFeatureItem,
@@ -31,6 +31,7 @@ const HomePage = () => {
   const user = useSelector((state) => state?.user);
   const searchDebounce = useDebounce(searchProduct, 1000);
   const [limit, setLimit] = useState(12)
+  const productsRef = useRef(null)
 
 
   const fetchProductAll = async (context) => {
@@ -70,6 +71,13 @@ const HomePage = () => {
     return () => clearTimeout(timer);
   }, [user])
 
+  const handleShopNowClick = () => {
+    productsRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    })
+  }
+
 
   return (
     <Loading isLoading={isPending}>
@@ -85,7 +93,7 @@ const HomePage = () => {
           <WrapperHeroCard>
             <h2>{t('home.heroTitle')}</h2>
             <p>{t('home.heroSubtitle')}</p>
-            <button type="button">{t('home.shopNow')}</button>
+            <button type="button" onClick={handleShopNowClick}>{t('home.shopNow')}</button>
           </WrapperHeroCard>
         </WrapperHeroBanner>
 
@@ -120,7 +128,7 @@ const HomePage = () => {
           </WrapperFeatureItem>
         </WrapperFeatureStrip>
 
-        <WrapperProducts>
+        <WrapperProducts ref={productsRef}>
           {products?.data?.map((product) => {
             return (
               <CardComponent

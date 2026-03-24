@@ -83,3 +83,35 @@ export const getAllTypeProduct = async () => {
     const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/get-all-type`)
     return res.data
 }
+
+export const getProductReviews = async (productId, page = 1, limit = 6) => {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/review/product/${productId}?page=${page}&limit=${limit}`);
+    return res.data;
+}
+
+export const createProductReview = async (productId, access_token, data) => {
+    try {
+        const res = await axiosJWT.post(`${process.env.REACT_APP_API_URL}/review/product/${productId}`, data, {
+            headers: {
+                Authorization: `Bearer ${access_token}`
+            }
+        });
+        return res.data;
+    } catch (error) {
+        if (error.response && error.response.status === 401) {
+            const { refreshToken } = await import('./UserService');
+            const refreshRes = await refreshToken();
+            const newToken = refreshRes?.access_token;
+            if (newToken) {
+                localStorage.setItem('access_token', JSON.stringify(newToken));
+                const retryRes = await axiosJWT.post(`${process.env.REACT_APP_API_URL}/review/product/${productId}`, data, {
+                    headers: {
+                        Authorization: `Bearer ${newToken}`
+                    }
+                });
+                return retryRes.data;
+            }
+        }
+        throw error;
+    }
+}

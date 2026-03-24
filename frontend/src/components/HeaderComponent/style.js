@@ -9,8 +9,8 @@ export const HeaderShell = styled.header`
 `;
 
 export const UtilityBar = styled.div`
-    background: #0856b0;
-    color: #dcecff;
+    background: #0a1f3d;
+    color: rgba(255, 255, 255, 0.5);
     font-size: 13px;
 `;
 
@@ -41,16 +41,30 @@ export const WrapperTopRight = styled.div`
 
 export const UtilityLink = styled.span`
     cursor: pointer;
-    color: #e9f2ff;
+    color: rgba(255, 255, 255, 0.5);
     transition: opacity 0.2s ease;
 
     &:hover {
-        opacity: 0.78;
+        opacity: 0.85;
     }
 `;
 
+export const UtilityLanguageBadge = styled.button`
+    border: none;
+    background: #f59e0b;
+    color: #0a1f3d;
+    font-size: 12px;
+    font-weight: 800;
+    height: 24px;
+    min-width: 34px;
+    padding: 0 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+`;
+
 export const MainBar = styled.div`
-    background: linear-gradient(90deg, #0b6fd0 0%, #1a8bfd 100%);
+    background: #1145a0;
 `;
 
 export const WrapperHeader = styled.div`
@@ -103,8 +117,9 @@ export const WrapperIconGroup = styled.div`
 `;
 
 export const CategoryBar = styled.div`
-    background: #0a67c5;
-    border-top: 1px solid rgba(255, 255, 255, 0.18);
+    background: #ffffff;
+    border-top: 3px solid #f59e0b;
+    border-bottom: 1px solid #e2e8f0;
 `;
 
 export const CategoryContent = styled.div`
@@ -130,7 +145,7 @@ export const CategoryContent = styled.div`
 export const CategoryItem = styled.button`
     border: none;
     background: transparent;
-    color: #f3f8ff;
+    color: #334155;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -142,15 +157,28 @@ export const CategoryItem = styled.button`
 
     &:hover {
         opacity: 1;
-        border-bottom-color: #9ed0ff;
+        color: #1145a0;
     }
+
+    ${({ $active }) => $active && `
+        color: #1145a0;
+        border-bottom-color: #1145a0;
+    `}
+`;
+
+export const LogoBase = styled.span`
+    color: #ffffff;
+`;
+
+export const LogoAccent = styled.span`
+    color: #f59e0b;
 `;
 
 export const WrapperTextHeader = styled.span`
     font-size: 28px;
     color: #ffffff;
     font-weight: 900;
-    letter-spacing: -0.8px;
+    letter-spacing: -0.04em;
     text-transform: lowercase;
     cursor: pointer;
     transition: transform 0.2s ease;
@@ -171,7 +199,7 @@ export const WrapperTextHeader = styled.span`
 export const WrapperHeaderAccount = styled.div`
     display: flex;
     align-items: center;
-    color: #ffffff;
+    color: rgba(255, 255, 255, 0.86);
     gap: 10px;
     cursor: pointer;
     padding: 8px 10px;
@@ -190,7 +218,7 @@ export const WrapperHeaderAccount = styled.div`
 
 export const WrapperText = styled.span`
     font-size: 14px;
-    color: #ffffff;
+    color: rgba(255, 255, 255, 0.86);
     white-space: nowrap;
     font-weight: 500;
 
@@ -233,6 +261,39 @@ export const WrapperCartBadge = styled.div`
     .ant-badge-count {
         background: linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%);
         box-shadow: 0 2px 8px rgba(255, 77, 79, 0.4);
+    }
+`;
+
+export const ActionIconItem = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.8);
+    min-width: 48px;
+    transition: color 0.2s ease, transform 0.2s ease;
+
+    .action-icon {
+        font-size: 22px;
+        color: currentColor;
+    }
+
+    &:hover {
+        color: #f59e0b;
+        transform: translateY(-1px);
+    }
+`;
+
+export const ActionLabel = styled.span`
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 600;
+    white-space: nowrap;
+
+    @media (max-width: 768px) {
+        font-size: 11px;
     }
 `;
 

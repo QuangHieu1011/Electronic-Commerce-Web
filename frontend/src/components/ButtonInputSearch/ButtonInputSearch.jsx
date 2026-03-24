@@ -11,13 +11,13 @@ const ButtonInputSearch = (props) => {
       colorButton='#fff'
     } = props
   return (
-    <div style={{ display: 'flex', backgroundColor: '#fff' }}>
+    <div style={{ display: 'flex', backgroundColor: '#fff', borderRadius: '10px', overflow: 'hidden' }}>
       <InputComponent
         size={size}
         placeholder={placeholder}
         style={{
           backgroundColor: backgroundColorInput,
-          borderRadius: 0,
+          borderRadius: '10px 0 0 10px',
           border: 'none',
           outline: 'none',
         }}
@@ -29,8 +29,11 @@ const ButtonInputSearch = (props) => {
         style={{
           backgroundColor: backgroundColorButton,
           color: colorButton,
-          borderRadius: 0,
+          borderRadius: '0 10px 10px 0',
           border: 'none',
+          fontWeight: 800,
+          letterSpacing: '0.02em',
+          textTransform: 'uppercase'
         }}
         icon={<SearchOutlined style={{ color: colorButton }} />}
         textButton={textButton}

@@ -6,8 +6,10 @@ import HeaderComponent from '../../components/HeaderComponent/HeaderComponent';
 import AdminUser from '../../components/AdminUser/AdminUser';
 import AdminProduct from '../../components/AdminProduct/AdminProduct';
 import AdminInventory from '../../components/AdminInventory/AdminInventory';
+import { useNavigate } from 'react-router-dom';
 
 const AdminPage = () => {
+    const navigate = useNavigate();
     const items = [
         getItem('Người Dùng', 'user', <UserOutlined />),
         getItem('Sản Phẩm', 'product', <AppstoreOutlined />),
@@ -24,7 +26,7 @@ const AdminPage = () => {
             case 'product':
                 return (<AdminProduct />);
             case 'orders':
-                window.location.href = '/admin/orders';
+                navigate('/admin/orders');
                 return null;
             case 'inventory':
                 return (<AdminInventory />);
