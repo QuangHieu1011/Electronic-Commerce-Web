@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { addToComparison, removeFromComparison } from '../../redux/slides/comparisonSlice'
 import { addToWishlist, removeFromWishlist } from '../../redux/slides/wishlistSlice'
-import { formatPrice } from '../../utils'
+import { formatPrice, toSlug } from '../../utils'
 
 const CardComponent = (props) => {
   const { countInStock, description, image, name, price, rating, type, selled, discount, id } = props
@@ -21,7 +21,8 @@ const CardComponent = (props) => {
   const isInWishlist = wishlistItems.some(item => item._id === id)
 
   const handleDetailProduct = (id) => {
-    navigate(`/product-details/${id}`);
+    const productSlug = toSlug(name) || 'product';
+    navigate(`/product-details/${id}/${productSlug}`);
   }
 
   const handleAddToComparison = (e) => {

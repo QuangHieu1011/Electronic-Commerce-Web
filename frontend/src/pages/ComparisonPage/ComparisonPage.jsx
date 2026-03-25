@@ -12,7 +12,7 @@ import {
     WrapperProductCell,
     WrapperEmpty
 } from './style'
-import { formatPrice } from '../../utils'
+import { formatPrice, toSlug } from '../../utils'
 
 const ComparisonPage = () => {
     const dispatch = useDispatch()
@@ -212,7 +212,10 @@ const ComparisonPage = () => {
                                         Thêm giỏ hàng
                                     </Button>
                                     <Button
-                                        onClick={() => navigate(`/product-details/${product._id}`)}
+                                        onClick={() => {
+                                            const productSlug = toSlug(product.name) || 'product';
+                                            navigate(`/product-details/${product._id}/${productSlug}`)
+                                        }}
                                         style={{ width: '100%' }}
                                     >
                                         Xem chi tiết

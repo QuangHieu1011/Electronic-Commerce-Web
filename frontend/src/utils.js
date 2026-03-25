@@ -15,6 +15,18 @@ export const formatPrice = (price) => {
     }).format(price);
 };
 
+export const toSlug = (text = '') => {
+    return text
+        .toString()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
+};
+
 export const getBase64 = (file) =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
