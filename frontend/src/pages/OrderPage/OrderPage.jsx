@@ -158,40 +158,32 @@ const OrderPage = () => {
           </Button>
         </WrapperEmpty>
       ) : (
-        <div style={{ display: 'flex', gap: '20px' }}>
+        <div className="order-layout">
           {/* Left Column - Cart Items */}
-          <div style={{ flex: 1 }}>
+          <div className="order-main">
             <WrapperProductInfo>
               {/* Header */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                padding: '20px',
-                backgroundColor: '#fafafa',
-                borderBottom: '1px solid #f0f0f0',
-                fontWeight: '600',
-                color: '#666'
-              }}>
-                <div style={{ width: '50px' }}>
+              <div className="table-row table-head">
+                <div className="col checkbox">
                   <Checkbox
                     checked={selectAll}
                     onChange={toggleSelectAll}
                   />
                 </div>
-                <div style={{ flex: 1 }}>
+                <div className="col product">
                   {t('order.allItems', { count: cart.cartItems.length })}
                 </div>
-                <div style={{ width: '120px', textAlign: 'center' }}>{t('order.unitPrice')}</div>
-                <div style={{ width: '150px', textAlign: 'center' }}>{t('order.quantity')}</div>
-                <div style={{ width: '120px', textAlign: 'center' }}>{t('order.totalPrice')}</div>
-                <div style={{ width: '60px' }}></div>
+                <div className="col unit-price">{t('order.unitPrice')}</div>
+                <div className="col quantity">{t('order.quantity')}</div>
+                <div className="col total">{t('order.totalPrice')}</div>
+                <div className="col action"></div>
               </div>
 
               {/* Cart items */}
               {cart.cartItems.map((item) => (
-                <div key={item.product._id} className="product-item">
+                <div key={item.product._id} className="table-row product-item">
                   {/* Checkbox */}
-                  <div style={{ width: '50px' }}>
+                  <div className="col checkbox">
                     <Checkbox
                       checked={selectedItems[item.product._id] || false}
                       onChange={() => toggleItemSelection(item.product._id)}
@@ -199,7 +191,7 @@ const OrderPage = () => {
                   </div>
 
                   {/* Product info */}
-                  <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+                  <div className="col product product-cell">
                     <WrapperProductImage>
                       <Image
                         src={item.product.image}
@@ -211,6 +203,12 @@ const OrderPage = () => {
                     </WrapperProductImage>
                     <WrapperProductDetails>
                       <div className="product-name">{item.product.name}</div>
+                      <div className="product-tags">
+                        {item.product.discount > 0 && (
+                          <span className="tag discount">-{item.product.discount}%</span>
+                        )}
+                        {item.product.type && <span className="tag type">{item.product.type}</span>}
+                      </div>
                       {item.product.discount && (
                         <div className="product-original-price">
                           {formatPrice(item.product.price)}
@@ -220,7 +218,7 @@ const OrderPage = () => {
                   </div>
 
                   {/* Price */}
-                  <div style={{ width: '120px', textAlign: 'center' }}>
+                  <div className="col unit-price" data-label={t('order.unitPrice')}>
                     <div className="product-price">
                       {formatPrice(calculateDiscountedPrice(item.product))}
                     </div>
@@ -232,8 +230,8 @@ const OrderPage = () => {
                   </div>
 
                   {/* Quantity controls */}
-                  <div style={{ width: '150px', textAlign: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                  <div className="col quantity" data-label={t('order.quantity')}>
+                    <div className="quantity-controls">
                       <Button
                         size="small"
                         icon={<MinusOutlined />}
@@ -262,14 +260,14 @@ const OrderPage = () => {
                   </div>
 
                   {/* Total price */}
-                  <div style={{ width: '120px', textAlign: 'center' }}>
+                  <div className="col total" data-label={t('order.totalPrice')}>
                     <div style={{ fontSize: '16px', fontWeight: '600', color: '#ff4d4f' }}>
                       {formatPrice(calculateDiscountedPrice(item.product) * item.quantity)}
                     </div>
                   </div>
 
                   {/* Delete button */}
-                  <div style={{ width: '60px', textAlign: 'center' }}>
+                  <div className="col action">
                     <Button
                       type="text"
                       icon={<DeleteOutlined />}
@@ -284,7 +282,7 @@ const OrderPage = () => {
           </div>
 
           {/* Right Column - Summary */}
-          <div style={{ width: '350px' }}>
+          <div className="order-summary-col">
             <WrapperSummary>
               <div className="summary-title">{t('order.summaryTitle')}</div>
 

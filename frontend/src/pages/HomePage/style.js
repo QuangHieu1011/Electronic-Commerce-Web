@@ -19,9 +19,13 @@ export const WrapperHeroBanner = styled.section`
     position: relative;
     border-radius: 22px;
     overflow: hidden;
-    min-height: 520px;
+    min-height: 500px;
     box-shadow: 0 20px 50px rgba(10, 48, 99, 0.18);
     margin-bottom: 26px;
+
+    @media (max-width: 768px) {
+        min-height: 240px;
+    }
 `;
 
 export const WrapperHeroCard = styled.div`

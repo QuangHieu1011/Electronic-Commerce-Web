@@ -1,5 +1,30 @@
 const ReviewService = require('../services/ReviewService');
 
+const parseBoolean = (value) => {
+    if (typeof value === 'boolean') return value;
+    if (typeof value !== 'string') return false;
+
+    const normalized = value.trim().toLowerCase();
+    return normalized === 'true' || normalized === '1' || normalized === 'yes';
+};
+
+const parseRatings = (value) => {
+    if (!value) return [];
+
+    const rawValues = Array.isArray(value)
+        ? value
+        : String(value)
+              .split(',')
+              .map((item) => item.trim())
+              .filter(Boolean);
+
+    const uniqueRatings = [...new Set(rawValues.map((item) => Number(item)))].filter(
+        (rating) => Number.isInteger(rating) && rating >= 1 && rating <= 5
+    );
+
+    return uniqueRatings;
+};
+
 const createReview = async (req, res) => {
     try {
         const userId = req.user?.id;
@@ -56,7 +81,7 @@ const createReview = async (req, res) => {
 const getReviewsByProduct = async (req, res) => {
     try {
         const { productId } = req.params;
-        const { page = 1, limit = 6 } = req.query;
+        const { page = 1, limit = 6, hasImages, verifiedPurchase, ratings } = req.query;
 
         if (!productId) {
             return res.status(400).json({
@@ -68,7 +93,10 @@ const getReviewsByProduct = async (req, res) => {
         const response = await ReviewService.getReviewsByProduct({
             productId,
             page,
-            limit
+            limit,
+            hasImages: parseBoolean(hasImages),
+            verifiedPurchase: parseBoolean(verifiedPurchase),
+            ratings: parseRatings(ratings)
         });
 
         const statusCode = response.status === 'ERR' ? 400 : 200;

@@ -42,6 +42,11 @@ const ProductDetailsComponent = ({ idProduct }) => {
   const [numProduct, setNumProduct] = useState(1);
   const [selectedImage, setSelectedImage] = useState('');
   const [reviewPage, setReviewPage] = useState(1);
+  const [reviewFilters, setReviewFilters] = useState({
+    hasImages: false,
+    verifiedPurchase: false,
+    ratings: []
+  });
   const [reviewForm, setReviewForm] = useState({
     rating: 5,
     comment: '',
@@ -138,10 +143,13 @@ const ProductDetailsComponent = ({ idProduct }) => {
     enabled: !!productDetails?.type,
   })
 
+  const reviewFilterKey = React.useMemo(() => JSON.stringify(reviewFilters), [reviewFilters]);
+
   const fetchProductReviews = async (context) => {
-    const [, productId, page] = context.queryKey;
+    const [, productId, page, filterKey] = context.queryKey;
     if (!productId) return null;
-    const res = await ProductService.getProductReviews(productId, page, 6);
+    const parsedFilters = filterKey ? JSON.parse(filterKey) : {};
+    const res = await ProductService.getProductReviews(productId, page, 6, parsedFilters);
     return res.data;
   };
 
@@ -150,10 +158,14 @@ const ProductDetailsComponent = ({ idProduct }) => {
     data: reviewData,
     refetch: refetchReviews
   } = useQuery({
-    queryKey: ['product-reviews', idProduct, reviewPage],
+    queryKey: ['product-reviews', idProduct, reviewPage, reviewFilterKey],
     queryFn: fetchProductReviews,
     enabled: !!idProduct,
   });
+
+  React.useEffect(() => {
+    setReviewPage(1);
+  }, [reviewFilterKey]);
 
   const mutationReview = useMutationHooks((data) =>
     ProductService.createProductReview(idProduct, user?.access_token, data)
@@ -208,6 +220,49 @@ const ProductDetailsComponent = ({ idProduct }) => {
 
   const reviewList = reviewData?.reviews || [];
   const reviewPagination = reviewData?.pagination || { pageCurrent: 1, totalPages: 1, totalReviews: 0 };
+
+  const toggleRatingFilter = (star) => {
+    setReviewFilters((prev) => {
+      const existed = prev.ratings.includes(star);
+      const nextRatings = existed
+        ? prev.ratings.filter((item) => item !== star)
+        : [...prev.ratings, star].sort((a, b) => b - a);
+
+      return {
+        ...prev,
+        ratings: nextRatings
+      };
+    });
+  };
+
+  const toggleBooleanFilter = (key) => {
+    setReviewFilters((prev) => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
+  const resetReviewFilters = () => {
+    setReviewFilters({
+      hasImages: false,
+      verifiedPurchase: false,
+      ratings: []
+    });
+  };
+
+  const isAllReviewFiltersOff =
+    !reviewFilters.hasImages && !reviewFilters.verifiedPurchase && reviewFilters.ratings.length === 0;
+
+  const getFilterButtonStyle = (active) => ({
+    borderRadius: '999px',
+    border: active ? '1px solid #1d67ff' : '1px solid #d9d9d9',
+    background: active ? '#e8f1ff' : '#f5f5f5',
+    color: active ? '#1d67ff' : '#262626',
+    height: '36px',
+    padding: '0 16px',
+    fontWeight: 500,
+    boxShadow: 'none'
+  });
 
   const handleReviewFileChange = async (event) => {
     const selectedFiles = Array.from(event.target.files || []);
@@ -491,6 +546,44 @@ const ProductDetailsComponent = ({ idProduct }) => {
                   </span>
                 </div>
               ))}
+            </div>
+          </div>
+
+          <div style={{ marginBottom: '24px' }}>
+            <div style={{ fontSize: '18px', fontWeight: '700', marginBottom: '12px', color: '#262626' }}>
+              {t('productReview.filterTitle')}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+              <Button
+                onClick={resetReviewFilters}
+                style={getFilterButtonStyle(isAllReviewFiltersOff)}
+              >
+                {t('productReview.filters.all')}
+              </Button>
+              <Button
+                onClick={() => toggleBooleanFilter('hasImages')}
+                style={getFilterButtonStyle(reviewFilters.hasImages)}
+              >
+                {t('productReview.filters.hasImages')}
+              </Button>
+              <Button
+                onClick={() => toggleBooleanFilter('verifiedPurchase')}
+                style={getFilterButtonStyle(reviewFilters.verifiedPurchase)}
+              >
+                {t('productReview.filters.verifiedPurchase')}
+              </Button>
+              {[5, 4, 3, 2, 1].map((star) => {
+                const isActive = reviewFilters.ratings.includes(star);
+                return (
+                  <Button
+                    key={`rating-filter-${star}`}
+                    onClick={() => toggleRatingFilter(star)}
+                    style={getFilterButtonStyle(isActive)}
+                  >
+                    {t('productReview.filters.star', { star })}
+                  </Button>
+                );
+              })}
             </div>
           </div>
 

@@ -119,8 +119,15 @@ export const translations = {
     },
     productReview: {
       sectionTitle: "Reviews & Comments",
+      filterTitle: "Filter reviews by",
       similarProductsTitle: "You may also like",
       totalReviews: "{{count}} reviews",
+      filters: {
+        all: "All",
+        hasImages: "Has images",
+        verifiedPurchase: "Verified purchase",
+        star: "{{star}} star"
+      },
       writeTitle: "Write your review",
       loginHint: "Please sign in to submit comments and ratings.",
       commentPlaceholder: "Share your experience with this product...",
@@ -411,8 +418,15 @@ export const translations = {
     },
     productReview: {
       sectionTitle: "Đánh giá & Nhận xét",
+      filterTitle: "Lọc đánh giá theo",
       similarProductsTitle: "Có thể bạn cũng thích",
       totalReviews: "{{count}} đánh giá",
+      filters: {
+        all: "Tất cả",
+        hasImages: "Có hình ảnh",
+        verifiedPurchase: "Đã mua hàng",
+        star: "{{star}} sao"
+      },
       writeTitle: "Viết đánh giá của bạn",
       loginHint: "Vui lòng đăng nhập để gửi bình luận và đánh giá.",
       commentPlaceholder: "Chia sẻ trải nghiệm của bạn về sản phẩm này...",

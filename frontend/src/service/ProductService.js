@@ -84,8 +84,23 @@ export const getAllTypeProduct = async () => {
     return res.data
 }
 
-export const getProductReviews = async (productId, page = 1, limit = 6) => {
-    const res = await axios.get(`${process.env.REACT_APP_API_URL}/review/product/${productId}?page=${page}&limit=${limit}`);
+export const getProductReviews = async (productId, page = 1, limit = 6, filters = {}) => {
+    const params = new URLSearchParams({
+        page: String(page),
+        limit: String(limit)
+    });
+
+    if (Array.isArray(filters?.ratings) && filters.ratings.length > 0) {
+        params.set('ratings', filters.ratings.join(','));
+    }
+    if (filters?.hasImages) {
+        params.set('hasImages', 'true');
+    }
+    if (filters?.verifiedPurchase) {
+        params.set('verifiedPurchase', 'true');
+    }
+
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/review/product/${productId}?${params.toString()}`);
     return res.data;
 }
 

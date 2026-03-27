@@ -1,8 +1,21 @@
 const mongoose = require('mongoose');
 const Review = require('../models/ReviewModel');
 const Product = require('../models/ProductModel');
+const Order = require('../models/OrderProduct');
 
 const toObjectId = (id) => new mongoose.Types.ObjectId(id);
+
+const getVerifiedBuyerIds = async (productId) => {
+    const orders = await Order.find(
+        {
+            'orderItems.product._id': String(productId),
+            orderStatus: { $ne: 'cancelled' }
+        },
+        'user'
+    ).lean();
+
+    return [...new Set(orders.map((order) => String(order.user)).filter(Boolean))];
+};
 
 const buildReviewSummary = async (productId) => {
     const productObjectId = toObjectId(productId);
@@ -111,7 +124,14 @@ const createOrUpdateReview = async ({ productId, userId, rating, comment, images
     };
 };
 
-const getReviewsByProduct = async ({ productId, page = 1, limit = 6 }) => {
+const getReviewsByProduct = async ({
+    productId,
+    page = 1,
+    limit = 6,
+    hasImages = false,
+    verifiedPurchase = false,
+    ratings = []
+}) => {
     const product = await Product.findById(productId);
     if (!product) {
         return {
@@ -122,10 +142,48 @@ const getReviewsByProduct = async ({ productId, page = 1, limit = 6 }) => {
 
     const safePage = Math.max(Number(page) || 1, 1);
     const safeLimit = Math.min(Math.max(Number(limit) || 6, 1), 20);
+    const safeRatings = Array.isArray(ratings)
+        ? [...new Set(ratings.map((item) => Number(item)))].filter(
+              (item) => Number.isInteger(item) && item >= 1 && item <= 5
+          )
+        : [];
+
+    const reviewQuery = { product: productId };
+    if (hasImages) {
+        reviewQuery['images.0'] = { $exists: true };
+    }
+    if (safeRatings.length > 0) {
+        reviewQuery.rating = { $in: safeRatings };
+    }
+
+    let verifiedBuyerIds = [];
+    if (verifiedPurchase) {
+        verifiedBuyerIds = await getVerifiedBuyerIds(productId);
+        if (!verifiedBuyerIds.length) {
+            return {
+                status: 'OK',
+                message: 'SUCCESS',
+                data: {
+                    reviews: [],
+                    summary: await buildReviewSummary(productId),
+                    pagination: {
+                        pageCurrent: safePage,
+                        limit: safeLimit,
+                        totalReviews: 0,
+                        totalPages: 0
+                    }
+                }
+            };
+        }
+
+        reviewQuery.user = {
+            $in: verifiedBuyerIds.map((id) => toObjectId(id))
+        };
+    }
 
     const [totalReviews, reviews, summary] = await Promise.all([
-        Review.countDocuments({ product: productId }),
-        Review.find({ product: productId })
+        Review.countDocuments(reviewQuery),
+        Review.find(reviewQuery)
             .populate('user', 'name avatar')
             .sort({ createdAt: -1 })
             .skip((safePage - 1) * safeLimit)
@@ -133,11 +191,23 @@ const getReviewsByProduct = async ({ productId, page = 1, limit = 6 }) => {
         buildReviewSummary(productId)
     ]);
 
+    const reviewsWithVerifiedFlag = reviews.map((review) => {
+        const plainReview = review.toObject();
+        const isVerifiedPurchase = verifiedBuyerIds.length
+            ? verifiedBuyerIds.includes(String(review.user?._id || review.user))
+            : false;
+
+        return {
+            ...plainReview,
+            isVerifiedPurchase
+        };
+    });
+
     return {
         status: 'OK',
         message: 'SUCCESS',
         data: {
-            reviews,
+            reviews: reviewsWithVerifiedFlag,
             summary,
             pagination: {
                 pageCurrent: safePage,

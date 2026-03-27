@@ -85,8 +85,8 @@ const HomePage = () => {
         <WrapperHeroBanner>
           <SliderComponent
             arrImages={[slider1, slider2, slider3]}
-            imageHeight="520px"
-            mobileImageHeight="420px"
+            imageHeight="500px"
+            mobileImageHeight="240px"
             autoplay
             autoplaySpeed={3200}
           />

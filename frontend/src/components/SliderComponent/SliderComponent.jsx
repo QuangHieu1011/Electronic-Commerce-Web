@@ -29,9 +29,16 @@ const SliderComponent = ({
             $imageHeight={imageHeight}
             $mobileImageHeight={mobileImageHeight}
         >
-        {arrImages.map((image)=> {
+        {arrImages.map((image, index)=> {
             return (
-                                <Image key={image} src={image} alt="slider" preview={false} width="100%" />
+                                <Image
+                                    key={image}
+                                    className={`hero-slide hero-slide-${index + 1}`}
+                                    src={image}
+                                    alt="slider"
+                                    preview={false}
+                                    width="100%"
+                                />
             )
         })}
     </WrapperSliderStyle>
