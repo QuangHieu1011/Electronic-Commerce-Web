@@ -1,18 +1,21 @@
 import { message, Tooltip } from 'antd'
 import React from 'react'
-import { StyleNameProduct, WrapperCardStyle, WrapperDiscountText, WrapperPriceText, WrapperReporText } from './style'
+import { StyleNameProduct, WrapperCardStyle, WrapperDiscountText, WrapperPriceText, WrapperQuickAddButton, WrapperReporText } from './style'
 import { StarFilled, HeartOutlined, HeartFilled, SwapOutlined } from '@ant-design/icons'
 import Logo from '../../assets/images/Logo.png'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { addToComparison, removeFromComparison } from '../../redux/slides/comparisonSlice'
 import { addToWishlist, removeFromWishlist } from '../../redux/slides/wishlistSlice'
+import { addToCart } from '../../redux/slides/cartSlice'
 import { formatPrice, toSlug } from '../../utils'
+import { useLanguage } from '../../context/LanguageContext'
 
 const CardComponent = (props) => {
-  const { countInStock, description, image, name, price, rating, type, selled, discount, id } = props
+  const { countInStock, description, image, name, price, rating, type, selled, discount, id, enableQuickAdd = false, cardWidth = 200 } = props
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { t } = useLanguage();
 
   const comparisonItems = useSelector((state) => state.comparison.comparisonItems)
   const wishlistItems = useSelector((state) => state.wishlist.wishlistItems)
@@ -52,20 +55,53 @@ const CardComponent = (props) => {
     }
   }
 
+  const handleQuickAddToCart = (e) => {
+    e.stopPropagation();
+
+    if (countInStock <= 0) {
+      message.warning(t('productDetail.messages.cannotAddCart'));
+      return;
+    }
+
+    dispatch(
+      addToCart({
+        product: {
+          _id: id,
+          name,
+          image,
+          price,
+          discount,
+          countInStock,
+          type,
+          rating,
+          description,
+          selled
+        },
+        quantity: 1
+      })
+    );
+
+    message.success(t('productDetail.messages.addToCartSuccess', { count: 1 }));
+  }
+
   return (
     <WrapperCardStyle
+      $enableQuickAdd={enableQuickAdd}
       hoverable
-      style={{ width: 200 }}
+      style={{ width: cardWidth }}
       styles={{
-        header: { width: '200px', height: '200px' },
+        header: { width: typeof cardWidth === 'number' ? `${cardWidth}px` : '100%', height: '200px' },
         body: { padding: '10px' }
       }}
       cover={
-        <img
-          draggable={false}
-          alt={name || "product"}
-          src={image}
-        />
+        <div className="card-image-wrap">
+          <img
+            className="product-image"
+            draggable={false}
+            alt={name || "product"}
+            src={image}
+          />
+        </div>
       }
       onClick={() => handleDetailProduct(id)}
     >
@@ -146,6 +182,17 @@ const CardComponent = (props) => {
         <span style={{ marginRight: '8px' }}>{formatPrice(price)}</span>
         <WrapperDiscountText> - {discount || 10}% </WrapperDiscountText>
       </WrapperPriceText>
+
+      {enableQuickAdd && (
+        <WrapperQuickAddButton
+          className="quick-add-btn"
+          type="button"
+          disabled={countInStock <= 0}
+          onClick={handleQuickAddToCart}
+        >
+          {t('productDetail.addToCartButton')}
+        </WrapperQuickAddButton>
+      )}
     </WrapperCardStyle>
   )
 }

@@ -1,47 +1,49 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Timeline, Progress } from 'antd';
 import { CheckCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { useLanguage } from '../../context/LanguageContext';
 import './OrderTrackMap.css';
 
 const OrderTrackMap = ({ orderStatus, createdAt }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [shipperPosition, setShipperPosition] = useState(0);
+  const { t, language } = useLanguage();
 
   // Định nghĩa các điểm dừng
   const locations = React.useMemo(() => [
     {
       id: 1,
-      name: 'Kho hàng',
-      address: 'TechStore - Quận 1, TP.HCM',
+      name: t('orderTracking.map.warehouseName'),
+      address: t('orderTracking.map.warehouseAddress'),
       status: 'pending',
       icon: '🏢',
       position: 8
     },
     {
       id: 2,
-      name: 'Trung tâm',
-      address: 'Phân phối - Quận 3',
+      name: t('orderTracking.map.distributionCenterName'),
+      address: t('orderTracking.map.distributionCenterAddress'),
       status: 'confirmed',
       icon: '📦',
       position: 38
     },
     {
       id: 3,
-      name: 'Đang giao',
-      address: 'Trên đường đến bạn',
+      name: t('orderTracking.shipping'),
+      address: t('orderTracking.map.shippingAddress'),
       status: 'shipping',
       icon: '🚚',
       position: 68
     },
     {
       id: 4,
-      name: 'Đã giao',
-      address: 'Giao hàng thành công',
+      name: t('orderTracking.delivered'),
+      address: t('orderTracking.map.deliveredAddress'),
       status: 'delivered',
       icon: '✅',
       position: 92
     }
-  ], []);
+  ], [t]);
 
   // Map order status to step
   useEffect(() => {
@@ -72,7 +74,7 @@ const OrderTrackMap = ({ orderStatus, createdAt }) => {
       new Date(orderTime.getTime() + 24 * 60 * 60 * 1000), // +1 ngày - Đang giao
       new Date(orderTime.getTime() + 48 * 60 * 60 * 1000) // +2 ngày - Đã giao
     ];
-    return estimates[step].toLocaleString('vi-VN', {
+    return estimates[step].toLocaleString(language === 'vi' ? 'vi-VN' : 'en-US', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
@@ -95,25 +97,25 @@ const OrderTrackMap = ({ orderStatus, createdAt }) => {
 
   // Random shipper info (fake data for demo)
   const shipperInfo = {
-    name: 'Nguyễn Văn Shipper',
+    name: t('orderTracking.map.shipperName'),
     phone: '0901 234 567',
-    vehicle: '🛵 Air Blade - 51B 12345'
+    vehicle: t('orderTracking.map.shipperVehicle')
   };
 
   if (orderStatus === 'cancelled') {
     return (
-      <Card title="📍 Theo dõi đơn hàng" className="track-map-card">
+      <Card title={`📍 ${t('orderTracking.map.trackOrderTitle')}`} className="track-map-card">
         <div style={{ textAlign: 'center', padding: '40px 0', color: '#999' }}>
           <div style={{ fontSize: 48, marginBottom: 16 }}>❌</div>
-          <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>Đơn hàng đã bị hủy</div>
-          <div style={{ fontSize: 14 }}>Tracking không khả dụng</div>
+          <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>{t('orderTracking.map.orderCancelled')}</div>
+          <div style={{ fontSize: 14 }}>{t('orderTracking.map.trackingUnavailable')}</div>
         </div>
       </Card>
     );
   }
 
   return (
-    <Card title="📍 Theo dõi vị trí đơn hàng" className="track-map-card">
+    <Card title={`📍 ${t('orderTracking.map.trackPositionTitle')}`} className="track-map-card">
       {/* Bản đồ mô phỏng */}
       <div className="map-container">
         <div className="map-background">
@@ -173,12 +175,12 @@ const OrderTrackMap = ({ orderStatus, createdAt }) => {
               </div>
               {index <= currentStep && (
                 <div style={{ color: '#52c41a', fontSize: 12, marginTop: 4 }}>
-                  ✓ Hoàn thành: {getEstimatedTime(index)}
+                  ✓ {t('orderTracking.map.completedLabel')} {getEstimatedTime(index)}
                 </div>
               )}
               {index === currentStep + 1 && (
                 <div style={{ color: '#ff9800', fontSize: 12, marginTop: 4 }}>
-                  ⏱ Dự kiến: {getEstimatedTime(index)}
+                  ⏱ {t('orderTracking.map.estimatedLabel')} {getEstimatedTime(index)}
                 </div>
               )}
             </div>
@@ -190,7 +192,7 @@ const OrderTrackMap = ({ orderStatus, createdAt }) => {
       {orderStatus === 'shipping' && (
         <Card
           size="small"
-          title="👤 Thông tin người giao hàng"
+          title={`👤 ${t('orderTracking.map.shipperInfoTitle')}`}
           className="shipper-info-card"
         >
           <div className="shipper-info-content">
@@ -200,7 +202,7 @@ const OrderTrackMap = ({ orderStatus, createdAt }) => {
               <div className="shipper-phone">📞 {shipperInfo.phone}</div>
               <div className="shipper-status">🛵 {shipperInfo.vehicle}</div>
               <div className="shipper-status" style={{ marginTop: 8 }}>
-                ✅ Đang trên đường giao hàng đến bạn
+                ✅ {t('orderTracking.map.shipperOnTheWay')}
               </div>
             </div>
           </div>
@@ -216,7 +218,7 @@ const OrderTrackMap = ({ orderStatus, createdAt }) => {
         fontSize: 12,
         color: '#666'
       }}>
-        💡 <strong>Lưu ý:</strong> Thời gian giao hàng là dự kiến và có thể thay đổi tùy theo tình trạng thực tế.
+        💡 <strong>{t('orderTracking.map.noteTitle')}</strong> {t('orderTracking.map.noteContent')}
       </div>
     </Card>
   );

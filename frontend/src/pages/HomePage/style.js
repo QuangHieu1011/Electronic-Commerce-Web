@@ -125,6 +125,200 @@ export const WrapperFeatureItem = styled.article`
     }
 `;
 
+export const WrapperSectionBlock = styled.section`
+    margin-top: 28px;
+`;
+
+export const WrapperSectionHeader = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 14px;
+
+    h3 {
+        margin: 0;
+        color: #173353;
+        font-size: clamp(22px, 2.2vw, 30px);
+        font-weight: 800;
+        letter-spacing: -0.3px;
+    }
+`;
+
+export const WrapperCarouselActions = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    button {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        border: 1px solid #cbddf2;
+        background: #ffffff;
+        color: #275a92;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    button:hover {
+        background: #0c6fd8;
+        color: #fff;
+        border-color: #0c6fd8;
+    }
+`;
+
+export const WrapperHorizontalTrack = styled.div`
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding: 10px 2px 8px;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+
+    > * {
+        flex: 0 0 200px;
+        min-width: 200px;
+    }
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    @media (max-width: 768px) {
+        > * {
+            flex: 0 0 170px;
+            min-width: 170px;
+        }
+    }
+`;
+
+export const WrapperPromoBanner = styled.div`
+    margin: 20px 0 12px;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid #d6e5f7;
+    box-shadow: 0 10px 22px rgba(21, 70, 125, 0.12);
+    background: #f1f6fc;
+
+    img {
+        width: 100%;
+        height: auto;
+        display: block;
+        object-fit: cover;
+        object-position: center;
+    }
+
+    @media (max-width: 768px) {
+        img {
+            width: 100%;
+        }
+    }
+`;
+
+export const WrapperCategorySection = styled.section`
+    margin-top: 10px;
+`;
+
+export const WrapperCategoryHorizontal = styled(WrapperHorizontalTrack)`
+    margin-top: 2px;
+`;
+
+export const WrapperLaptopGrid = styled.div`
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+
+    > * {
+        min-width: 0;
+    }
+
+    @media (max-width: 1200px) {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    @media (max-width: 992px) {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    @media (max-width: 768px) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+`;
+
+export const WrapperVerticalMoreWrap = styled.div`
+    margin-top: 22px;
+    display: flex;
+    justify-content: center;
+`;
+
+export const WrapperCustomGrid = styled.div`
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+
+    @media (max-width: 1200px) {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    @media (max-width: 768px) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (max-width: 520px) {
+        grid-template-columns: 1fr;
+    }
+`;
+
+export const WrapperCustomHighlight = styled.article`
+    grid-column: span 2;
+    border-radius: 16px;
+    padding: 24px;
+    background: linear-gradient(125deg, #03294e 0%, #0e4d8d 54%, #2c79bf 100%);
+    color: #fff;
+    min-height: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 16px 30px rgba(9, 53, 102, 0.26);
+
+    span {
+        align-self: flex-start;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.2px;
+        text-transform: uppercase;
+        padding: 5px 10px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    h4 {
+        margin: 14px 0 8px;
+        font-size: clamp(22px, 2.2vw, 30px);
+        line-height: 1.2;
+    }
+
+    p {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.9);
+        line-height: 1.6;
+    }
+
+    @media (max-width: 1200px) {
+        grid-column: span 3;
+    }
+
+    @media (max-width: 768px) {
+        grid-column: span 2;
+    }
+
+    @media (max-width: 520px) {
+        grid-column: span 1;
+    }
+`;
+
 export const WrapperTypeProduct = styled.div`
     display: flex;
     align-items: center;

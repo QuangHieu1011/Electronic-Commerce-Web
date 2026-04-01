@@ -1,12 +1,22 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  WrapperButtonMore,
+  WrapperCarouselActions,
+  WrapperCategoryHorizontal,
+  WrapperCategorySection,
+  WrapperCustomGrid,
+  WrapperCustomHighlight,
   WrapperFeatureItem,
   WrapperFeatureStrip,
+  WrapperHorizontalTrack,
   WrapperHeroBanner,
   WrapperHeroCard,
   WrapperHomeContainer,
-  WrapperProducts
+  WrapperLaptopGrid,
+  WrapperPromoBanner,
+  WrapperSectionBlock,
+  WrapperSectionHeader,
+  WrapperVerticalMoreWrap,
+  WrapperButtonMore
 } from './style'
 import SliderComponent from '../../components/SliderComponent/SliderComponent'
 import slider1 from '../../assets/images/Slider 1.png'
@@ -20,7 +30,7 @@ import { useSelector } from 'react-redux'
 import Loading from '../../components/LoadingComponent/Loading'
 import { useDebounce } from '../../hooks/useDebounce'
 import { useLanguage } from '../../context/LanguageContext'
-import { CreditCardOutlined, CustomerServiceOutlined, SyncOutlined, TruckOutlined } from '@ant-design/icons'
+import { CreditCardOutlined, CustomerServiceOutlined, FireOutlined, LeftOutlined, RightOutlined, SyncOutlined, TruckOutlined } from '@ant-design/icons'
 
 
 
@@ -30,8 +40,13 @@ const HomePage = () => {
   const searchProduct = useSelector((state) => state?.product?.search);
   const user = useSelector((state) => state?.user);
   const searchDebounce = useDebounce(searchProduct, 1000);
-  const [limit, setLimit] = useState(12)
-  const productsRef = useRef(null)
+  const [limit] = useState(80)
+  const [laptopVisibleCount, setLaptopVisibleCount] = useState(10)
+
+  const featuredSectionRef = useRef(null)
+  const featuredTrackRef = useRef(null)
+  const phoneTrackRef = useRef(null)
+  const headphoneTrackRef = useRef(null)
 
 
   const fetchProductAll = async (context) => {
@@ -71,8 +86,65 @@ const HomePage = () => {
     return () => clearTimeout(timer);
   }, [user])
 
+  const allProducts = products?.data || []
+
+  const normalizeText = (value = '') => value
+    .toString()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+
+  const matchProductType = (type, keywords) => {
+    const normalizedType = normalizeText(type)
+    return keywords.some((keyword) => normalizedType.includes(keyword))
+  }
+
+  const featuredProducts = useMemo(() => {
+    const clonedProducts = [...allProducts]
+    for (let index = clonedProducts.length - 1; index > 0; index -= 1) {
+      const randomIndex = Math.floor(Math.random() * (index + 1))
+      ;[clonedProducts[index], clonedProducts[randomIndex]] = [clonedProducts[randomIndex], clonedProducts[index]]
+    }
+    return clonedProducts.slice(0, 12)
+  }, [allProducts])
+
+  const phoneProducts = useMemo(
+    () => allProducts.filter((product) => matchProductType(product?.type, ['dien thoai', 'phone', 'smartphone', 'iphone'])).slice(0, 10),
+    [allProducts]
+  )
+
+  const laptopProducts = useMemo(
+    () => allProducts.filter((product) => matchProductType(product?.type, ['laptop', 'notebook', 'macbook'])),
+    [allProducts]
+  )
+
+  const headphoneProducts = useMemo(
+    () => allProducts.filter((product) => matchProductType(product?.type, ['tai nghe', 'headphone', 'earphone', 'earbud'])).slice(0, 10),
+    [allProducts]
+  )
+
+  const trendingProducts = useMemo(
+    () => [...allProducts].sort((a, b) => (b?.selled || 0) - (a?.selled || 0)).slice(0, 6),
+    [allProducts]
+  )
+
+  const bestDealProduct = useMemo(
+    () => [...allProducts].sort((a, b) => (b?.discount || 0) - (a?.discount || 0))[0],
+    [allProducts]
+  )
+
+  const visibleLaptopProducts = laptopProducts.slice(0, laptopVisibleCount)
+
+  const scrollTrack = (trackRef, direction) => {
+    const distance = 760
+    trackRef.current?.scrollBy({
+      left: direction === 'left' ? -distance : distance,
+      behavior: 'smooth'
+    })
+  }
+
   const handleShopNowClick = () => {
-    productsRef.current?.scrollIntoView({
+    featuredSectionRef.current?.scrollIntoView({
       behavior: 'smooth',
       block: 'start'
     })
@@ -128,9 +200,20 @@ const HomePage = () => {
           </WrapperFeatureItem>
         </WrapperFeatureStrip>
 
-        <WrapperProducts ref={productsRef}>
-          {products?.data?.map((product) => {
-            return (
+        <WrapperSectionBlock ref={featuredSectionRef}>
+          <WrapperSectionHeader>
+            <h3>{t('home.sections.featured')}</h3>
+            <WrapperCarouselActions>
+              <button type="button" onClick={() => scrollTrack(featuredTrackRef, 'left')}>
+                <LeftOutlined />
+              </button>
+              <button type="button" onClick={() => scrollTrack(featuredTrackRef, 'right')}>
+                <RightOutlined />
+              </button>
+            </WrapperCarouselActions>
+          </WrapperSectionHeader>
+          <WrapperHorizontalTrack ref={featuredTrackRef}>
+            {featuredProducts.map((product) => (
               <CardComponent
                 key={product._id}
                 countInStock={product.countInStock}
@@ -143,37 +226,163 @@ const HomePage = () => {
                 selled={product.selled}
                 discount={product.discount}
                 id={product._id}
+                enableQuickAdd
+                cardWidth={200}
               />
-            )
-          })}
+            ))}
+          </WrapperHorizontalTrack>
+        </WrapperSectionBlock>
 
-        </WrapperProducts>
-        <div style={{ display: 'flex', width: '100%', justifyContent: 'center', marginTop: '20px' }}>
-          <WrapperButtonMore
-            type="default"
-            disabled={
-              products?.data?.length >= products?.total ||
-              (searchDebounce && products?.data?.length < limit)
-            }
-            onClick={() => setLimit(limit + 12)}
-            style={{
-              backgroundColor: (
-                products?.data?.length >= products?.total ||
-                (searchDebounce && products?.data?.length < limit)
-              ) ? '#ccc' : '',
-              borderColor: (
-                products?.data?.length >= products?.total ||
-                (searchDebounce && products?.data?.length < limit)
-              ) ? '#ccc' : '',
-              cursor: (
-                products?.data?.length >= products?.total ||
-                (searchDebounce && products?.data?.length < limit)
-              ) ? 'not-allowed' : 'pointer'
-            }}
-          >
-            {t('home.loadMore')}
-          </WrapperButtonMore>
-        </div>
+        <WrapperPromoBanner>
+          <img src="https://res.cloudinary.com/dj8buonsf/image/upload/q_auto/f_auto/v1775052934/promo1-ezremove_izcplu.png" alt={t('home.sections.phoneBannerAlt')} />
+        </WrapperPromoBanner>
+
+        <WrapperCategorySection>
+          <WrapperSectionHeader>
+            <h3>{t('home.sections.smartphones')}</h3>
+            <WrapperCarouselActions>
+              <button type="button" onClick={() => scrollTrack(phoneTrackRef, 'left')}>
+                <LeftOutlined />
+              </button>
+              <button type="button" onClick={() => scrollTrack(phoneTrackRef, 'right')}>
+                <RightOutlined />
+              </button>
+            </WrapperCarouselActions>
+          </WrapperSectionHeader>
+          <WrapperCategoryHorizontal ref={phoneTrackRef}>
+            {phoneProducts.map((product) => (
+              <CardComponent
+                key={product._id}
+                countInStock={product.countInStock}
+                description={product.description}
+                image={product.image}
+                name={product.name}
+                price={product.price}
+                rating={product.rating}
+                type={product.type}
+                selled={product.selled}
+                discount={product.discount}
+                id={product._id}
+                enableQuickAdd
+                cardWidth={200}
+              />
+            ))}
+          </WrapperCategoryHorizontal>
+        </WrapperCategorySection>
+
+        <WrapperPromoBanner>
+          <img src="https://res.cloudinary.com/dj8buonsf/image/upload/q_auto/f_auto/v1775054824/promo2_blc7no.png" alt={t('home.sections.laptopBannerAlt')} />
+        </WrapperPromoBanner>
+
+        <WrapperCategorySection>
+          <WrapperSectionHeader>
+            <h3>{t('home.sections.laptops')}</h3>
+          </WrapperSectionHeader>
+          <WrapperLaptopGrid>
+            {visibleLaptopProducts.map((product) => (
+              <CardComponent
+                key={product._id}
+                countInStock={product.countInStock}
+                description={product.description}
+                image={product.image}
+                name={product.name}
+                price={product.price}
+                rating={product.rating}
+                type={product.type}
+                selled={product.selled}
+                discount={product.discount}
+                id={product._id}
+                enableQuickAdd
+                cardWidth="100%"
+              />
+            ))}
+          </WrapperLaptopGrid>
+
+          {laptopVisibleCount < laptopProducts.length && (
+            <WrapperVerticalMoreWrap>
+              <WrapperButtonMore
+                type="default"
+                onClick={() => setLaptopVisibleCount((prev) => prev + 10)}
+              >
+                {t('home.loadMore')}
+              </WrapperButtonMore>
+            </WrapperVerticalMoreWrap>
+          )}
+        </WrapperCategorySection>
+
+        <WrapperPromoBanner>
+          <img src="https://res.cloudinary.com/dj8buonsf/image/upload/q_auto/f_auto/v1775054865/promo3_etrsjd.png" alt={t('home.sections.headphoneBannerAlt')} />
+        </WrapperPromoBanner>
+
+        <WrapperCategorySection>
+          <WrapperSectionHeader>
+            <h3>{t('home.sections.headphones')}</h3>
+            <WrapperCarouselActions>
+              <button type="button" onClick={() => scrollTrack(headphoneTrackRef, 'left')}>
+                <LeftOutlined />
+              </button>
+              <button type="button" onClick={() => scrollTrack(headphoneTrackRef, 'right')}>
+                <RightOutlined />
+              </button>
+            </WrapperCarouselActions>
+          </WrapperSectionHeader>
+          <WrapperCategoryHorizontal ref={headphoneTrackRef}>
+            {headphoneProducts.map((product) => (
+              <CardComponent
+                key={product._id}
+                countInStock={product.countInStock}
+                description={product.description}
+                image={product.image}
+                name={product.name}
+                price={product.price}
+                rating={product.rating}
+                type={product.type}
+                selled={product.selled}
+                discount={product.discount}
+                id={product._id}
+                enableQuickAdd
+                cardWidth={200}
+              />
+            ))}
+          </WrapperCategoryHorizontal>
+        </WrapperCategorySection>
+
+        <WrapperSectionBlock>
+          <WrapperSectionHeader>
+            <h3>
+              <FireOutlined style={{ marginRight: '8px', color: '#f57f17' }} />
+              {t('home.sections.comboTitle')}
+            </h3>
+          </WrapperSectionHeader>
+
+          <WrapperCustomGrid>
+            <WrapperCustomHighlight>
+              <span>{t('home.sections.hotDeal')}</span>
+              <h4>{bestDealProduct?.name || t('home.sections.hotDealFallback')}</h4>
+              <p>
+                {t('home.sections.hotDealDesc', { discount: bestDealProduct?.discount || 0 })}
+              </p>
+            </WrapperCustomHighlight>
+
+            {trendingProducts.map((product) => (
+              <CardComponent
+                key={product._id}
+                countInStock={product.countInStock}
+                description={product.description}
+                image={product.image}
+                name={product.name}
+                price={product.price}
+                rating={product.rating}
+                type={product.type}
+                selled={product.selled}
+                discount={product.discount}
+                id={product._id}
+                enableQuickAdd
+                cardWidth="100%"
+              />
+            ))}
+          </WrapperCustomGrid>
+        </WrapperSectionBlock>
       </WrapperHomeContainer>
     </Loading>
 

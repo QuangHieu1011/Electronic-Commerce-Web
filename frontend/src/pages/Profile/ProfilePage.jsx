@@ -106,154 +106,130 @@ const ProfilePage = () => {
         <WrapperContainer>
             <WrapperHeader>
                 <h1>{t('profile.title')}</h1>
+                <p>{t('profile.subtitle')}</p>
             </WrapperHeader>
 
             <Loading isLoading={isPending}>
                 <WrapperContentProfile>
-                    {/* Avatar Section */}
                     <WrapperAvatarSection>
-                        <div className="avatar-wrapper">
-                            {avatar ? (
-                                <img
-                                    src={avatar}
-                                    style={{
-                                        height: '140px',
-                                        width: '140px',
+                        <div className="avatar-block">
+                            <div className="avatar-wrapper">
+                                {avatar ? (
+                                    <img
+                                        src={avatar}
+                                        style={{
+                                            height: '92px',
+                                            width: '92px',
+                                            borderRadius: '50%',
+                                            objectFit: 'cover'
+                                        }}
+                                        alt="avatar"
+                                    />
+                                ) : (
+                                    <div style={{
+                                        height: '92px',
+                                        width: '92px',
                                         borderRadius: '50%',
-                                        objectFit: 'cover'
-                                    }}
-                                    alt="avatar"
-                                />
-                            ) : (
-                                <div style={{
-                                    height: '140px',
-                                    width: '140px',
-                                    borderRadius: '50%',
-                                    background: '#1a94ff',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    fontSize: '48px',
-                                    color: '#fff',
-                                    fontWeight: '700'
-                                }}>
-                                    {name?.charAt(0)?.toUpperCase() || 'U'}
-                                </div>
-                            )}
+                                        background: 'linear-gradient(135deg, #1a94ff 0%, #0d7de8 100%)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: '34px',
+                                        color: '#fff',
+                                        fontWeight: '700'
+                                    }}>
+                                        {name?.charAt(0)?.toUpperCase() || 'U'}
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="avatar-content">
+                                <h3>{t('profile.avatarSectionTitle')}</h3>
+                                <p>{t('profile.avatarSectionHint')}</p>
+                            </div>
                         </div>
 
-                        <WrapperUploadFile onChange={handleOnchangeAvatar} maxCount={1} showUploadList={false}>
+                        <div className="avatar-actions">
+                            <WrapperUploadFile onChange={handleOnchangeAvatar} maxCount={1} showUploadList={false}>
+                                <Button
+                                    icon={<CameraOutlined />}
+                                    size="large"
+                                    className="outline-btn"
+                                >
+                                    {t('profile.changeAvatar')}
+                                </Button>
+                            </WrapperUploadFile>
                             <Button
-                                icon={<CameraOutlined />}
-                                size="large"
-                                style={{
-                                    marginTop: '18px',
-                                    borderRadius: '8px',
-                                    padding: '0 24px',
-                                    height: '44px',
-                                    fontSize: '14px',
-                                    fontWeight: '600',
-                                    border: '1px solid #1a94ff',
-                                    color: '#1a94ff'
-                                }}
+                                className="update-btn"
+                                icon={<SaveOutlined />}
+                                onClick={handleUpdate}
                             >
-                                {t('profile.changeAvatar')}
+                                {t('profile.saveAll')}
                             </Button>
-                        </WrapperUploadFile>
+                        </div>
                     </WrapperAvatarSection>
 
-                    {/* Info Grid */}
-                    <WrapperInfoGrid>
-                        {/* Name Card */}
-                        <WrapperInfoCard>
+                    <WrapperInfoCard>
+                        <div className="card-title">{t('profile.formTitle')}</div>
+                        <WrapperInfoGrid>
                             <WrapperInput>
                                 <WrapperLabel htmlFor="name">
                                     <UserOutlined /> {t('profile.fullName')}
                                 </WrapperLabel>
-                                <div className="input-group">
-                                    <Input
-                                        id="name"
-                                        value={name}
-                                        onChange={(e) => handleOnchangeName(e.target.value)}
-                                        placeholder={t('profile.fullNamePlaceholder')}
-                                        size="large"
-                                        prefix={<UserOutlined style={{ color: '#8c8c8c' }} />}
-                                    />
-                                    <Button onClick={handleUpdate}>
-                                        {t('profile.save')}
-                                    </Button>
-                                </div>
+                                <Input
+                                    id="name"
+                                    value={name}
+                                    onChange={(e) => handleOnchangeName(e.target.value)}
+                                    placeholder={t('profile.fullNamePlaceholder')}
+                                    size="large"
+                                    prefix={<UserOutlined style={{ color: '#8c8c8c' }} />}
+                                />
                             </WrapperInput>
-                        </WrapperInfoCard>
 
-                        {/* Email Card */}
-                        <WrapperInfoCard>
                             <WrapperInput>
                                 <WrapperLabel htmlFor="email">
-                                    <MailOutlined /> Email
+                                    <MailOutlined /> {t('profile.email')}
                                 </WrapperLabel>
-                                <div className="input-group">
-                                    <Input
-                                        id="email"
-                                        value={email}
-                                        onChange={(e) => handleOnchangeEmail(e.target.value)}
-                                        placeholder={t('profile.emailPlaceholder')}
-                                        size="large"
-                                        prefix={<MailOutlined style={{ color: '#8c8c8c' }} />}
-                                    />
-                                    <Button onClick={handleUpdate}>
-                                        {t('profile.save')}
-                                    </Button>
-                                </div>
+                                <Input
+                                    id="email"
+                                    value={email}
+                                    onChange={(e) => handleOnchangeEmail(e.target.value)}
+                                    placeholder={t('profile.emailPlaceholder')}
+                                    size="large"
+                                    prefix={<MailOutlined style={{ color: '#8c8c8c' }} />}
+                                />
                             </WrapperInput>
-                        </WrapperInfoCard>
 
-                        {/* Phone Card */}
-                        <WrapperInfoCard>
                             <WrapperInput>
                                 <WrapperLabel htmlFor="phone">
                                     <PhoneOutlined /> {t('profile.phone')}
                                 </WrapperLabel>
-                                <div className="input-group">
-                                    <Input
-                                        id="phone"
-                                        value={phone}
-                                        onChange={(e) => handleOnchangePhone(e.target.value)}
-                                        placeholder={t('profile.phonePlaceholder')}
-                                        size="large"
-                                        prefix={<PhoneOutlined style={{ color: '#8c8c8c' }} />}
-                                    />
-                                    <Button onClick={handleUpdate}>
-                                        {t('profile.save')}
-                                    </Button>
-                                </div>
+                                <Input
+                                    id="phone"
+                                    value={phone}
+                                    onChange={(e) => handleOnchangePhone(e.target.value)}
+                                    placeholder={t('profile.phonePlaceholder')}
+                                    size="large"
+                                    prefix={<PhoneOutlined style={{ color: '#8c8c8c' }} />}
+                                />
                             </WrapperInput>
-                        </WrapperInfoCard>
 
-                        {/* Address Card */}
-                        <WrapperInfoCard>
-                            <WrapperInput>
+                            <WrapperInput className="full-width">
                                 <WrapperLabel htmlFor="address">
                                     <HomeOutlined /> {t('profile.address')}
                                 </WrapperLabel>
-                                <div className="input-group">
-                                    <Input
-                                        id="address"
-                                        value={address}
-                                        onChange={(e) => handleOnchangeAddress(e.target.value)}
-                                        placeholder={t('profile.addressPlaceholder')}
-                                        size="large"
-                                        prefix={<HomeOutlined style={{ color: '#8c8c8c' }} />}
-                                    />
-                                    <Button onClick={handleUpdate}>
-                                        {t('profile.save')}
-                                    </Button>
-                                </div>
+                                <Input
+                                    id="address"
+                                    value={address}
+                                    onChange={(e) => handleOnchangeAddress(e.target.value)}
+                                    placeholder={t('profile.addressPlaceholder')}
+                                    size="large"
+                                    prefix={<HomeOutlined style={{ color: '#8c8c8c' }} />}
+                                />
                             </WrapperInput>
-                        </WrapperInfoCard>
-                    </WrapperInfoGrid>
+                        </WrapperInfoGrid>
+                    </WrapperInfoCard>
 
-                    {/* Action Buttons */}
                     <WrapperActionButtons>
                         <Button
                             className="primary"

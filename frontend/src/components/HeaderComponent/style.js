@@ -179,7 +179,6 @@ export const WrapperTextHeader = styled.span`
     color: #ffffff;
     font-weight: 900;
     letter-spacing: -0.04em;
-    text-transform: lowercase;
     cursor: pointer;
     transition: transform 0.2s ease;
 

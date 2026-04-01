@@ -159,8 +159,8 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
       <MainBar>
         <WrapperHeader>
           <WrapperTextHeader onClick={() => navigate('/')}>
-            <LogoBase>tech</LogoBase>
-            <LogoAccent>store</LogoAccent>
+            <LogoBase>Tech</LogoBase>
+            <LogoAccent>Store</LogoAccent>
           </WrapperTextHeader>
 
           {!isHiddenSearch && (
