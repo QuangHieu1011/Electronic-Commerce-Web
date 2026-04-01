@@ -1,14 +1,19 @@
 import React, { useEffect, useState } from 'react'
-import { Badge, Popover, Switch } from 'antd';
+import { Badge, Popover } from 'antd';
 import {
+  ActionIconItem,
+  ActionLabel,
   CategoryBar,
   CategoryContent,
   CategoryItem,
   HeaderShell,
+  LogoAccent,
+  LogoBase,
   MainBar,
   SearchWrapper,
   UtilityBar,
   UtilityContent,
+  UtilityLanguageBadge,
   UtilityLink,
   WrapperContentPopup,
   WrapperHeader,
@@ -27,7 +32,7 @@ import {
   SwapOutlined
 } from '@ant-design/icons';
 import ButtonInputSearch from '../ButtonInputSearch/ButtonInputSearch';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import * as UserService from '../../service/UserService'
 import { resetUser } from '../../redux/slides/userSlide'
@@ -43,6 +48,7 @@ import * as ProductService from '../../service/ProductService';
 
 const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const user = useSelector((state) => state.user);
   const cart = useSelector((state) => state.cart);
   const comparisonItems = useSelector((state) => state.comparison?.comparisonItems || []);
@@ -65,6 +71,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
       await UserService.logoutUser();
     } catch (e) { }
     localStorage.removeItem('access_token');
+    localStorage.removeItem('auth_session');
     dispatch(resetUser());
     setLoading(false);
     window.location.href = '/';
@@ -116,23 +123,34 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
     navigate(`/product/${encodedType}`);
   };
 
+  const getActiveType = () => {
+    if (!location.pathname.startsWith('/product/')) return '';
+
+    try {
+      const currentType = location.pathname.replace('/product/', '');
+      return decodeURIComponent(currentType).replace(/_/g, ' ').toLowerCase();
+    } catch (error) {
+      return '';
+    }
+  };
+
+  const activeType = getActiveType();
+
   return (
     <HeaderShell>
       {!isHiddenSearch && (
         <UtilityBar>
           <UtilityContent>
-            <div style={{ opacity: 0.95 }}>{t('header.utilityMessage')}</div>
+            <div>{t('header.utilityMessage')}</div>
             <WrapperTopRight>
               <UtilityLink onClick={() => navigate('/order-tracking')}>{t('header.shippingReturn')}</UtilityLink>
               <UtilityLink onClick={() => navigate('/order-tracking')}>{t('header.trackOrder')}</UtilityLink>
-              <Switch
-                checked={language === 'en'}
-                onChange={(checked) => setLanguage(checked ? 'en' : 'vi')}
-                checkedChildren="EN"
-                unCheckedChildren="VI"
-                size="small"
-                style={{ backgroundColor: language === 'en' ? '#52c41a' : '#1677ff' }}
-              />
+              <UtilityLanguageBadge
+                type="button"
+                onClick={() => setLanguage(language === 'en' ? 'vi' : 'en')}
+              >
+                {language === 'en' ? 'EN' : 'VI'}
+              </UtilityLanguageBadge>
             </WrapperTopRight>
           </UtilityContent>
         </UtilityBar>
@@ -140,14 +158,20 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
 
       <MainBar>
         <WrapperHeader>
-          <WrapperTextHeader onClick={() => navigate('/')}>TechStore</WrapperTextHeader>
+          <WrapperTextHeader onClick={() => navigate('/')}>
+            <LogoBase>Tech</LogoBase>
+            <LogoAccent>Store</LogoAccent>
+          </WrapperTextHeader>
 
           {!isHiddenSearch && (
             <SearchWrapper>
               <ButtonInputSearch
                 size="large"
                 placeholder={t('common.searchPlaceholder')}
-                textButton={t('common.searchButton')}
+                textButton={t('common.searchButton').toUpperCase()}
+                backgroundColorInput="#ffffff"
+                backgroundColorButton="#f59e0b"
+                colorButton="#0a1f3d"
                 onChange={onSearch}
               />
             </SearchWrapper>
@@ -178,24 +202,28 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
 
             {!isHiddenCart && (
               <>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }} onClick={() => navigate('/comparison')}>
-                  <Badge count={comparisonItems.length} size="small" style={{ backgroundColor: '#52c41a' }}>
-                    <SwapOutlined style={{ fontSize: '24px', color: '#ffffff' }} />
+                <ActionIconItem onClick={() => navigate('/comparison')}>
+                  <Badge count={comparisonItems.length} size="small" style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)', color: '#ffffff' }}>
+                    <SwapOutlined className="action-icon" />
                   </Badge>
-                  <WrapperText>{t('header.compare')}</WrapperText>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }} onClick={() => navigate('/wishlist')}>
-                  <Badge count={wishlistItems.length} size="small" style={{ backgroundColor: '#ff4d4f' }}>
-                    <HeartOutlined style={{ fontSize: '24px', color: '#ffffff' }} />
+                  <ActionLabel>{t('header.compare')}</ActionLabel>
+                </ActionIconItem>
+                <ActionIconItem onClick={() => navigate('/wishlist')}>
+                  <Badge count={wishlistItems.length} size="small" style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)', color: '#ffffff' }}>
+                    <HeartOutlined className="action-icon" />
                   </Badge>
-                  <WrapperText>{t('header.wishlist')}</WrapperText>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }} onClick={() => navigate('/order')}>
-                  <Badge count={cart?.totalQuantity || 0} size="small">
-                    <ShoppingCartOutlined style={{ fontSize: '24px', color: '#ffffff' }} />
+                  <ActionLabel>{t('header.wishlist')}</ActionLabel>
+                </ActionIconItem>
+                <ActionIconItem onClick={() => navigate('/order')}>
+                  <Badge
+                    count={cart?.totalQuantity || 0}
+                    size="small"
+                    style={{ backgroundColor: '#f59e0b', color: '#0a1f3d', fontWeight: 800 }}
+                  >
+                    <ShoppingCartOutlined className="action-icon" />
                   </Badge>
-                  <WrapperText>{t('header.cart')}</WrapperText>
-                </div>
+                  <ActionLabel>{t('header.cart')}</ActionLabel>
+                </ActionIconItem>
               </>
             )}
           </WrapperIconGroup>
@@ -205,9 +233,15 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
       {!isHiddenSearch && (
         <CategoryBar>
           <CategoryContent>
-            <CategoryItem onClick={() => navigate('/')}>{t('header.allProducts')}</CategoryItem>
+            <CategoryItem $active={location.pathname === '/'} onClick={() => navigate('/')}>
+              {t('header.allProducts')}
+            </CategoryItem>
             {typeProducts.map((type) => (
-              <CategoryItem key={type} onClick={() => handleNavigateType(type)}>
+              <CategoryItem
+                key={type}
+                $active={type.toLowerCase() === activeType}
+                onClick={() => handleNavigateType(type)}
+              >
                 {type}
               </CategoryItem>
             ))}

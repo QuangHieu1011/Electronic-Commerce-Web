@@ -9,15 +9,15 @@ const sampleProducts = [
     // ========================================================
 
     {
-        name: "iPhone 16 Pro Max 256GB (Titan Đen)",
-        image: "https://images.unsplash.com/photo-1592286927505-341827d5f62e?w=600",
+        name: "iPhone 16 Pro Max 256GB Black Titanium",
+        image: "https://res.cloudinary.com/dj8buonsf/image/upload/v1774276782/49989___i___n_tho___i_iphone_16_pro_max_256gb_titan___en_ch__nh_h__ng_vna_mk38wx.jpg",
         images: [
-            "https://images.unsplash.com/photo-1592286927505-341827d5f62e?w=400",
+            "https://res.cloudinary.com/dj8buonsf/image/upload/v1774276782/49989___i___n_tho___i_iphone_16_pro_max_256gb_titan___en_ch__nh_h__ng_vna_mk38wx.jpg",
             "https://images.unsplash.com/photo-1611472173362-3f53dbd65d80?w=400",
             "https://images.unsplash.com/photo-1632633728024-e1fd4bef561a?w=400",
             "https://images.unsplash.com/photo-1678685888221-cda5f1f0bee6?w=400",
-            "https://images.unsplash.com/photo-1695048133092-34f395b9d0ad?w=400",
-            "https://images.unsplash.com/photo-1695048133859-81f7e7cde5f7?w=400"
+            "https://res.cloudinary.com/dj8buonsf/image/upload/v1774277606/s-l400_c3yjsh.jpg",
+            "https://res.cloudinary.com/dj8buonsf/image/upload/v1774280947/QC-4_gxkltq.jpg"
         ],
         type: "Phone",
         price: 36990000,
@@ -28,14 +28,14 @@ const sampleProducts = [
         selled: 150
     },
     {
-        name: "iPhone 15 128GB (Màu Hồng)",
-        image: "https://images.unsplash.com/photo-1556656793-08538906a9f8?w=600",
+        name: "iPhone 15 128GB Pink",
+        image: "https://res.cloudinary.com/dj8buonsf/image/upload/v1774281097/refurb-iphone-15-pink-202412_aue3be.jpg",
         images: [
             "https://images.unsplash.com/photo-1556656793-08538906a9f8?w=400",
-            "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=400",
-            "https://images.unsplash.com/photo-1678652002419-c4c62e66b0c6?w=400",
-            "https://images.unsplash.com/photo-1632633728024-e1fd4bef561a?w=400",
-            "https://images.unsplash.com/photo-1611472173362-3f53dbd65d80?w=400",
+            "https://res.cloudinary.com/dj8buonsf/image/upload/v1774281260/Screenshot2023-09-13at1.31.03PM_wn7rn1.png",
+            "https://res.cloudinary.com/dj8buonsf/image/upload/v1774281261/603001000000840_1_c3atnl.jpg",
+            "https://res.cloudinary.com/dj8buonsf/image/upload/v1774281258/e87ade00-a80a-4f6f-89d9-796282e8bf7e.33a5a0c8fd31d9700238aacad98e18d5_u17jkg.jpg",
+            "https://res.cloudinary.com/dj8buonsf/image/upload/v1774281262/iphone15_pink_2_1_zxtqbq.jpg",
             "https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=400"
         ],
         type: "Phone",

@@ -40,7 +40,7 @@ const OrderTrackingPage = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const location = useLocation()
-    const { t } = useLanguage()
+    const { t, language } = useLanguage()
 
     // Calculate discounted price
     const calculateDiscountedPrice = (product) => {
@@ -88,7 +88,7 @@ const OrderTrackingPage = () => {
     useEffect(() => {
         // Kiểm tra nếu chưa đăng nhập thì chuyển về trang đăng nhập
         if (!user?.access_token) {
-            message.warning('Vui lòng đăng nhập để xem đơn hàng!')
+            message.warning(t('orderTracking.loginRequired'))
             navigate('/sign-in', {
                 state: {
                     from: '/order-tracking'
@@ -187,12 +187,12 @@ const OrderTrackingPage = () => {
     // Get order status color and text
     const getOrderStatusInfo = (status) => {
         const statusMap = {
-            'pending': { color: 'orange', text: 'Chờ xác nhận', icon: <ClockCircleOutlined /> },
-            'paid': { color: 'green', text: 'Đã thanh toán', icon: <CheckCircleOutlined /> },
-            'confirmed': { color: 'blue', text: 'Đã xác nhận', icon: <CheckCircleOutlined /> },
-            'shipping': { color: 'cyan', text: 'Đang giao hàng', icon: <TruckOutlined /> },
-            'delivered': { color: 'green', text: 'Đã giao hàng', icon: <CheckCircleOutlined /> },
-            'cancelled': { color: 'red', text: 'Đã hủy', icon: <DeleteOutlined /> }
+            'pending': { color: 'orange', text: t('orderTracking.pending'), icon: <ClockCircleOutlined /> },
+            'paid': { color: 'green', text: t('orderTracking.paid'), icon: <CheckCircleOutlined /> },
+            'confirmed': { color: 'blue', text: t('orderTracking.confirmed'), icon: <CheckCircleOutlined /> },
+            'shipping': { color: 'cyan', text: t('orderTracking.shipping'), icon: <TruckOutlined /> },
+            'delivered': { color: 'green', text: t('orderTracking.delivered'), icon: <CheckCircleOutlined /> },
+            'cancelled': { color: 'red', text: t('orderTracking.cancelled'), icon: <DeleteOutlined /> }
         }
         return statusMap[status] || statusMap['pending']
     }
@@ -204,16 +204,16 @@ const OrderTrackingPage = () => {
                 const response = await OrderService.cancelOrder(orderId, user.access_token)
                 if (response.status === 'OK') {
                     dispatch(cancelOrder({ orderId }))
-                    message.success('Đã hủy đơn hàng!')
+                    message.success(t('orderTracking.cancelSuccess'))
                 }
             } else {
                 // Fallback to local update
                 dispatch(cancelOrder({ orderId }))
-                message.success('Đã hủy đơn hàng (local)!')
+                message.success(t('orderTracking.cancelLocalSuccess'))
             }
         } catch (error) {
             console.error('Error cancelling order:', error)
-            message.error('Lỗi khi hủy đơn hàng: ' + (error.response?.data?.message || error.message))
+            message.error(`${t('orderTracking.cancelError')} ${error.response?.data?.message || error.message}`)
         }
     }
 
@@ -221,7 +221,7 @@ const OrderTrackingPage = () => {
     const handleReorder = (orderId) => {
         try {
             if (!user?.access_token) {
-                message.error('Vui lòng đăng nhập để đặt lại đơn hàng!')
+                message.error(t('orderTracking.reorderLoginRequired'))
                 return
             }
 
@@ -229,7 +229,7 @@ const OrderTrackingPage = () => {
             const orderToReorder = userOrders.find(order => order._id === orderId)
 
             if (!orderToReorder) {
-                message.error('Không tìm thấy đơn hàng!')
+                message.error(t('orderTracking.orderNotFound'))
                 return
             }
 
@@ -252,10 +252,10 @@ const OrderTrackingPage = () => {
                 }
             })
 
-            message.success('Chuyển đến trang thanh toán!')
+            message.success(t('orderTracking.redirectCheckout'))
         } catch (error) {
             console.error('Error preparing reorder:', error)
-            message.error('Lỗi khi chuẩn bị đặt lại đơn hàng!')
+            message.error(t('orderTracking.reorderPrepareError'))
         }
     }
 
@@ -285,12 +285,12 @@ const OrderTrackingPage = () => {
                 <h2>{t('orderTracking.title')}</h2>
                 {(!user?.id && !user?._id) && (
                     <div style={{ marginLeft: 'auto', fontSize: '14px', color: '#fff9' }}>
-                        ⚠️ Vui lòng đăng nhập để xem đầy đủ đơn hàng
+                        {t('orderTracking.loginHint')}
                     </div>
                 )}
             </WrapperHeader>
 
-            <Spin spinning={loading} tip="Đang tải đơn hàng..." size="large">
+            <Spin spinning={loading} tip={t('orderTracking.loadingOrders')} size="large">
 
                 {/* Filter and Search */}
                 <div style={{
@@ -302,7 +302,7 @@ const OrderTrackingPage = () => {
                 }}>
                     <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
                         <Input
-                            placeholder="Tìm kiếm theo mã đơn hàng hoặc tên sản phẩm..."
+                            placeholder={t('orderTracking.searchPlaceholder')}
                             prefix={<SearchOutlined />}
                             value={searchText}
                             onChange={(e) => setSearchText(e.target.value)}
@@ -315,17 +315,17 @@ const OrderTrackingPage = () => {
                             style={{ minWidth: 150 }}
                             suffixIcon={<FilterOutlined />}
                         >
-                            <Option value="all">Tất cả trạng thái</Option>
-                            <Option value="pending">Chờ xác nhận</Option>
-                            <Option value="paid">Đã thanh toán</Option>
-                            <Option value="confirmed">Đã xác nhận</Option>
-                            <Option value="shipping">Đang giao hàng</Option>
-                            <Option value="delivered">Đã giao hàng</Option>
-                            <Option value="cancelled">Đã hủy</Option>
+                            <Option value="all">{t('orderTracking.allStatuses')}</Option>
+                            <Option value="pending">{t('orderTracking.pending')}</Option>
+                            <Option value="paid">{t('orderTracking.paid')}</Option>
+                            <Option value="confirmed">{t('orderTracking.confirmed')}</Option>
+                            <Option value="shipping">{t('orderTracking.shipping')}</Option>
+                            <Option value="delivered">{t('orderTracking.delivered')}</Option>
+                            <Option value="cancelled">{t('orderTracking.cancelled')}</Option>
                         </Select>
 
                         <div style={{ marginLeft: 'auto', color: '#666' }}>
-                            Tổng cộng: <strong>{filteredOrders.length}</strong> đơn hàng của bạn
+                            {t('orderTracking.totalOrders', { count: filteredOrders.length })}
                         </div>
                     </div>
                 </div>
@@ -333,13 +333,13 @@ const OrderTrackingPage = () => {
                 {filteredOrders.length === 0 ? (
                     <WrapperEmpty>
                         <div className="empty-title">
-                            {userOrders.length === 0 ? 'Bạn chưa có đơn hàng nào' : 'Không tìm thấy đơn hàng'}
+                            {userOrders.length === 0 ? t('orderTracking.noOrders') : t('orderTracking.noResult')}
                         </div>
                         <div className="empty-description">
-                            {userOrders.length === 0 ? 'Hãy mua sắm và đặt hàng để theo dõi đơn hàng' : 'Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm'}
+                            {userOrders.length === 0 ? t('orderTracking.noOrdersDesc') : t('orderTracking.noResultDesc')}
                         </div>
                         <Button className="shopping-btn" type="primary" onClick={() => navigate('/')}>
-                            {userOrders.length === 0 ? 'Bắt đầu mua sắm' : 'Về trang chủ'}
+                            {userOrders.length === 0 ? t('orderTracking.startShopping') : t('orderTracking.backHome')}
                         </Button>
                     </WrapperEmpty>
                 ) : (
@@ -360,15 +360,15 @@ const OrderTrackingPage = () => {
                                         }}>
                                             <div>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                                                    <strong style={{ fontSize: '16px' }}>Đơn hàng #{order._id.slice(-8).toUpperCase()}</strong>
+                                                    <strong style={{ fontSize: '16px' }}>{t('orderTracking.orderLabel')} #{order._id.slice(-8).toUpperCase()}</strong>
                                                     <Tag color={statusInfo.color} icon={statusInfo.icon} style={{ fontSize: '12px' }}>
                                                         {statusInfo.text}
                                                     </Tag>
                                                 </div>
                                                 <div style={{ fontSize: '12px', color: '#666' }}>
-                                                    <div>Đặt lúc: {new Date(order.createdAt).toLocaleString('vi-VN')}</div>
+                                                    <div>{t('orderTracking.placedAt')} {new Date(order.createdAt).toLocaleString(language === 'vi' ? 'vi-VN' : 'en-US')}</div>
                                                     {order.shippingInfo?.fullName && (
-                                                        <div>Người nhận: {order.shippingInfo.fullName} - {order.shippingInfo.phone}</div>
+                                                        <div>{t('orderTracking.receiver')} {order.shippingInfo.fullName} - {order.shippingInfo.phone}</div>
                                                     )}
                                                 </div>
                                             </div>
@@ -377,14 +377,14 @@ const OrderTrackingPage = () => {
                                                 {/* Users can only cancel pending orders (not paid orders) */}
                                                 {order.orderStatus === 'pending' && (
                                                     <Popconfirm
-                                                        title="Bạn có chắc muốn hủy đơn hàng này?"
+                                                        title={t('orderTracking.cancelConfirm')}
                                                         onConfirm={() => handleCancelOrder(order._id)}
-                                                        okText="Có"
-                                                        cancelText="Không"
+                                                        okText={t('orderTracking.yes')}
+                                                        cancelText={t('orderTracking.no')}
                                                         okButtonProps={{ danger: true, type: 'primary' }}
                                                     >
                                                         <Button size="small" danger>
-                                                            Hủy đơn
+                                                            {t('adminOrders.cancel')}
                                                         </Button>
                                                     </Popconfirm>
                                                 )}
@@ -396,7 +396,7 @@ const OrderTrackingPage = () => {
                                                         type="primary"
                                                         onClick={() => handleReorder(order._id)}
                                                     >
-                                                        Mua lại
+                                                        {t('orderTracking.reorder')}
                                                     </Button>
                                                 )}
                                             </div>
@@ -417,9 +417,9 @@ const OrderTrackingPage = () => {
                                                 marginBottom: '16px',
                                                 fontSize: '13px'
                                             }}>
-                                                <strong>Địa chỉ giao hàng:</strong>
+                                                <strong>{t('orderTracking.shippingAddress')}</strong>
                                                 <div>{order.shippingInfo.address}, {order.shippingInfo.ward}, {order.shippingInfo.district}, {order.shippingInfo.province}</div>
-                                                {order.shippingInfo.note && <div>Ghi chú: {order.shippingInfo.note}</div>}
+                                                {order.shippingInfo.note && <div>{t('orderTracking.note')} {order.shippingInfo.note}</div>}
                                             </div>
                                         )}
 
@@ -449,7 +449,7 @@ const OrderTrackingPage = () => {
                                                             {item.product.name}
                                                         </div>
                                                         <div style={{ fontSize: '12px', color: '#666' }}>
-                                                            SL: {item.quantity} x {formatPrice(calculateDiscountedPrice(item.product))}
+                                                            {t('adminOrders.quantityShort')}: {item.quantity} x {formatPrice(calculateDiscountedPrice(item.product))}
                                                         </div>
                                                     </div>
                                                     <div style={{
@@ -474,15 +474,15 @@ const OrderTrackingPage = () => {
                                             borderTop: '2px solid #f0f0f0'
                                         }}>
                                             <div style={{ fontSize: '13px', color: '#666' }}>
-                                                <div>Phương thức: {
-                                                    order.paymentMethod === 'cod' ? 'COD' :
+                                                <div>{t('orderTracking.paymentMethod')} {
+                                                    order.paymentMethod === 'cod' ? t('orderTracking.cod') :
                                                         order.paymentMethod === 'paypal' ? 'PayPal' :
-                                                            order.paymentMethod === 'banking' ? 'Chuyển khoản' :
-                                                                'Thẻ tín dụng'
+                                                            order.paymentMethod === 'banking' ? t('orderTracking.banking') :
+                                                                t('orderTracking.card')
                                                 }</div>
-                                                <div>Trạng thái thanh toán:
+                                                <div>{t('orderTracking.paymentStatus')}
                                                     <Tag color={order.orderStatus === 'paid' || order.paymentStatus === 'paid' ? 'green' : 'orange'} style={{ marginLeft: '8px' }}>
-                                                        {order.orderStatus === 'paid' || order.paymentStatus === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán'}
+                                                        {order.orderStatus === 'paid' || order.paymentStatus === 'paid' ? t('orderTracking.paid') : t('adminOrders.unpaid')}
                                                     </Tag>
                                                 </div>
                                                 {order.paymentInfo?.transactionId && (
@@ -496,15 +496,15 @@ const OrderTrackingPage = () => {
                                             </div>
                                             <div style={{ textAlign: 'right' }}>
                                                 <div style={{ fontSize: '16px', fontWeight: '600', color: '#ff4d4f' }}>
-                                                    Tổng tiền: {formatPrice(order.finalAmount ?? order.totalAmount)}
+                                                    {t('orderTracking.totalAmount')} {formatPrice(order.finalAmount ?? order.totalAmount)}
                                                 </div>
                                                 {order.voucher?.appliedDiscount > 0 && (
                                                     <div style={{ fontSize: '12px', color: '#1890ff' }}>
-                                                        (Đã tiết kiệm {formatPrice(order.voucher.appliedDiscount)})
+                                                        ({t('orderTracking.savedAmount')} {formatPrice(order.voucher.appliedDiscount)})
                                                     </div>
                                                 )}
                                                 <div style={{ fontSize: '12px', color: '#666' }}>
-                                                    (Đã bao gồm phí vận chuyển)
+                                                    ({t('orderTracking.includeShippingFee')})
                                                 </div>
                                             </div>
                                         </div>

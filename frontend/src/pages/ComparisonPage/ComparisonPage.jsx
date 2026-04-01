@@ -12,12 +12,14 @@ import {
     WrapperProductCell,
     WrapperEmpty
 } from './style'
-import { formatPrice } from '../../utils'
+import { formatPrice, toSlug } from '../../utils'
+import { useLanguage } from '../../context/LanguageContext'
 
 const ComparisonPage = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const comparisonItems = useSelector((state) => state.comparison.comparisonItems)
+    const { t } = useLanguage()
 
     const calculateDiscountedPrice = (product) => {
         if (product.discount && product.discount > 0) {
@@ -48,19 +50,19 @@ const ComparisonPage = () => {
                         onClick={() => navigate('/')}
                         style={{ background: 'rgba(255,255,255,0.2)', color: 'white', border: 'none' }}
                     >
-                        Về trang chủ
+                        {t('comparison.backHome')}
                     </Button>
-                    <h2>So Sánh Sản Phẩm</h2>
+                    <h2>{t('comparison.title')}</h2>
                     <div style={{ width: '100px' }}></div>
                 </WrapperHeader>
 
                 <WrapperEmpty>
-                    <div className="empty-title">Chưa có sản phẩm để so sánh</div>
+                    <div className="empty-title">{t('comparison.emptyTitle')}</div>
                     <div className="empty-description">
-                        Hãy thêm sản phẩm vào danh sách so sánh để xem sự khác biệt
+                        {t('comparison.emptyDescription')}
                     </div>
                     <Button type="primary" size="large" onClick={() => navigate('/')}>
-                        Khám phá sản phẩm
+                        {t('comparison.exploreProducts')}
                     </Button>
                 </WrapperEmpty>
             </WrapperContainer>
@@ -75,15 +77,15 @@ const ComparisonPage = () => {
                     onClick={() => navigate('/')}
                     style={{ background: 'rgba(255,255,255,0.2)', color: 'white', border: 'none' }}
                 >
-                    Về trang chủ
+                    {t('comparison.backHome')}
                 </Button>
-                <h2>So Sánh Sản Phẩm ({comparisonItems.length}/3)</h2>
+                <h2>{t('comparison.titleWithCount', { count: comparisonItems.length })}</h2>
                 <Button
                     danger
                     onClick={handleClearAll}
                     style={{ background: 'rgba(255,77,79,0.9)', color: 'white', border: 'none' }}
                 >
-                    Xóa tất cả
+                    {t('comparison.clearAll')}
                 </Button>
             </WrapperHeader>
 
@@ -91,7 +93,7 @@ const ComparisonPage = () => {
                 <table>
                     <thead>
                         <tr>
-                            <th style={{ minWidth: '150px' }}>Thông số</th>
+                            <th style={{ minWidth: '150px' }}>{t('comparison.specifications')}</th>
                             {comparisonItems.map((product) => (
                                 <th key={product._id} style={{ minWidth: '200px', position: 'relative' }}>
                                     <WrapperProductCell>
@@ -110,7 +112,7 @@ const ComparisonPage = () => {
                     </thead>
                     <tbody>
                         <tr>
-                            <td style={{ fontWeight: '600' }}>Giá gốc</td>
+                            <td style={{ fontWeight: '600' }}>{t('comparison.originalPrice')}</td>
                             {comparisonItems.map((product) => (
                                 <td key={product._id} style={{ textAlign: 'center' }}>
                                     <span style={{ textDecoration: product.discount > 0 ? 'line-through' : 'none', color: '#999' }}>
@@ -122,7 +124,7 @@ const ComparisonPage = () => {
 
                         {comparisonItems.some(p => p.discount > 0) && (
                             <tr>
-                                <td style={{ fontWeight: '600' }}>Giảm giá</td>
+                                <td style={{ fontWeight: '600' }}>{t('comparison.discount')}</td>
                                 {comparisonItems.map((product) => (
                                     <td key={product._id} style={{ textAlign: 'center' }}>
                                         {product.discount > 0 ? (
@@ -136,7 +138,7 @@ const ComparisonPage = () => {
                         )}
 
                         <tr style={{ background: '#fff9e6' }}>
-                            <td style={{ fontWeight: '600' }}>Giá bán</td>
+                            <td style={{ fontWeight: '600' }}>{t('comparison.salePrice')}</td>
                             {comparisonItems.map((product) => (
                                 <td key={product._id} style={{ textAlign: 'center' }}>
                                     <span style={{ fontSize: '18px', fontWeight: '600', color: '#ff4d4f' }}>
@@ -147,7 +149,7 @@ const ComparisonPage = () => {
                         </tr>
 
                         <tr>
-                            <td style={{ fontWeight: '600' }}>Loại sản phẩm</td>
+                            <td style={{ fontWeight: '600' }}>{t('comparison.productType')}</td>
                             {comparisonItems.map((product) => (
                                 <td key={product._id} style={{ textAlign: 'center' }}>
                                     <Tag color="blue">{product.type}</Tag>
@@ -156,41 +158,41 @@ const ComparisonPage = () => {
                         </tr>
 
                         <tr>
-                            <td style={{ fontWeight: '600' }}>Đánh giá</td>
+                            <td style={{ fontWeight: '600' }}>{t('comparison.rating')}</td>
                             {comparisonItems.map((product) => (
                                 <td key={product._id} style={{ textAlign: 'center' }}>
                                     <Rate disabled value={product.rating} style={{ fontSize: '14px' }} />
                                     <div style={{ fontSize: '12px', color: '#999', marginTop: '4px' }}>
-                                        {product.rating} sao
+                                        {t('comparison.stars', { rating: product.rating })}
                                     </div>
                                 </td>
                             ))}
                         </tr>
 
                         <tr>
-                            <td style={{ fontWeight: '600' }}>Tồn kho</td>
+                            <td style={{ fontWeight: '600' }}>{t('comparison.stock')}</td>
                             {comparisonItems.map((product) => (
                                 <td key={product._id} style={{ textAlign: 'center' }}>
                                     {product.countInStock > 0 ? (
-                                        <Tag color="green">{product.countInStock} sản phẩm</Tag>
+                                        <Tag color="green">{t('comparison.stockCount', { count: product.countInStock })}</Tag>
                                     ) : (
-                                        <Tag color="red">Hết hàng</Tag>
+                                        <Tag color="red">{t('comparison.outOfStock')}</Tag>
                                     )}
                                 </td>
                             ))}
                         </tr>
 
                         <tr>
-                            <td style={{ fontWeight: '600' }}>Đã bán</td>
+                            <td style={{ fontWeight: '600' }}>{t('comparison.sold')}</td>
                             {comparisonItems.map((product) => (
                                 <td key={product._id} style={{ textAlign: 'center' }}>
-                                    <span style={{ color: '#666' }}>{product.selled || 0} sản phẩm</span>
+                                    <span style={{ color: '#666' }}>{t('comparison.soldCount', { count: product.selled || 0 })}</span>
                                 </td>
                             ))}
                         </tr>
 
                         <tr>
-                            <td style={{ fontWeight: '600' }}>Mô tả</td>
+                            <td style={{ fontWeight: '600' }}>{t('comparison.description')}</td>
                             {comparisonItems.map((product) => (
                                 <td key={product._id} style={{ fontSize: '13px', color: '#666' }}>
                                     {product.description}
@@ -199,7 +201,7 @@ const ComparisonPage = () => {
                         </tr>
 
                         <tr>
-                            <td style={{ fontWeight: '600' }}>Hành động</td>
+                            <td style={{ fontWeight: '600' }}>{t('comparison.actions')}</td>
                             {comparisonItems.map((product) => (
                                 <td key={product._id} style={{ textAlign: 'center' }}>
                                     <Button
@@ -207,15 +209,25 @@ const ComparisonPage = () => {
                                         icon={<ShoppingCartOutlined />}
                                         onClick={() => handleAddToCart(product)}
                                         disabled={product.countInStock === 0}
-                                        style={{ marginBottom: '8px', width: '100%' }}
+                                        style={{
+                                            marginBottom: '8px',
+                                            width: '100%',
+                                            backgroundColor: product.countInStock === 0 ? '#d9d9d9' : '#1a94ff',
+                                            borderColor: product.countInStock === 0 ? '#d9d9d9' : '#1a94ff',
+                                            color: product.countInStock === 0 ? 'rgba(0, 0, 0, 0.35)' : '#fff',
+                                            fontWeight: 600
+                                        }}
                                     >
-                                        Thêm giỏ hàng
+                                        {t('comparison.addToCart')}
                                     </Button>
                                     <Button
-                                        onClick={() => navigate(`/product-details/${product._id}`)}
+                                        onClick={() => {
+                                            const productSlug = toSlug(product.name) || 'product';
+                                            navigate(`/product-details/${product._id}/${productSlug}`)
+                                        }}
                                         style={{ width: '100%' }}
                                     >
-                                        Xem chi tiết
+                                        {t('comparison.viewDetails')}
                                     </Button>
                                 </td>
                             ))}

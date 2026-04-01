@@ -4,6 +4,7 @@ const OrderRouter = require('./OrderRouter')
 const PayPalRouter = require('./PayPalRouter')
 const OTPRouter = require('./OTPRouter')
 const ChatBotRouter = require('./ChatBotRouter')
+const ReviewRouter = require('./ReviewRouter')
 
 const routes = (app) => {
     app.use('/api/user', UserRouter)
@@ -12,6 +13,7 @@ const routes = (app) => {
     app.use('/api/paypal', PayPalRouter)
     app.use('/api/otp', OTPRouter)
     app.use('/api/chatbot', ChatBotRouter)
+    app.use('/api/review', ReviewRouter)
 };
 
 

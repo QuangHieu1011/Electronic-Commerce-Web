@@ -7,7 +7,9 @@ export const WrapperContainerImage = styled.div`
   align-items: center;
   background: #fff;
   padding: 24px;
+  height: 520px;
   border-radius: 12px;
+  overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   transition: all 0.3s ease;
   
@@ -17,13 +19,14 @@ export const WrapperContainerImage = styled.div`
 
   .ant-image {
     width: 100%;
-    height: auto;
-    
-    img {
-      object-fit: contain;
-      max-height: 500px;
-      transition: transform 0.4s ease;
-    }
+    height: 100%;
+  }
+
+  .ant-image img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain;
+    transition: transform 0.4s ease;
   }
 
   &:hover img {
@@ -32,10 +35,7 @@ export const WrapperContainerImage = styled.div`
 
   @media (max-width: 768px) {
     padding: 16px;
-    
-    .ant-image img {
-      max-height: 350px;
-    }
+    height: 360px;
   }
 `;
 
@@ -129,44 +129,55 @@ export const WrapperStyleTextSell=styled.span`
 `
 
 export const WrapperPriceProduct=styled.div`
-    background: #fff;
-    border-radius: 12px;
-    padding: 4px;
+  background: linear-gradient(135deg, #f0f8ff 0%, #ffffff 55%, #eef7ff 100%);
+  border-radius: 14px;
+  padding: 6px;
     margin: 20px 0;
-    border: 2px solid #1a94ff;
-    box-shadow: 0 2px 8px rgba(26, 148, 255, 0.1);
+  border: 2px solid #1a94ff;
+  box-shadow: 0 6px 20px rgba(26, 148, 255, 0.15);
     transition: all 0.3s ease;
-
-    &:hover {
-        box-shadow: 0 4px 12px rgba(26, 148, 255, 0.15);
-    }
 
     @media (max-width: 768px) {
         margin: 16px 0;
+    border-radius: 12px;
+    padding: 4px;
     }
 `
 
 export const WrapperPriceTextProduct=styled.h1`
-    font-size: 36px;
+  font-size: 34px;
     line-height: 1.4;
-    margin-right: 8px;
-    font-weight: 700;
-    padding: 12px 16px;
+  margin-right: 0;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  padding: 12px 18px;
     margin-top: 0;
     margin-bottom: 0;
-    color: #1a94ff;
+  color: #0a6ed1;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
 
     @media (max-width: 768px) {
         font-size: 28px;
         padding: 10px 12px;
+    letter-spacing: 0.2px;
     }
 `
 
 export const WrapperAddressProduct=styled.div`
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
     padding: 16px;
     background: #f5f5f5;
     border-radius: 8px;
     margin: 16px 0;
+
+  > span {
+    display: inline-flex;
+    align-items: center;
+    line-height: 24px;
+  }
 
     span.address {
         text-decoration: underline;
@@ -176,7 +187,8 @@ export const WrapperAddressProduct=styled.div`
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        display: inline-block;
+    display: inline-flex;
+    align-items: center;
         max-width: 70%;
     }
     
@@ -211,30 +223,63 @@ export const WrapperAddressProduct=styled.div`
 
 export const WrapperQualityProduct=styled.div`
     display: flex;
-    gap: 4px;
     align-items: center;
-    width: 120px;
-    border: 2px solid #d9d9d9;
-    border-radius: 8px;
+    width: 168px;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
     overflow: hidden;
+    background: #f8fbff;
     transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
 
     &:hover {
-        border-color: #1890ff;
+        border-color: #1a94ff;
+        box-shadow: 0 6px 16px rgba(26, 148, 255, 0.18);
+    }
+
+    .quantity-btn {
+        width: 44px;
+        height: 44px;
+        border: none;
+        background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+        color: #334155;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+
+    .quantity-btn:hover:not(:disabled) {
+        background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
+        color: #1d4ed8;
+    }
+
+    .quantity-btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.45;
     }
 
     @media (max-width: 768px) {
-        width: 110px;
+        width: 156px;
+
+        .quantity-btn {
+            width: 40px;
+            height: 40px;
+        }
     }
 `
 
 export const WrapperInputNumber = styled(InputNumber)`
-  width: 60px !important;
+  width: calc(100% - 88px) !important;
   text-align: center;
-  border-top: none !important;
-  border-bottom: none !important;
-  border-left: none !important;
-  border-right: none !important;
+  border: none !important;
+  background: #fff !important;
+  border-radius: 0 !important;
+
+  &.ant-input-number {
+    box-shadow: none !important;
+  }
 
   .ant-input-number-handler-wrap {
     display: none !important;
@@ -242,15 +287,16 @@ export const WrapperInputNumber = styled(InputNumber)`
 
   input {
     text-align: center;
-    font-weight: 600;
-    font-size: 16px;
+    font-weight: 700;
+    font-size: 17px;
+    color: #0f172a;
   }
 
   @media (max-width: 768px) {
-    width: 50px !important;
+    width: calc(100% - 80px) !important;
     
     input {
-      font-size: 14px;
+      font-size: 15px;
     }
   }
 `

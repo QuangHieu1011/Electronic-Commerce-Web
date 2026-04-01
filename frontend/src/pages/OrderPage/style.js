@@ -6,6 +6,32 @@ export const WrapperContainer = styled.div`
   padding: 40px 20px;
   background: #f5f5f5;
   min-height: 100vh;
+
+  .order-layout {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+
+  .order-main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .order-summary-col {
+    width: 350px;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 1200px) {
+    .order-layout {
+      flex-direction: column;
+    }
+
+    .order-summary-col {
+      width: 100%;
+    }
+  }
 `
 
 export const WrapperHeader = styled.div`
@@ -30,12 +56,49 @@ export const WrapperProductInfo = styled.div`
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   overflow: hidden;
   border: 1px solid #e5e7eb;
-  
-  .product-item {
-    padding: 24px;
+
+  .table-row {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) 140px 170px 140px 44px;
+    align-items: center;
+    column-gap: 12px;
+    padding: 18px 20px;
+  }
+
+  .table-head {
+    background-color: #fafafa;
+    border-bottom: 1px solid #f0f0f0;
+    font-weight: 600;
+    color: #666;
+  }
+
+  .col {
+    min-width: 0;
+  }
+
+  .col.unit-price,
+  .col.quantity,
+  .col.total,
+  .col.action,
+  .col.checkbox {
+    text-align: center;
+  }
+
+  .product-cell {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 14px;
+    min-width: 0;
+  }
+
+  .quantity-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  
+  .product-item {
     border-bottom: 1px solid #f0f0f0;
     transition: all 0.3s ease;
     
@@ -47,11 +110,69 @@ export const WrapperProductInfo = styled.div`
       border-bottom: none;
     }
   }
+
+  @media (max-width: 1024px) {
+    .table-row {
+      grid-template-columns: 44px minmax(220px, 1fr) 120px 150px 120px 40px;
+      padding: 16px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .table-head {
+      display: none;
+    }
+
+    .table-row.product-item {
+      grid-template-columns: 32px minmax(0, 1fr);
+      row-gap: 10px;
+      align-items: start;
+    }
+
+    .table-row.product-item .col.checkbox {
+      grid-column: 1;
+      grid-row: 1;
+      text-align: left;
+      padding-top: 6px;
+    }
+
+    .table-row.product-item .col.product {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .table-row.product-item .col.unit-price,
+    .table-row.product-item .col.quantity,
+    .table-row.product-item .col.total,
+    .table-row.product-item .col.action {
+      grid-column: 2;
+      text-align: left;
+    }
+
+    .table-row.product-item .col.unit-price::before,
+    .table-row.product-item .col.quantity::before,
+    .table-row.product-item .col.total::before {
+      content: attr(data-label) ':';
+      display: inline-block;
+      min-width: 88px;
+      font-weight: 600;
+      color: #6b7280;
+      margin-right: 8px;
+    }
+
+    .table-row.product-item .col.action {
+      margin-top: -4px;
+    }
+
+    .product-cell {
+      align-items: flex-start;
+    }
+  }
 `
 
 export const WrapperProductImage = styled.div`
-  width: 100px;
-  height: 100px;
+  width: 88px;
+  height: 88px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -80,14 +201,51 @@ export const WrapperProductImage = styled.div`
 
 export const WrapperProductDetails = styled.div`
   flex: 1;
+  min-width: 0;
   
   .product-name {
-    font-size: 17px;
+    font-size: 18px;
     font-weight: 600;
     color: #1f2937;
-    margin-bottom: 10px;
-    line-height: 1.5;
+    margin-bottom: 8px;
+    line-height: 1.35;
     letter-spacing: -0.2px;
+    white-space: normal;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .product-tags {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .tag.discount {
+    color: #ffffff;
+    background: #ee4d2d;
+  }
+
+  .tag.type {
+    color: #1d4ed8;
+    background: #e8f1ff;
+    text-transform: capitalize;
   }
   
   .product-price {
@@ -98,9 +256,22 @@ export const WrapperProductDetails = styled.div`
   }
   
   .product-original-price {
-    font-size: 15px;
+    font-size: 14px;
     color: #9ca3af;
     text-decoration: line-through;
+  }
+
+  @media (max-width: 992px) {
+    .product-name {
+      font-size: 16px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .product-name {
+      font-size: 15px;
+      -webkit-line-clamp: 3;
+    }
   }
 `
 

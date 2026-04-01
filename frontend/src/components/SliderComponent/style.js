@@ -2,6 +2,15 @@ import styled from 'styled-components';
 import Slider from 'react-slick';
 
 export const WrapperSliderStyle = styled(Slider)`
+    border-radius: inherit;
+
+    .slick-list,
+    .slick-track,
+    .slick-slide,
+    .slick-slide > div {
+        height: 100%;
+    }
+
     & .slick-arrow.slick-prev {
         left: 14px;
         top: 50%;
@@ -44,19 +53,38 @@ export const WrapperSliderStyle = styled(Slider)`
     
     .ant-image {
         width: 100%;
+        height: ${({ $imageHeight }) => $imageHeight || '500px'};
+        display: block;
+        background: #0f2338;
+        overflow: hidden;
 
         img {
             object-fit: cover;
+            object-position: center;
             width: 100%;
-            height: ${({ $imageHeight }) => $imageHeight || '300px'};
+            height: 100%;
             display: block;
         }
     }
 
+    .hero-slide-1 img {
+        object-position: 58% center;
+    }
+
+    .hero-slide-2 img {
+        object-position: center 55%;
+    }
+
+    .hero-slide-3 img {
+        object-position: 35% center;
+    }
+
     @media (max-width: 768px) {
         .ant-image {
+            height: ${({ $mobileImageHeight }) => $mobileImageHeight || '240px'};
+
             img {
-                height: ${({ $mobileImageHeight }) => $mobileImageHeight || '220px'};
+                object-position: center;
             }
         }
 

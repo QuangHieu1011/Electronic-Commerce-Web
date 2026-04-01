@@ -13,11 +13,14 @@ const SliderComponent = ({
     const settings = {
         dots: true,
         infinite: true,
-                speed: 550,
+        speed: 550,
         slidesToShow: 1,
         slidesToScroll: 1,
-                autoplay,
-                autoplaySpeed
+        autoplay,
+        autoplaySpeed,
+        pauseOnHover: false,
+        pauseOnFocus: false,
+        pauseOnDotsHover: false
   };
 
   return (
@@ -26,9 +29,16 @@ const SliderComponent = ({
             $imageHeight={imageHeight}
             $mobileImageHeight={mobileImageHeight}
         >
-        {arrImages.map((image)=> {
+        {arrImages.map((image, index)=> {
             return (
-                                <Image key={image} src={image} alt="slider" preview={false} width="100%" />
+                                <Image
+                                    key={image}
+                                    className={`hero-slide hero-slide-${index + 1}`}
+                                    src={image}
+                                    alt="slider"
+                                    preview={false}
+                                    width="100%"
+                                />
             )
         })}
     </WrapperSliderStyle>

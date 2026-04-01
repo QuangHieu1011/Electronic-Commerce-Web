@@ -12,11 +12,21 @@ export const WrapperCardStyle = styled(Card)`
     position: relative;
     background: #fff;
     
-    & img {
+    .card-image-wrap {
         width: 100%;
         height: 200px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .product-image {
+        width: 100%;
+        height: 100%;
         object-fit: cover;
-        transition: transform 0.4s ease;
+        display: block;
+        transform: translateY(0);
+        transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+        will-change: transform;
     }
 
     &:hover {
@@ -24,8 +34,14 @@ export const WrapperCardStyle = styled(Card)`
         box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
         border-color: #1a94ff;
         
-        & img {
-            transform: scale(1.08);
+        .product-image {
+            transform: ${props => (props.$enableQuickAdd ? 'translateY(-10px)' : 'translateY(-6px)')};
+        }
+
+        .quick-add-btn {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
         }
     }
 
@@ -34,23 +50,70 @@ export const WrapperCardStyle = styled(Card)`
     }
 
     @media (max-width: 768px) {
-        & img {
+        .card-image-wrap {
             height: 160px;
         }
         
         .ant-card-body {
             padding: 10px;
+            padding-bottom: ${props => (props.$enableQuickAdd ? '52px' : '10px')};
         }
 
         &:hover {
             transform: translateY(-4px);
         }
+
+        .quick-add-btn {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
     }
 
     @media (max-width: 480px) {
-        & img {
+        .card-image-wrap {
             height: 140px;
         }
+    }
+`
+
+export const WrapperQuickAddButton = styled.button`
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    height: 34px;
+    border: none;
+    border-radius: 8px;
+    background: #1a94ff;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(120%);
+    pointer-events: none;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.22s ease, background-color 0.2s ease;
+    z-index: 2;
+
+    &:hover:not(:disabled) {
+        background: #0b77e3;
+    }
+
+    &:disabled {
+        background: #e5e7eb;
+        color: #9ca3af;
+        cursor: not-allowed;
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
+
+    @media (max-width: 768px) {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
     }
 `
 
