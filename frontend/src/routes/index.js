@@ -1,5 +1,4 @@
 import AdminPage from "../pages/AdminPage/AdminPage";
-import AdminOrderManagement from "../pages/AdminOrderManagement/AdminOrderManagement";
 import CheckoutPage from "../pages/CheckoutPage/CheckoutPage";
 import HomePage from "../pages/HomePage/HomePage";
 import NotFoundPage from "../pages/NotFoundPage/NotFoundPage";
@@ -53,8 +52,8 @@ export const routes = [
     },
     {
         path: "/admin/orders",
-        page: AdminOrderManagement,
-        isShowHeader: true,
+        page: AdminPage,
+        isShowHeader: false,
         isPrivate: true
     },
     {

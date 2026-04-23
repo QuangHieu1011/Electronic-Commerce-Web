@@ -1,17 +1,19 @@
 import React, { useState } from 'react'
 import { Modal, Input, Button, Tag, Divider, message, Space } from 'antd'
 import { GiftOutlined, PercentageOutlined, CheckCircleOutlined } from '@ant-design/icons'
+import { useLanguage } from '../../context/LanguageContext'
 
 const VoucherModal = ({ visible, onClose, onApply, totalAmount }) => {
     const [voucherCode, setVoucherCode] = useState('')
     const [selectedVoucher, setSelectedVoucher] = useState(null)
+    const { language, t } = useLanguage()
 
     // Danh sách voucher demo
     const availableVouchers = [
         {
             code: 'FREESHIP',
-            title: 'Miễn phí vận chuyển',
-            description: 'Giảm 30,000đ phí ship',
+            titleKey: 'checkout.voucherModal.vouchers.freeship.title',
+            descriptionKey: 'checkout.voucherModal.vouchers.freeship.description',
             discountType: 'shipping',
             discountValue: 30000,
             minOrder: 0,
@@ -20,8 +22,8 @@ const VoucherModal = ({ visible, onClose, onApply, totalAmount }) => {
         },
         {
             code: 'GIAM50K',
-            title: 'Giảm 50K',
-            description: 'Giảm 50,000đ cho đơn từ 500K',
+            titleKey: 'checkout.voucherModal.vouchers.giam50k.title',
+            descriptionKey: 'checkout.voucherModal.vouchers.giam50k.description',
             discountType: 'fixed',
             discountValue: 50000,
             minOrder: 500000,
@@ -30,8 +32,8 @@ const VoucherModal = ({ visible, onClose, onApply, totalAmount }) => {
         },
         {
             code: 'GIAM10',
-            title: 'Giảm 10%',
-            description: 'Giảm 10% tối đa 100K',
+            titleKey: 'checkout.voucherModal.vouchers.giam10.title',
+            descriptionKey: 'checkout.voucherModal.vouchers.giam10.description',
             discountType: 'percent',
             discountValue: 10,
             minOrder: 200000,
@@ -40,8 +42,8 @@ const VoucherModal = ({ visible, onClose, onApply, totalAmount }) => {
         },
         {
             code: 'NEWUSER',
-            title: 'Khách hàng mới',
-            description: 'Giảm 100,000đ cho đơn đầu tiên',
+            titleKey: 'checkout.voucherModal.vouchers.newuser.title',
+            descriptionKey: 'checkout.voucherModal.vouchers.newuser.description',
             discountType: 'fixed',
             discountValue: 100000,
             minOrder: 300000,
@@ -50,8 +52,8 @@ const VoucherModal = ({ visible, onClose, onApply, totalAmount }) => {
         },
         {
             code: 'GIAM20',
-            title: 'Giảm 20%',
-            description: 'Giảm 20% tối đa 200K cho đơn từ 1 triệu',
+            titleKey: 'checkout.voucherModal.vouchers.giam20.title',
+            descriptionKey: 'checkout.voucherModal.vouchers.giam20.description',
             discountType: 'percent',
             discountValue: 20,
             minOrder: 1000000,
@@ -61,17 +63,18 @@ const VoucherModal = ({ visible, onClose, onApply, totalAmount }) => {
     ]
 
     const formatPrice = (price) => {
-        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
+        const locale = language === 'vi' ? 'vi-VN' : 'en-US'
+        return new Intl.NumberFormat(locale, { style: 'currency', currency: 'VND' }).format(price)
     }
 
     const checkVoucherValidity = (voucher) => {
         if (totalAmount < voucher.minOrder) {
             return {
                 valid: false,
-                message: `Đơn hàng tối thiểu ${formatPrice(voucher.minOrder)}`
+                message: t('checkout.voucherModal.minimumOrder', { amount: formatPrice(voucher.minOrder) })
             }
         }
-        return { valid: true, message: 'Có thể áp dụng' }
+        return { valid: true, message: t('checkout.voucherModal.available') }
     }
 
     const calculateDiscount = (voucher) => {
@@ -99,7 +102,7 @@ const VoucherModal = ({ visible, onClose, onApply, totalAmount }) => {
         const voucher = availableVouchers.find(v => v.code === voucherCode.toUpperCase())
         
         if (!voucher) {
-            message.error('Mã voucher không tồn tại!')
+            message.error(t('checkout.voucherModal.invalidCode'))
             return
         }
 
@@ -110,20 +113,20 @@ const VoucherModal = ({ visible, onClose, onApply, totalAmount }) => {
         }
 
         const discount = calculateDiscount(voucher)
-        message.success(`Áp dụng voucher thành công! Giảm ${formatPrice(discount)}`)
-        onApply({ ...voucher, appliedDiscount: discount })
+        message.success(t('checkout.voucherModal.applySuccess', { amount: formatPrice(discount) }))
+        onApply({ ...voucher, title: t(voucher.titleKey), appliedDiscount: discount })
         onClose()
     }
 
     const handleApply = () => {
         if (!selectedVoucher) {
-            message.warning('Vui lòng chọn hoặc nhập mã voucher!')
+            message.warning(t('checkout.voucherModal.selectOrEnterWarning'))
             return
         }
         
         const discount = calculateDiscount(selectedVoucher)
-        message.success(`Áp dụng voucher thành công! Giảm ${formatPrice(discount)}`)
-        onApply({ ...selectedVoucher, appliedDiscount: discount })
+        message.success(t('checkout.voucherModal.applySuccess', { amount: formatPrice(discount) }))
+        onApply({ ...selectedVoucher, title: t(selectedVoucher.titleKey), appliedDiscount: discount })
         onClose()
     }
 
@@ -132,7 +135,7 @@ const VoucherModal = ({ visible, onClose, onApply, totalAmount }) => {
             title={
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <GiftOutlined style={{ fontSize: 20, color: '#ff4d4f' }} />
-                    <span>Chọn mã giảm giá</span>
+                    <span>{t('checkout.voucherModal.title')}</span>
                 </div>
             }
             open={visible}
@@ -145,16 +148,16 @@ const VoucherModal = ({ visible, onClose, onApply, totalAmount }) => {
                 {/* Input nhập mã */}
                 <div style={{ marginBottom: 20 }}>
                     <Input.Search
-                        placeholder="Nhập mã voucher"
+                        placeholder={t('checkout.voucherModal.inputPlaceholder')}
                         value={voucherCode}
                         onChange={(e) => setVoucherCode(e.target.value.toUpperCase())}
                         onSearch={handleApplyCode}
-                        enterButton="Áp dụng"
+                        enterButton={t('checkout.voucherModal.applyButton')}
                         size="large"
                     />
                 </div>
 
-                <Divider style={{ margin: '16px 0' }}>Hoặc chọn voucher có sẵn</Divider>
+                <Divider style={{ margin: '16px 0' }}>{t('checkout.voucherModal.orChooseAvailable')}</Divider>
 
                 {/* Danh sách voucher */}
                 <div style={{ maxHeight: 400, overflowY: 'auto' }}>
@@ -205,7 +208,7 @@ const VoucherModal = ({ visible, onClose, onApply, totalAmount }) => {
                                                 fontSize: 15,
                                                 color: validity.valid ? '#000' : '#999'
                                             }}>
-                                                {voucher.title}
+                                                {t(voucher.titleKey)}
                                             </span>
                                             <Tag 
                                                 color={validity.valid ? 'success' : 'default'}
@@ -220,7 +223,7 @@ const VoucherModal = ({ visible, onClose, onApply, totalAmount }) => {
                                             color: '#666',
                                             marginBottom: 8
                                         }}>
-                                            {voucher.description}
+                                            {t(voucher.descriptionKey)}
                                         </div>
 
                                         <div style={{ 
@@ -231,7 +234,7 @@ const VoucherModal = ({ visible, onClose, onApply, totalAmount }) => {
                                             <Space size={4} split="|">
                                                 {voucher.minOrder > 0 && (
                                                     <span style={{ fontSize: 12, color: '#999' }}>
-                                                        Đơn tối thiểu {formatPrice(voucher.minOrder)}
+                                                        {t('checkout.voucherModal.minimumOrder', { amount: formatPrice(voucher.minOrder) })}
                                                     </span>
                                                 )}
                                                 {validity.valid && (
@@ -240,7 +243,7 @@ const VoucherModal = ({ visible, onClose, onApply, totalAmount }) => {
                                                         color: '#ff4d4f',
                                                         fontWeight: 600
                                                     }}>
-                                                        <PercentageOutlined /> Giảm {formatPrice(discount)}
+                                                        <PercentageOutlined /> {t('checkout.voucherModal.discountAmount', { amount: formatPrice(discount) })}
                                                     </span>
                                                 )}
                                             </Space>
@@ -272,7 +275,7 @@ const VoucherModal = ({ visible, onClose, onApply, totalAmount }) => {
                         fontWeight: 600
                     }}
                 >
-                    Áp dụng
+                    {t('checkout.voucherModal.applyButton')}
                 </Button>
             </div>
         </Modal>

@@ -23,7 +23,7 @@ const AdminInventory = () => {
             });
             setInventory(res.data.data);
         } catch (e) {
-            message.error('Lỗi tải kho hàng');
+            message.error('Failed to load inventory');
         }
         setLoading(false);
     };
@@ -54,10 +54,10 @@ const AdminInventory = () => {
                     Authorization: `Bearer ${user.access_token}`
                 }
             });
-            message.success('Cập nhật thành công');
+            message.success('Inventory updated successfully');
             fetchInventory();
         } catch (e) {
-            message.error('Lỗi cập nhật kho');
+            message.error('Failed to update inventory');
         }
         setEditId(null);
         setLoading(false);
@@ -65,19 +65,19 @@ const AdminInventory = () => {
 
     const columns = [
         {
-            title: 'Tên sản phẩm',
+            title: 'Product name',
             dataIndex: 'name',
             key: 'name',
             width: '30%',
         },
         {
-            title: 'Loại',
+            title: 'Category',
             dataIndex: 'type',
             key: 'type',
             width: '20%',
         },
         {
-            title: 'Số lượng tồn kho',
+            title: 'In-stock quantity',
             dataIndex: 'countInStock',
             key: 'countInStock',
             width: '20%',
@@ -90,18 +90,18 @@ const AdminInventory = () => {
             )
         },
         {
-            title: 'Hành động',
+            title: 'Actions',
             key: 'action',
             width: '20%',
             render: (_, record) => (
                 <WrapperAction>
                     {editId === record._id ? (
                         <>
-                            <Button type="primary" icon={<SaveOutlined />} onClick={() => handleSave(record._id)} size="small">Lưu</Button>
-                            <Button icon={<CloseOutlined />} onClick={() => setEditId(null)} size="small">Hủy</Button>
+                            <Button type="primary" icon={<SaveOutlined />} onClick={() => handleSave(record._id)} size="small">Save</Button>
+                            <Button icon={<CloseOutlined />} onClick={() => setEditId(null)} size="small">Cancel</Button>
                         </>
                     ) : (
-                        <Button icon={<EditOutlined />} onClick={() => handleEdit(record._id, 0)} size="small">Nhập/Xuất kho</Button>
+                        <Button icon={<EditOutlined />} onClick={() => handleEdit(record._id, 0)} size="small">Adjust stock</Button>
                     )}
                 </WrapperAction>
             )
@@ -110,7 +110,7 @@ const AdminInventory = () => {
 
     return (
         <WrapperContainer>
-            <WrapperHeader>Quản lý kho hàng</WrapperHeader>
+            <WrapperHeader>Inventory Management</WrapperHeader>
             <WrapperTable>
                 <Table
                     columns={columns}

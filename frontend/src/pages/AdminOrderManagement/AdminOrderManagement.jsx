@@ -21,7 +21,6 @@ import {
     Spin
 } from 'antd'
 import {
-    ArrowLeftOutlined,
     ClockCircleOutlined,
     CheckCircleOutlined,
     TruckOutlined,
@@ -34,7 +33,6 @@ import {
     ShoppingCartOutlined
 } from '@ant-design/icons'
 import { useSelector, useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
 import socketService from '../../service/SocketService'
 import { updateOrderStatus, updatePaymentStatus, cancelOrder, deleteOrderPermanently, syncOrdersFromAPI, restoreOrderForUser, clearOrders } from '../../redux/slides/orderSlice'
 import { message } from 'antd'
@@ -57,7 +55,6 @@ const AdminOrderManagement = () => {
     const orders = useSelector((state) => state.order.orders)
     const user = useSelector((state) => state.user)
     const dispatch = useDispatch()
-    const navigate = useNavigate()
 
     // Load orders function
     const loadOrders = useCallback(async () => {
@@ -517,12 +514,6 @@ const AdminOrderManagement = () => {
     return (
         <WrapperContainer>
             <WrapperHeader>
-                <Button
-                    icon={<ArrowLeftOutlined />}
-                    onClick={() => navigate('/system/admin')}
-                >
-                    {t('adminOrders.backAdmin')}
-                </Button>
                 <h2>{t('adminOrders.title')}</h2>
             </WrapperHeader>
 
