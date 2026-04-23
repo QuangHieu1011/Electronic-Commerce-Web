@@ -89,10 +89,10 @@ const createOrUpdateReview = async ({ productId, userId, rating, comment, images
 
     const cleanedImages = Array.isArray(images)
         ? images
-              .filter((url) => typeof url === 'string')
-              .map((url) => url.trim())
-              .filter((url) => url.length > 0)
-              .slice(0, 5)
+            .filter((url) => typeof url === 'string')
+            .map((url) => url.trim())
+            .filter((url) => url.length > 0)
+            .slice(0, 5)
         : [];
 
     const savedReview = await Review.findOneAndUpdate(
@@ -144,8 +144,8 @@ const getReviewsByProduct = async ({
     const safeLimit = Math.min(Math.max(Number(limit) || 6, 1), 20);
     const safeRatings = Array.isArray(ratings)
         ? [...new Set(ratings.map((item) => Number(item)))].filter(
-              (item) => Number.isInteger(item) && item >= 1 && item <= 5
-          )
+            (item) => Number.isInteger(item) && item >= 1 && item <= 5
+        )
         : [];
 
     const reviewQuery = { product: productId };
@@ -219,7 +219,119 @@ const getReviewsByProduct = async ({
     };
 };
 
+const getAdminReviews = async ({ page = 1, limit = 10, search = '', rating = '' }) => {
+    const safePage = Math.max(Number(page) || 1, 1);
+    const safeLimit = Math.min(Math.max(Number(limit) || 10, 1), 50);
+
+    const query = {};
+
+    // Nếu có search thì tìm product ID trước, rồi lọc review theo product ID đó
+    if (search) {
+        const matchingProducts = await Product.find(
+            { name: { $regex: search, $options: 'i' } },
+            '_id'
+        ).lean();
+        query.product = { $in: matchingProducts.map((p) => p._id) };
+    }
+
+    if (rating && Number(rating) >= 1 && Number(rating) <= 5) {
+        query.rating = Number(rating);
+    }
+
+    const [total, reviews] = await Promise.all([
+        Review.countDocuments(query),
+        Review.find(query)
+            .populate('product', 'name image')
+            .populate('user', 'name email avatar')
+            .sort({ createdAt: -1 })
+            .skip((safePage - 1) * safeLimit)
+            .limit(safeLimit)
+            .lean()
+    ]);
+
+    return {
+        status: 'OK',
+        message: 'SUCCESS',
+        data: reviews,
+        pagination: {
+            pageCurrent: safePage,
+            limit: safeLimit,
+            total,
+            totalPages: Math.ceil(total / safeLimit)
+        }
+    };
+};
+
+const getProductReviewStats = async ({ page = 1, limit = 10, sort = 'rating' }) => {
+    const safePage = Math.max(Number(page) || 1, 1);
+    const safeLimit = Math.min(Math.max(Number(limit) || 10, 1), 50);
+
+    const sortField = sort === 'totalReviews' ? 'totalReviews' : 'averageRating';
+
+    // Group theo product để tính thống kê
+    const grouped = await Review.aggregate([
+        {
+            $group: {
+                _id: '$product',
+                averageRating: { $avg: '$rating' },
+                totalReviews: { $sum: 1 },
+                star5: { $sum: { $cond: [{ $eq: ['$rating', 5] }, 1, 0] } },
+                star4: { $sum: { $cond: [{ $eq: ['$rating', 4] }, 1, 0] } },
+                star3: { $sum: { $cond: [{ $eq: ['$rating', 3] }, 1, 0] } },
+                star2: { $sum: { $cond: [{ $eq: ['$rating', 2] }, 1, 0] } },
+                star1: { $sum: { $cond: [{ $eq: ['$rating', 1] }, 1, 0] } }
+            }
+        },
+        { $sort: { [sortField]: -1 } }
+    ]);
+
+    const total = grouped.length;
+    const paged = grouped.slice((safePage - 1) * safeLimit, safePage * safeLimit);
+
+    // Lấy thông tin product bằng find().lean() bình thường
+    const productIds = paged.map((item) => item._id);
+    const products = await Product.find({ _id: { $in: productIds } }, 'name image type price').lean();
+    const productMap = {};
+    products.forEach((p) => { productMap[String(p._id)] = p; });
+
+    const data = paged.map((item) => ({
+        ...item,
+        averageRating: Number((item.averageRating || 0).toFixed(1)),
+        productInfo: productMap[String(item._id)] || null
+    }));
+
+    return {
+        status: 'OK',
+        message: 'SUCCESS',
+        data,
+        pagination: {
+            pageCurrent: safePage,
+            limit: safeLimit,
+            total,
+            totalPages: Math.ceil(total / safeLimit)
+        }
+    };
+};
+
+const deleteReview = async (reviewId) => {
+    const review = await Review.findById(reviewId);
+    if (!review) {
+        return { status: 'ERR', message: 'Đánh giá không tồn tại' };
+    }
+
+    const productId = review.product;
+    await Review.findByIdAndDelete(reviewId);
+
+    const summary = await buildReviewSummary(productId);
+    await Product.findByIdAndUpdate(productId, { rating: summary.averageRating });
+
+    return { status: 'OK', message: 'Xóa đánh giá thành công' };
+};
+
 module.exports = {
     createOrUpdateReview,
-    getReviewsByProduct
+    getReviewsByProduct,
+    getAdminReviews,
+    getProductReviewStats,
+    deleteReview
 };

@@ -14,9 +14,9 @@ const parseRatings = (value) => {
     const rawValues = Array.isArray(value)
         ? value
         : String(value)
-              .split(',')
-              .map((item) => item.trim())
-              .filter(Boolean);
+            .split(',')
+            .map((item) => item.trim())
+            .filter(Boolean);
 
     const uniqueRatings = [...new Set(rawValues.map((item) => Number(item)))].filter(
         (rating) => Number.isInteger(rating) && rating >= 1 && rating <= 5
@@ -109,7 +109,44 @@ const getReviewsByProduct = async (req, res) => {
     }
 };
 
+const getAdminReviews = async (req, res) => {
+    try {
+        const { page = 1, limit = 10, search = '', rating = '' } = req.query;
+        const response = await ReviewService.getAdminReviews({ page, limit, search, rating });
+        return res.status(200).json(response);
+    } catch (e) {
+        return res.status(500).json({ status: 'ERR', message: e.message || e });
+    }
+};
+
+const getProductReviewStats = async (req, res) => {
+    try {
+        const { page = 1, limit = 10, sort = 'rating' } = req.query;
+        const response = await ReviewService.getProductReviewStats({ page, limit, sort });
+        return res.status(200).json(response);
+    } catch (e) {
+        return res.status(500).json({ status: 'ERR', message: e.message || e });
+    }
+};
+
+const deleteReview = async (req, res) => {
+    try {
+        const { reviewId } = req.params;
+        if (!reviewId) {
+            return res.status(400).json({ status: 'ERR', message: 'Review ID is required' });
+        }
+        const response = await ReviewService.deleteReview(reviewId);
+        const statusCode = response.status === 'ERR' ? 404 : 200;
+        return res.status(statusCode).json(response);
+    } catch (e) {
+        return res.status(500).json({ status: 'ERR', message: e.message || e });
+    }
+};
+
 module.exports = {
     createReview,
-    getReviewsByProduct
+    getReviewsByProduct,
+    getAdminReviews,
+    getProductReviewStats,
+    deleteReview
 };

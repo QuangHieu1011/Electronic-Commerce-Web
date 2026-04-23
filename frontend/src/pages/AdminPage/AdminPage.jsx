@@ -1,11 +1,12 @@
 import { Menu } from 'antd'
 import React, { useState } from 'react'
 import { getItem } from '../../utils';
-import { UserOutlined, AppstoreOutlined, ShoppingCartOutlined } from '@ant-design/icons';
+import { UserOutlined, AppstoreOutlined, ShoppingCartOutlined, StarOutlined } from '@ant-design/icons';
 import HeaderComponent from '../../components/HeaderComponent/HeaderComponent';
 import AdminUser from '../../components/AdminUser/AdminUser';
 import AdminProduct from '../../components/AdminProduct/AdminProduct';
 import AdminInventory from '../../components/AdminInventory/AdminInventory';
+import AdminReview from '../../components/AdminReview/AdminReview';
 import { useNavigate } from 'react-router-dom';
 
 const AdminPage = () => {
@@ -15,6 +16,7 @@ const AdminPage = () => {
         getItem('Sản Phẩm', 'product', <AppstoreOutlined />),
         getItem('Quản lý đơn hàng', 'orders', <ShoppingCartOutlined />),
         getItem('Quản lý kho', 'inventory', <AppstoreOutlined />),
+        getItem('Đánh giá sản phẩm', 'reviews', <StarOutlined />),
     ];
 
     const [keySelected, setKeySelected] = useState('');
@@ -30,6 +32,8 @@ const AdminPage = () => {
                 return null;
             case 'inventory':
                 return (<AdminInventory />);
+            case 'reviews':
+                return (<AdminReview />);
             default:
                 return <></>;
         }
