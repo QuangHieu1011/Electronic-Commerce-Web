@@ -1,5 +1,5 @@
 import { Menu } from 'antd'
-import React, { useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { getItem } from '../../utils';
 import { UserOutlined, AppstoreOutlined, ShoppingCartOutlined, StarOutlined } from '@ant-design/icons';
 import HeaderComponent from '../../components/HeaderComponent/HeaderComponent';
@@ -7,19 +7,43 @@ import AdminUser from '../../components/AdminUser/AdminUser';
 import AdminProduct from '../../components/AdminProduct/AdminProduct';
 import AdminInventory from '../../components/AdminInventory/AdminInventory';
 import AdminReview from '../../components/AdminReview/AdminReview';
-import { useNavigate } from 'react-router-dom';
+import AdminOrderManagement from '../AdminOrderManagement/AdminOrderManagement';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useLanguage } from '../../context/LanguageContext';
 
 const AdminPage = () => {
+    const location = useLocation();
     const navigate = useNavigate();
+    const { language, setLanguage } = useLanguage();
+
+    const getInitialTab = () => {
+        const params = new URLSearchParams(location.search);
+        const tabFromQuery = params.get('tab');
+        if (tabFromQuery) return tabFromQuery;
+        if (location.pathname === '/admin/orders') return 'orders';
+        return 'user';
+    };
+
     const items = [
-        getItem('Người Dùng', 'user', <UserOutlined />),
-        getItem('Sản Phẩm', 'product', <AppstoreOutlined />),
-        getItem('Quản lý đơn hàng', 'orders', <ShoppingCartOutlined />),
-        getItem('Quản lý kho', 'inventory', <AppstoreOutlined />),
-        getItem('Đánh giá sản phẩm', 'reviews', <StarOutlined />),
+        getItem('Users', 'user', <UserOutlined />),
+        getItem('Products', 'product', <AppstoreOutlined />),
+        getItem('Orders', 'orders', <ShoppingCartOutlined />),
+        getItem('Inventory', 'inventory', <AppstoreOutlined />),
+        getItem('Reviews', 'reviews', <StarOutlined />),
     ];
 
-    const [keySelected, setKeySelected] = useState('');
+    const [keySelected, setKeySelected] = useState(getInitialTab());
+
+    useEffect(() => {
+        if (language !== 'en') {
+            setLanguage('en');
+        }
+    }, [language, setLanguage]);
+
+    useEffect(() => {
+        const nextTab = getInitialTab();
+        setKeySelected(nextTab);
+    }, [location.pathname, location.search]);
 
     const renderPage = (key) => {
         switch (key) {
@@ -28,38 +52,47 @@ const AdminPage = () => {
             case 'product':
                 return (<AdminProduct />);
             case 'orders':
-                navigate('/admin/orders');
-                return null;
+                return (<AdminOrderManagement />);
             case 'inventory':
                 return (<AdminInventory />);
             case 'reviews':
                 return (<AdminReview />);
             default:
-                return <></>;
+                return (<AdminUser />);
         }
     }
 
+    const activeTitle = useMemo(() => {
+        const current = items.find((item) => item.key === keySelected);
+        return current?.label || 'Users';
+    }, [items, keySelected]);
 
     const handleOnClick = ({ key }) => {
         setKeySelected(key);
+        navigate(`/system/admin?tab=${key}`, { replace: true });
     }
-    console.log('keySelected', keySelected)
 
     return (
         <>
             <HeaderComponent isHiddenSearch isHiddenCart />
-            <div style={{ display: 'flex' }} >
+            <div style={{ display: 'flex', minHeight: 'calc(100vh - 72px)', background: '#f5f7fb' }}>
                 <Menu
                     mode="inline"
                     style={{
                         width: 256,
-                        boxShadow: '2px 0 6px #ccc',
-                        height: '100vh',
+                        boxShadow: '2px 0 12px rgba(15, 23, 42, 0.08)',
+                        minHeight: 'calc(100vh - 72px)',
+                        borderRight: 0,
+                        paddingTop: 12,
                     }}
                     items={items}
+                    selectedKeys={[keySelected]}
                     onClick={handleOnClick}
                 />
-                <div style={{ flex: 1, padding: '15px' }}>
+                <div style={{ flex: 1, padding: '20px 24px' }}>
+                    <div style={{ marginBottom: 12, fontSize: 22, fontWeight: 700, color: '#0f172a' }}>
+                        {activeTitle} Management
+                    </div>
                     {renderPage(keySelected)}
                 </div>
             </div>

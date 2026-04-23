@@ -31,6 +31,7 @@ import * as OrderService from '../../service/OrderService'
 import { formatPrice } from '../../utils'
 import PayPalPaymentModal from '../../components/PaymentModal/PayPalPaymentModal'
 import VoucherModal from '../../components/PaymentModal/VoucherModal'
+import { useLanguage } from '../../context/LanguageContext'
 import {
     WrapperContainer,
     WrapperHeader,
@@ -54,6 +55,7 @@ const CheckoutPage = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const location = useLocation()
+    const { t } = useLanguage()
 
     // Calculate discounted price
     const calculateDiscountedPrice = (product) => {
@@ -78,7 +80,7 @@ const CheckoutPage = () => {
 
         // Nếu chưa đăng nhập, redirect về trang đăng nhập
         if (!user?.access_token) {
-            message.warning('Vui lòng đăng nhập để đặt hàng!')
+            message.warning(t('checkout.loginRequired'))
             navigate('/sign-in', {
                 state: {
                     from: '/checkout',
@@ -154,7 +156,7 @@ const CheckoutPage = () => {
     // Xóa voucher
     const handleRemoveVoucher = () => {
         setAppliedVoucher(null)
-        message.info('Đã xóa voucher')
+        message.info(t('checkout.voucherRemoved'))
     }
 
     // Xử lý thanh toán thành công từ PayPal
@@ -327,9 +329,9 @@ const CheckoutPage = () => {
 
                     // Thông báo thành công
                     if (isPaid) {
-                        message.success('Đặt hàng và thanh toán PayPal thành công!')
+                        message.success(t('checkout.paypalOrderSuccess'))
                     } else {
-                        message.success('Đặt hàng thành công!')
+                        message.success(t('checkout.orderSuccess'))
                     }
 
                     // Lưu order vào Redux với dữ liệu từ server (có _id)
@@ -348,8 +350,8 @@ const CheckoutPage = () => {
                     // Hiển thị thông báo thành công
                     const orderCode = response.data?._id?.slice(-8).toUpperCase() || 'N/A'
                     const successMessage = isPaid
-                        ? `🎉 Thanh toán PayPal và đặt hàng thành công! Mã đơn hàng: #${orderCode}`
-                        : `🎉 Đặt hàng thành công! Mã đơn hàng: #${orderCode}`
+                        ? t('checkout.paypalOrderSuccessWithCode', { orderCode })
+                        : t('checkout.orderSuccessWithCode', { orderCode })
 
                     message.success(successMessage, 2)
 
@@ -371,7 +373,7 @@ const CheckoutPage = () => {
                 selectedProducts.forEach(item => {
                     dispatch(removeFromCart({ productId: item.product._id }))
                 })
-                message.success('Đặt hàng thành công (chưa đăng nhập)!')
+                message.success(t('checkout.orderSuccessGuest'))
                 navigate('/order-tracking')
             }
 
@@ -380,7 +382,7 @@ const CheckoutPage = () => {
 
             // Nếu là PayPal đã thanh toán thành công, vẫn chuyển trang
             if (isPaid && orderData) {
-                message.warning('PayPal thanh toán thành công nhưng có lỗi lưu order. Vui lòng liên hệ hỗ trợ.')
+                message.warning(t('checkout.paypalPaidButSaveError'))
 
                 // Vẫn lưu local và chuyển trang
                 dispatch(createOrder(orderData))
@@ -392,7 +394,7 @@ const CheckoutPage = () => {
                     navigate('/order-tracking')
                 }, 1000)
             } else {
-                message.error('Có lỗi xảy ra khi đặt hàng: ' + (error.response?.data?.message || error.message))
+                message.error(t('checkout.orderErrorPrefix') + (error.response?.data?.message || error.message || t('checkout.unknownError')))
             }
         } finally {
             setLoading(false)
@@ -407,9 +409,9 @@ const CheckoutPage = () => {
                         icon={<ArrowLeftOutlined />}
                         onClick={() => navigate('/order')}
                     >
-                        Quay lại
+                        {t('checkout.back')}
                     </Button>
-                    <Title level={3}>Không có sản phẩm để thanh toán</Title>
+                    <Title level={3}>{t('checkout.emptyTitle')}</Title>
                 </WrapperHeader>
             </WrapperContainer>
         )
@@ -422,9 +424,9 @@ const CheckoutPage = () => {
                     icon={<ArrowLeftOutlined />}
                     onClick={() => navigate('/order')}
                 >
-                    Quay lại giỏ hàng
+                    {t('checkout.backToCart')}
                 </Button>
-                <Title level={3}>Thanh toán đơn hàng</Title>
+                <Title level={3}>{t('checkout.pageTitle')}</Title>
             </WrapperHeader>
 
             <WrapperContent>
@@ -444,27 +446,27 @@ const CheckoutPage = () => {
                         >
                             {/* Thông tin giao hàng */}
                             <WrapperSection>
-                                <Title level={4}>Thông tin giao hàng</Title>
+                                <Title level={4}>{t('checkout.shippingInfoTitle')}</Title>
                                 <Row gutter={16}>
                                     <Col span={12}>
                                         <Form.Item
-                                            label="Họ và tên"
+                                            label={t('checkout.fullName')}
                                             name="fullName"
-                                            rules={[{ required: true, message: 'Vui lòng nhập họ tên!' }]}
+                                            rules={[{ required: true, message: t('checkout.fullNameRequired') }]}
                                         >
-                                            <Input placeholder="Nhập họ và tên" />
+                                            <Input placeholder={t('checkout.fullNamePlaceholder')} />
                                         </Form.Item>
                                     </Col>
                                     <Col span={12}>
                                         <Form.Item
-                                            label="Số điện thoại"
+                                            label={t('checkout.phone')}
                                             name="phone"
                                             rules={[
-                                                { required: true, message: 'Vui lòng nhập số điện thoại!' },
-                                                { pattern: /^[0-9]{10,11}$/, message: 'Số điện thoại không hợp lệ!' }
+                                                { required: true, message: t('checkout.phoneRequired') },
+                                                { pattern: /^[0-9]{10,11}$/, message: t('checkout.phoneInvalid') }
                                             ]}
                                         >
-                                            <Input placeholder="Nhập số điện thoại" />
+                                            <Input placeholder={t('checkout.phonePlaceholder')} />
                                         </Form.Item>
                                     </Col>
                                 </Row>
@@ -472,12 +474,12 @@ const CheckoutPage = () => {
                                 <Row gutter={16}>
                                     <Col span={8}>
                                         <Form.Item
-                                            label="Tỉnh/Thành phố"
+                                            label={t('checkout.province')}
                                             name="province"
-                                            rules={[{ required: true, message: 'Vui lòng chọn tỉnh/thành phố!' }]}
+                                            rules={[{ required: true, message: t('checkout.provinceRequired') }]}
                                         >
                                             <Select
-                                                placeholder="Chọn tỉnh/thành phố"
+                                                placeholder={t('checkout.provincePlaceholder')}
                                                 onChange={(value) => {
                                                     if (value === 'Hồ Chí Minh' || value === 'Hà Nội') {
                                                         setShippingFee(30000)
@@ -488,50 +490,50 @@ const CheckoutPage = () => {
                                                     }
                                                 }}
                                             >
-                                                <Option value="Hồ Chí Minh">TP. Hồ Chí Minh (30,000đ)</Option>
-                                                <Option value="Hà Nội">Hà Nội (30,000đ)</Option>
-                                                <Option value="Đà Nẵng">Đà Nẵng (50,000đ)</Option>
-                                                <Option value="Cần Thơ">Cần Thơ (50,000đ)</Option>
-                                                <Option value="Khác">Tỉnh khác (70,000đ)</Option>
+                                                <Option value="Hồ Chí Minh">{t('checkout.provinceHCM')}</Option>
+                                                <Option value="Hà Nội">{t('checkout.provinceHN')}</Option>
+                                                <Option value="Đà Nẵng">{t('checkout.provinceDN')}</Option>
+                                                <Option value="Cần Thơ">{t('checkout.provinceCT')}</Option>
+                                                <Option value="Khác">{t('checkout.provinceOther')}</Option>
                                             </Select>
                                         </Form.Item>
                                     </Col>
                                     <Col span={8}>
                                         <Form.Item
-                                            label="Quận/Huyện"
+                                            label={t('checkout.district')}
                                             name="district"
-                                            rules={[{ required: true, message: 'Vui lòng nhập quận/huyện!' }]}
+                                            rules={[{ required: true, message: t('checkout.districtRequired') }]}
                                         >
-                                            <Input placeholder="Nhập quận/huyện" />
+                                            <Input placeholder={t('checkout.districtPlaceholder')} />
                                         </Form.Item>
                                     </Col>
                                     <Col span={8}>
                                         <Form.Item
-                                            label="Phường/Xã"
+                                            label={t('checkout.ward')}
                                             name="ward"
-                                            rules={[{ required: true, message: 'Vui lòng nhập phường/xã!' }]}
+                                            rules={[{ required: true, message: t('checkout.wardRequired') }]}
                                         >
-                                            <Input placeholder="Nhập phường/xã" />
+                                            <Input placeholder={t('checkout.wardPlaceholder')} />
                                         </Form.Item>
                                     </Col>
                                 </Row>
 
                                 <Form.Item
-                                    label="Địa chỉ cụ thể"
+                                    label={t('checkout.address')}
                                     name="address"
-                                    rules={[{ required: true, message: 'Vui lòng nhập địa chỉ!' }]}
+                                    rules={[{ required: true, message: t('checkout.addressRequired') }]}
                                 >
-                                    <Input placeholder="Số nhà, tên đường..." />
+                                    <Input placeholder={t('checkout.addressPlaceholder')} />
                                 </Form.Item>
 
-                                <Form.Item label="Ghi chú" name="note">
-                                    <Input.TextArea placeholder="Ghi chú cho đơn hàng (không bắt buộc)" rows={3} />
+                                <Form.Item label={t('checkout.note')} name="note">
+                                    <Input.TextArea placeholder={t('checkout.notePlaceholder')} rows={3} />
                                 </Form.Item>
                             </WrapperSection>
 
                             {/* Hình thức thanh toán */}
                             <WrapperSection>
-                                <Title level={4}>Hình thức thanh toán</Title>
+                                <Title level={4}>{t('checkout.paymentMethodTitle')}</Title>
                                 <Radio.Group
                                     value={paymentMethod}
                                     onChange={(e) => setPaymentMethod(e.target.value)}
@@ -547,8 +549,8 @@ const CheckoutPage = () => {
                                                 <Space>
                                                     <WalletOutlined style={{ fontSize: 20, color: '#52c41a' }} />
                                                     <div>
-                                                        <div style={{ fontWeight: 600 }}>Thanh toán khi nhận hàng (COD)</div>
-                                                        <div style={{ fontSize: 12, color: '#666' }}>Thanh toán bằng tiền mặt khi nhận hàng</div>
+                                                        <div style={{ fontWeight: 600 }}>{t('checkout.codTitle')}</div>
+                                                        <div style={{ fontSize: 12, color: '#666' }}>{t('checkout.codDescription')}</div>
                                                     </div>
                                                 </Space>
                                             </Radio>
@@ -570,8 +572,8 @@ const CheckoutPage = () => {
                                                         PayPal
                                                     </div>
                                                     <div>
-                                                        <div style={{ fontWeight: 600 }}>Thanh toán PayPal</div>
-                                                        <div style={{ fontSize: 12, color: '#666' }}>Thẻ tín dụng, thẻ ghi nợ, PayPal Balance</div>
+                                                        <div style={{ fontWeight: 600 }}>{t('checkout.paypalTitle')}</div>
+                                                        <div style={{ fontSize: 12, color: '#666' }}>{t('checkout.paypalDescription')}</div>
                                                     </div>
                                                 </Space>
                                             </Radio>
@@ -595,7 +597,7 @@ const CheckoutPage = () => {
                                 }}
                             >
                                 <CheckCircleOutlined />
-                                Hoàn tất đơn hàng
+                                {t('checkout.completeOrder')}
                             </Button>
                         </Form>
                     </Col>
@@ -603,7 +605,7 @@ const CheckoutPage = () => {
                     {/* Cột phải - Tóm tắt đơn hàng */}
                     <Col span={8}>
                         <WrapperSummary>
-                            <Title level={4}>Tóm tắt đơn hàng</Title>
+                            <Title level={4}>{t('checkout.summaryTitle')}</Title>
 
                             {/* Danh sách sản phẩm */}
                             <div style={{ marginBottom: 16 }}>
@@ -629,7 +631,7 @@ const CheckoutPage = () => {
                                                 {item.product.name}
                                             </div>
                                             <div style={{ fontSize: 12, color: '#666' }}>
-                                                SL: {item.quantity} | Đơn giá: {formatPrice(calculateDiscountedPrice(item.product))}
+                                                {t('checkout.quantityShort')}: {item.quantity} | {t('checkout.unitPrice')}: {formatPrice(calculateDiscountedPrice(item.product))}
                                             </div>
                                         </div>
                                         <div style={{ fontSize: 14, fontWeight: 600, color: '#ff4d4f' }}>
@@ -660,11 +662,11 @@ const CheckoutPage = () => {
                                                 <span style={{ fontWeight: 600, fontSize: 13 }}>{appliedVoucher.title}</span>
                                             </div>
                                             <div style={{ fontSize: 12, color: '#666' }}>
-                                                Mã: {appliedVoucher.code} • Giảm {formatPrice(appliedVoucher.appliedDiscount)}
+                                                {t('checkout.codeLabel')}: {appliedVoucher.code} • {t('checkout.discountLabel')} {formatPrice(appliedVoucher.appliedDiscount)}
                                             </div>
                                             {appliedVoucher.code === 'LOYALTY10' && (
                                                 <div style={{ color: '#1890ff', fontWeight: 600, marginTop: 4 }}>
-                                                    🎉 Bạn là khách hàng thân thiết! Được giảm 10% toàn bộ đơn hàng.
+                                                    {t('checkout.loyaltyMessage')}
                                                 </div>
                                             )}
                                         </div>
@@ -688,7 +690,7 @@ const CheckoutPage = () => {
                                             color: '#ff4d4f'
                                         }}
                                     >
-                                        Chọn hoặc nhập mã giảm giá
+                                        {t('checkout.chooseVoucher')}
                                     </Button>
                                 )}
                             </div>
@@ -698,24 +700,24 @@ const CheckoutPage = () => {
                             {/* Tính tổng */}
                             <div style={{ fontSize: 14 }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                                    <span>Tạm tính ({selectedProducts.length} sản phẩm):</span>
+                                    <span>{t('checkout.subtotalWithCount', { count: selectedProducts.length })}</span>
                                     <span>{formatPrice(calculateProductTotal())}</span>
                                 </div>
                                 {isLoyalty && (
                                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                                        <span style={{ color: '#1890ff' }}>Giảm giá thân thiết (10%):</span>
+                                        <span style={{ color: '#1890ff' }}>{t('checkout.loyaltyDiscount')}</span>
                                         <span style={{ color: '#1890ff', fontWeight: 600 }}>- {formatPrice(loyaltyDiscount)}</span>
                                     </div>
                                 )}
                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                                    <span>Phí vận chuyển:</span>
+                                    <span>{t('checkout.shippingFee')}</span>
                                     <span style={{ textDecoration: appliedVoucher?.discountType === 'shipping' ? 'line-through' : 'none', color: appliedVoucher?.discountType === 'shipping' ? '#999' : '#000' }}>
                                         {formatPrice(shippingFee)}
                                     </span>
                                 </div>
                                 {appliedVoucher?.discountType === 'shipping' && (
                                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                                        <span style={{ color: '#52c41a' }}>Phí ship sau giảm:</span>
+                                        <span style={{ color: '#52c41a' }}>{t('checkout.shippingAfterDiscount')}</span>
                                         <span style={{ color: '#52c41a', fontWeight: 600 }}>
                                             {formatPrice(Math.max(0, shippingFee - appliedVoucher.appliedDiscount))}
                                         </span>
@@ -723,7 +725,7 @@ const CheckoutPage = () => {
                                 )}
                                 {appliedVoucher && appliedVoucher.discountType !== 'shipping' && (
                                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                                        <span style={{ color: '#52c41a' }}>Giảm giá:</span>
+                                        <span style={{ color: '#52c41a' }}>{t('checkout.discount')}</span>
                                         <span style={{ color: '#52c41a', fontWeight: 600 }}>
                                             - {formatPrice(appliedVoucher.appliedDiscount)}
                                         </span>
@@ -731,18 +733,18 @@ const CheckoutPage = () => {
                                 )}
                                 <Divider />
                                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 18, fontWeight: 600, color: '#ff4d4f' }}>
-                                    <span>Tổng cộng:</span>
+                                    <span>{t('checkout.total')}</span>
                                     <span>{formatPrice(calculateFinalAmount)}</span>
                                 </div>
                                 {(isLoyalty && loyaltyDiscount > 0) && (
                                     <div style={{ fontSize: 12, color: '#1890ff', marginTop: 8, textAlign: 'right' }}>
-                                        🎉 Bạn là khách hàng thân thiết! Được giảm 10% toàn bộ đơn hàng.<br />
-                                        Bạn đã tiết kiệm {formatPrice(loyaltyDiscount)}!
+                                        {t('checkout.loyaltyMessage')}<br />
+                                        {t('checkout.savedAmount', { amount: formatPrice(loyaltyDiscount) })}
                                     </div>
                                 )}
                                 {appliedVoucher && (
                                     <div style={{ fontSize: 12, color: '#52c41a', marginTop: 8, textAlign: 'right' }}>
-                                        Bạn đã tiết kiệm thêm {formatPrice(appliedVoucher.appliedDiscount)}!
+                                        {t('checkout.savedMoreAmount', { amount: formatPrice(appliedVoucher.appliedDiscount) })}
                                     </div>
                                 )}
                             </div>
