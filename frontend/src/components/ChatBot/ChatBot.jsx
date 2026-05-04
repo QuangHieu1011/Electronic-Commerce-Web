@@ -73,6 +73,73 @@ const ChatBot = () => {
     }
   };
 
+  const splitMessage = (text) => {
+    const lines = String(text || '')
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean);
+
+    const paragraphs = [];
+    const items = [];
+
+    lines.forEach((line) => {
+      if (line.startsWith('- ') || line.startsWith('• ')) {
+        items.push(line.replace(/^[-•]\s*/, ''));
+      } else {
+        paragraphs.push(line);
+      }
+    });
+
+    return { paragraphs, items };
+  };
+
+  const renderMessageContent = (msg) => {
+    if (msg.sender !== 'bot') {
+      return <p className="message-text">{msg.text}</p>;
+    }
+
+    const { paragraphs, items } = splitMessage(msg.text);
+
+    if (!paragraphs.length && !items.length) {
+      return <p className="message-text">{msg.text}</p>;
+    }
+
+    return (
+      <>
+        {paragraphs.map((paragraph, index) => (
+          <p key={`p-${index}`} className="message-text">{paragraph}</p>
+        ))}
+        {items.length > 0 && (
+          <ul className="message-list">
+            {items.map((item, index) => {
+              const columns = item.split('|').map((part) => part.trim()).filter(Boolean);
+              if (columns.length <= 1) {
+                return (
+                  <li key={`i-${index}`} className="message-list-item">
+                    <span className="message-list-title">{item}</span>
+                  </li>
+                );
+              }
+
+              return (
+                <li key={`i-${index}`} className="message-list-item">
+                  <div className="message-list-row">
+                    <span className="message-list-title">{columns[0]}</span>
+                    <div className="message-list-meta">
+                      {columns.slice(1).map((column, colIndex) => (
+                        <span key={`c-${index}-${colIndex}`} className="message-list-chip">{column}</span>
+                      ))}
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </>
+    );
+  };
+
   return (
     <>
       {/* Chat Bubble Button */}
@@ -103,7 +170,7 @@ const ChatBot = () => {
               <div key={index} className={`message ${msg.sender}`}>
                 {msg.sender === 'bot' && <span className="message-avatar">🤖</span>}
                 <div className="message-bubble">
-                  <p>{msg.text}</p>
+                  {renderMessageContent(msg)}
                   <span className="message-time">
                     {msg.timestamp.toLocaleTimeString(language === 'vi' ? 'vi-VN' : 'en-US', {
                       hour: '2-digit', 

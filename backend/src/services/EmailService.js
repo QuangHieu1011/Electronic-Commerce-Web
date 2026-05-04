@@ -1,5 +1,13 @@
 const nodemailer = require('nodemailer')
 
+const escapeHtml = (value) =>
+    String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+
 // Cấu hình email transporter - Hỗ trợ nhiều email provider
 const createTransporter = () => {
     const emailUser = process.env.EMAIL_USER || 'your-email@gmail.com'
@@ -105,6 +113,67 @@ const sendOTPEmail = async (email, otp, type = 'signup') => {
     }
 }
 
+const sendReviewModerationAlert = async ({
+    to,
+    reviewId,
+    productId,
+    productName,
+    userId,
+    rating,
+    comment,
+    score,
+    labels,
+    reason
+}) => {
+    try {
+        if (!to) {
+            return { success: false, error: 'Missing recipient' }
+        }
+
+        const transporter = createTransporter()
+        const fromEmail = process.env.EMAIL_USER || 'your-email@gmail.com'
+        const fromName = process.env.EMAIL_FROM_NAME || 'TechStore'
+
+        const safeComment = escapeHtml(comment)
+        const labelText = Array.isArray(labels) && labels.length ? labels.join(', ') : 'n/a'
+
+        const html = `
+            <div style="font-family: Arial, sans-serif; max-width: 680px; margin: 0 auto;">
+                <h2 style="color: #fa541c;">Canh bao review doc hai</h2>
+                <p>Mot review vua bi danh dau.</p>
+                <ul>
+                    <li><strong>Review ID:</strong> ${escapeHtml(reviewId)}</li>
+                    <li><strong>Product:</strong> ${escapeHtml(productName || '')} (${escapeHtml(productId)})</li>
+                    <li><strong>User ID:</strong> ${escapeHtml(userId)}</li>
+                    <li><strong>Rating:</strong> ${escapeHtml(rating)}</li>
+                    <li><strong>Score:</strong> ${escapeHtml(score)}</li>
+                    <li><strong>Labels:</strong> ${escapeHtml(labelText)}</li>
+                    <li><strong>Reason:</strong> ${escapeHtml(reason)}</li>
+                </ul>
+                <div style="background: #fafafa; border: 1px solid #f0f0f0; padding: 12px;">
+                    <pre style="margin: 0; white-space: pre-wrap;">${safeComment}</pre>
+                </div>
+            </div>
+        `
+
+        const mailOptions = {
+            from: `${fromName} <${fromEmail}>`,
+            to,
+            subject: 'Canh bao review doc hai',
+            html,
+            replyTo: process.env.EMAIL_REPLY_TO || fromEmail
+        }
+
+        const result = await transporter.sendMail(mailOptions)
+        console.log('Email sent successfully:', result.messageId)
+        return { success: true, messageId: result.messageId }
+    } catch (error) {
+        console.error('Error sending moderation email:', error)
+        return { success: false, error: error.message }
+    }
+}
+
 module.exports = {
-    sendOTPEmail
+    sendOTPEmail,
+    sendReviewModerationAlert
 }
