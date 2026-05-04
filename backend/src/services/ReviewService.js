@@ -235,7 +235,7 @@ const getReviewsByProduct = async ({
     };
 };
 
-const getAdminReviews = async ({ page = 1, limit = 10, search = '', rating = '' }) => {
+const getAdminReviews = async ({ page = 1, limit = 10, search = '', rating = '', flagged }) => {
     const safePage = Math.max(Number(page) || 1, 1);
     const safeLimit = Math.min(Math.max(Number(limit) || 10, 1), 50);
 
@@ -252,6 +252,12 @@ const getAdminReviews = async ({ page = 1, limit = 10, search = '', rating = '' 
 
     if (rating && Number(rating) >= 1 && Number(rating) <= 5) {
         query.rating = Number(rating);
+    }
+
+    if (flagged === true) {
+        query['moderation.isFlagged'] = true;
+    } else if (flagged === false) {
+        query['moderation.isFlagged'] = { $ne: true };
     }
 
     const [total, reviews] = await Promise.all([
