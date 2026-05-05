@@ -466,7 +466,7 @@ const AdminUser = (props) => {
 
 
             <Form.Item label={null} wrapperCol={{ offset: 20, span: 16 }}>
-              <Button type="primary" htmlType="submit">
+              <Button className="admin-save-btn" type="primary" htmlType="submit">
                 Apply
               </Button>
             </Form.Item>

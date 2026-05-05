@@ -122,6 +122,7 @@ const sendReviewModerationAlert = async ({
     rating,
     comment,
     score,
+    category,
     labels,
     reason
 }) => {
@@ -136,24 +137,88 @@ const sendReviewModerationAlert = async ({
 
         const safeComment = escapeHtml(comment)
         const labelText = Array.isArray(labels) && labels.length ? labels.join(', ') : 'n/a'
+        const categoryText = category ? String(category) : 'n/a'
+        const categoryValue = categoryText.toLowerCase()
+        const scoreNumber = Number(score)
+        const scoreText = Number.isFinite(scoreNumber) ? scoreNumber.toFixed(2) : String(score || 'n/a')
+
+        const badgeMap = {
+            toxic: { label: 'TOXIC', color: '#d92d20', bg: '#fff1f0', border: '#ffccc7' },
+            negative: { label: 'NEGATIVE', color: '#d48806', bg: '#fffbe6', border: '#ffe58f' },
+            clean: { label: 'CLEAN', color: '#237804', bg: '#f6ffed', border: '#b7eb8f' }
+        }
+        const badge = badgeMap[categoryValue] || badgeMap.toxic
 
         const html = `
-            <div style="font-family: Arial, sans-serif; max-width: 680px; margin: 0 auto;">
-                <h2 style="color: #fa541c;">Canh bao review doc hai</h2>
-                <p>Mot review vua bi danh dau.</p>
-                <ul>
-                    <li><strong>Review ID:</strong> ${escapeHtml(reviewId)}</li>
-                    <li><strong>Product:</strong> ${escapeHtml(productName || '')} (${escapeHtml(productId)})</li>
-                    <li><strong>User ID:</strong> ${escapeHtml(userId)}</li>
-                    <li><strong>Rating:</strong> ${escapeHtml(rating)}</li>
-                    <li><strong>Score:</strong> ${escapeHtml(score)}</li>
-                    <li><strong>Labels:</strong> ${escapeHtml(labelText)}</li>
-                    <li><strong>Reason:</strong> ${escapeHtml(reason)}</li>
-                </ul>
-                <div style="background: #fafafa; border: 1px solid #f0f0f0; padding: 12px;">
-                    <pre style="margin: 0; white-space: pre-wrap;">${safeComment}</pre>
-                </div>
-            </div>
+            <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#f3f4f6; padding: 24px 0; font-family: Arial, sans-serif;">
+                <tr>
+                    <td align="center">
+                        <table role="presentation" cellpadding="0" cellspacing="0" width="720" style="width: 720px; max-width: 95%; background:#ffffff; border:1px solid #e5e7eb; border-radius: 14px; overflow:hidden;">
+                            <tr>
+                                <td style="padding: 22px 28px; background:#0f172a; color:#ffffff;">
+                                    <div style="font-size: 16px; letter-spacing: 0.3px; font-weight: 700;">${escapeHtml(fromName)}</div>
+                                    <div style="font-size: 12px; opacity: 0.75; margin-top: 4px;">Review moderation alert</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 22px 28px;">
+                                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                                        <tr>
+                                            <td>
+                                                <span style="display:inline-block; padding:4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: 0.6px; color:${badge.color}; background:${badge.bg}; border:1px solid ${badge.border};">${badge.label}</span>
+                                            </td>
+                                            <td align="right" style="font-size: 12px; color:#6b7280;">Score: ${escapeHtml(scoreText)}</td>
+                                        </tr>
+                                    </table>
+
+                                    <div style="margin-top: 16px; border:1px solid #eef2f7; border-radius: 10px; overflow:hidden;">
+                                        <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="font-size: 13px;">
+                                            <tr style="background:#f9fafb;">
+                                                <td style="padding: 10px 14px; color:#6b7280; width: 140px;">Review ID</td>
+                                                <td style="padding: 10px 14px; color:#111827; font-weight: 600;">${escapeHtml(reviewId)}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 10px 14px; color:#6b7280;">Product</td>
+                                                <td style="padding: 10px 14px; color:#111827;">${escapeHtml(productName || '')} (${escapeHtml(productId)})</td>
+                                            </tr>
+                                            <tr style="background:#f9fafb;">
+                                                <td style="padding: 10px 14px; color:#6b7280;">User ID</td>
+                                                <td style="padding: 10px 14px; color:#111827;">${escapeHtml(userId)}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 10px 14px; color:#6b7280;">Rating</td>
+                                                <td style="padding: 10px 14px; color:#111827;">${escapeHtml(rating)}</td>
+                                            </tr>
+                                            <tr style="background:#f9fafb;">
+                                                <td style="padding: 10px 14px; color:#6b7280;">Category</td>
+                                                <td style="padding: 10px 14px; color:#111827;">${escapeHtml(categoryText)}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 10px 14px; color:#6b7280;">Labels</td>
+                                                <td style="padding: 10px 14px; color:#111827;">${escapeHtml(labelText)}</td>
+                                            </tr>
+                                            <tr style="background:#f9fafb;">
+                                                <td style="padding: 10px 14px; color:#6b7280;">Reason</td>
+                                                <td style="padding: 10px 14px; color:#111827;">${escapeHtml(reason)}</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+
+                                    <div style="margin-top: 18px; font-size: 12px; color:#6b7280;">Comment</div>
+                                    <div style="margin-top: 6px; background:#f8fafc; border:1px solid #e2e8f0; padding: 12px 14px; border-radius: 10px; color:#111827; line-height: 1.6; white-space: pre-wrap;">
+                                        ${safeComment}
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 14px 28px; background:#f9fafb; border-top:1px solid #e5e7eb; font-size: 12px; color:#6b7280;">
+                                    Review this content in the admin panel. If this is expected, no action is required.
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
         `
 
         const mailOptions = {

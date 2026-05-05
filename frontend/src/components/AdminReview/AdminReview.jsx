@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import {
     Table,
     Rate,
@@ -184,15 +184,24 @@ const AdminReview = () => {
                 if (!moderation) {
                     return <Tag color="default">Not scanned</Tag>;
                 }
+                const category = (moderation.category || (moderation.isFlagged ? 'toxic' : 'clean')).toLowerCase();
+                const score = Number.isFinite(moderation.score) ? moderation.score.toFixed(2) : '—';
+                const reason = moderation.reason ? ` • ${moderation.reason}` : '';
 
-                if (moderation.isFlagged) {
-                    const score = Number.isFinite(moderation.score) ? moderation.score.toFixed(2) : '—';
-                    const reason = moderation.reason ? ` • ${moderation.reason}` : '';
+                if (category === 'toxic') {
                     return (
-                        <Tooltip title={`Điểm: ${score}${reason}`}>
+                        <Tooltip title={`Score: ${score}${reason}`}>
                             <Tag color="red" icon={<ExclamationCircleOutlined />}>
                                 Toxic
                             </Tag>
+                        </Tooltip>
+                    );
+                }
+
+                if (category === 'negative') {
+                    return (
+                        <Tooltip title={`Score: ${score}${reason}`}>
+                            <Tag color="gold">Negative</Tag>
                         </Tooltip>
                     );
                 }

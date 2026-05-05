@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { Table, Button, InputNumber, message } from 'antd';
@@ -13,7 +13,7 @@ const AdminInventory = () => {
     const [editValue, setEditValue] = useState(0);
     const user = useSelector(state => state.user);
 
-    const fetchInventory = async () => {
+    const fetchInventory = useCallback(async () => {
         setLoading(true);
         try {
             const res = await axios.get('/api/product/inventory', {
@@ -26,7 +26,7 @@ const AdminInventory = () => {
             message.error('Failed to load inventory');
         }
         setLoading(false);
-    };
+    }, [user.access_token]);
 
     useEffect(() => {
         fetchInventory();
@@ -39,7 +39,7 @@ const AdminInventory = () => {
         return () => {
             socket.off('inventoryUpdate', handleInventoryUpdate);
         };
-    }, []);
+    }, [fetchInventory]);
 
     const handleEdit = (id, current) => {
         setEditId(id);
@@ -97,7 +97,7 @@ const AdminInventory = () => {
                 <WrapperAction>
                     {editId === record._id ? (
                         <>
-                            <Button type="primary" icon={<SaveOutlined />} onClick={() => handleSave(record._id)} size="small">Save</Button>
+                            <Button className="admin-save-btn" icon={<SaveOutlined />} onClick={() => handleSave(record._id)} size="small">Save</Button>
                             <Button icon={<CloseOutlined />} onClick={() => setEditId(null)} size="small">Cancel</Button>
                         </>
                     ) : (

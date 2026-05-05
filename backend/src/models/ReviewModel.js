@@ -8,6 +8,7 @@ const reviewSchema = new mongoose.Schema(
         comment: { type: String, required: true, trim: true, maxlength: 2000 },
         images: { type: [String], default: [] },
         moderation: {
+            category: { type: String },
             isFlagged: { type: Boolean },
             score: { type: Number, min: 0, max: 1 },
             labels: { type: [String] },

@@ -614,7 +614,7 @@ const AdminProduct = (props) => {
 
 
                         <Form.Item label={null} wrapperCol={{ offset: 20, span: 16 }}>
-                            <Button type="primary" htmlType="submit">
+                            <Button className="admin-save-btn" type="primary" htmlType="submit">
                                 Submit
                             </Button>
                         </Form.Item>
@@ -631,6 +631,11 @@ const AdminProduct = (props) => {
                         onFinish={onUpdateProduct}
                         autoComplete="on"
                         form={formDetails}
+                        onKeyDown={(event) => {
+                            if (event.key === 'Enter') {
+                                event.preventDefault();
+                            }
+                        }}
                     >
                         <Form.Item
                             label="Name"
@@ -701,11 +706,32 @@ const AdminProduct = (props) => {
 
 
 
-                        <Form.Item label={null} wrapperCol={{ offset: 20, span: 16 }}>
-                            <Button type="primary" htmlType="submit">
-                                Apply
+                        <div
+                            style={{
+                                position: 'sticky',
+                                bottom: 0,
+                                marginTop: 16,
+                                padding: '12px 0',
+                                background: '#fff',
+                                borderTop: '1px solid #eef2f7',
+                                display: 'flex',
+                                justifyContent: 'flex-end',
+                                gap: 10,
+                                zIndex: 1
+                            }}
+                        >
+                            <Button onClick={() => setIsOpenDrawer(false)}>
+                                Cancel
                             </Button>
-                        </Form.Item>
+                            <Button
+                                className="admin-save-btn"
+                                type="primary"
+                                htmlType="submit"
+                                style={{ minWidth: 120 }}
+                            >
+                                Save changes
+                            </Button>
+                        </div>
 
                     </Form>
                 </Loading>

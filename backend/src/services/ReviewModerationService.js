@@ -3,6 +3,7 @@ const EmailService = require('./EmailService');
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const DEFAULT_MODEL = 'openai/gpt-4o-mini';
 const DEFAULT_THRESHOLD = 0.7;
+const DEFAULT_NEGATIVE_THRESHOLD = 0.35;
 const MAX_COMMENT_LENGTH = 1000;
 
 const parseBoolean = (value) => {
@@ -23,6 +24,12 @@ const getThreshold = () => {
 
 const normalizeComment = (comment) =>
     String(comment || '').trim().slice(0, MAX_COMMENT_LENGTH);
+
+const normalizeCategory = (value) => {
+    const normalized = String(value || '').trim().toLowerCase();
+    if (['clean', 'negative', 'toxic'].includes(normalized)) return normalized;
+    return null;
+};
 
 const extractJson = (text) => {
     if (!text) return null;
@@ -71,8 +78,11 @@ const moderateReview = async ({
 
     const systemPrompt =
         'You are a content moderation classifier for product reviews. ' +
-        'Return ONLY strict JSON with keys: is_toxic (boolean), severity (number 0..1), ' +
-        'labels (array of strings), reason (string <= 120 chars).';
+        'Classify into one of: clean, negative, toxic. ' +
+        'Clean = neutral/praise. Negative = criticism without insults or harassment. ' +
+        'Toxic = insults, harassment, hate, threats, or abusive language. ' +
+        'Return ONLY strict JSON with keys: category (clean|negative|toxic), ' +
+        'severity (number 0..1), labels (array of strings), reason (string <= 120 chars).';
 
     const userPrompt = `Review: "${safeComment}"`;
 
@@ -112,10 +122,18 @@ const moderateReview = async ({
         const reason = typeof parsed.reason === 'string'
             ? parsed.reason.trim().slice(0, 120)
             : '';
-        const isToxic = Boolean(parsed.is_toxic);
-        const isFlagged = isToxic || severity >= getThreshold();
+        const modelCategory = normalizeCategory(parsed.category);
+        const threshold = getThreshold();
+        const fallbackCategory = severity >= threshold
+            ? 'toxic'
+            : severity >= DEFAULT_NEGATIVE_THRESHOLD
+                ? 'negative'
+                : 'clean';
+        const category = modelCategory || fallbackCategory;
+        const isFlagged = category === 'toxic';
 
         const moderation = {
+            category,
             isFlagged,
             score: severity,
             labels,
@@ -133,6 +151,7 @@ const moderateReview = async ({
                 rating,
                 comment: safeComment,
                 score: severity,
+                category,
                 labels,
                 reason
             });
