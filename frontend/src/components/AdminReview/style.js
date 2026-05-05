@@ -4,6 +4,14 @@ export const WrapperContainer = styled.div`
     padding: 24px;
     background: #f5f5f5;
     min-height: 100vh;
+
+    .review-flagged-row td {
+        background: #fff1f0;
+    }
+
+    .review-flagged-row:hover td {
+        background: #ffe7e6;
+    }
 `;
 
 export const WrapperHeader = styled.div`

@@ -156,6 +156,25 @@ body {
   animation: shimmer 2s infinite;
 }
 
+.admin-save-btn {
+  background: #1a94ff !important;
+  border-color: #1a94ff !important;
+  color: #fff !important;
+  font-weight: 600;
+  box-shadow: 0 8px 16px rgba(26, 148, 255, 0.2);
+}
+
+.admin-save-btn:hover,
+.admin-save-btn:focus,
+.admin-save-btn.ant-btn:hover,
+.admin-save-btn.ant-btn:focus,
+.admin-save-btn:active,
+.admin-save-btn.ant-btn:active {
+  background: #1a94ff !important;
+  border-color: #1a94ff !important;
+  color: #fff !important;
+}
+
 /* ========== RESPONSIVE BREAKPOINTS ========== */
 @media (max-width: 1200px) {
   html {
@@ -222,8 +241,7 @@ body {
 .ant-btn-primary:hover {
   background: var(--primary-dark);
   border-color: var(--primary-dark);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  box-shadow: none;
 }
 
 .ant-card {

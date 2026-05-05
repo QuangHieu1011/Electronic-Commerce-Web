@@ -8,6 +8,11 @@ const parseBoolean = (value) => {
     return normalized === 'true' || normalized === '1' || normalized === 'yes';
 };
 
+const parseOptionalBoolean = (value) => {
+    if (value === undefined || value === null || value === '') return undefined;
+    return parseBoolean(value);
+};
+
 const parseRatings = (value) => {
     if (!value) return [];
 
@@ -111,8 +116,14 @@ const getReviewsByProduct = async (req, res) => {
 
 const getAdminReviews = async (req, res) => {
     try {
-        const { page = 1, limit = 10, search = '', rating = '' } = req.query;
-        const response = await ReviewService.getAdminReviews({ page, limit, search, rating });
+        const { page = 1, limit = 10, search = '', rating = '', flagged } = req.query;
+        const response = await ReviewService.getAdminReviews({
+            page,
+            limit,
+            search,
+            rating,
+            flagged: parseOptionalBoolean(flagged)
+        });
         return res.status(200).json(response);
     } catch (e) {
         return res.status(500).json({ status: 'ERR', message: e.message || e });

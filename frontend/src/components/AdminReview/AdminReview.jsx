@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import {
     Table,
     Rate,
@@ -13,6 +13,7 @@ import {
     Row,
     Col,
     Tooltip,
+    Switch,
     message,
     Popconfirm
 } from 'antd';
@@ -22,7 +23,8 @@ import {
     SearchOutlined,
     EyeOutlined,
     CommentOutlined,
-    TrophyOutlined
+    TrophyOutlined,
+    ExclamationCircleOutlined
 } from '@ant-design/icons';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
@@ -51,6 +53,7 @@ const AdminReview = () => {
     const [reviewPage, setReviewPage] = useState(1);
     const [reviewSearch, setReviewSearch] = useState('');
     const [reviewRating, setReviewRating] = useState('');
+    const [reviewFlaggedOnly, setReviewFlaggedOnly] = useState(false);
 
     // ---------- Tab: Product Stats ----------
     const [statPage, setStatPage] = useState(1);
@@ -62,13 +65,14 @@ const AdminReview = () => {
 
     // ---- Queries ----
     const { data: reviewsData, isLoading: reviewsLoading } = useQuery({
-        queryKey: ['admin-reviews', reviewPage, reviewSearch, reviewRating],
+        queryKey: ['admin-reviews', reviewPage, reviewSearch, reviewRating, reviewFlaggedOnly],
         queryFn: () =>
             ReviewService.getAdminReviews(user.access_token, {
                 page: reviewPage,
                 limit: 10,
                 search: reviewSearch,
-                rating: reviewRating
+                rating: reviewRating,
+                flagged: reviewFlaggedOnly ? true : undefined
             }),
         keepPreviousData: true
     });
@@ -95,14 +99,14 @@ const AdminReview = () => {
             {
                 onSuccess: (res) => {
                     if (res?.status === 'OK') {
-                        message.success('Đã xóa đánh giá');
+                        message.success('Review deleted');
                         queryClient.invalidateQueries(['admin-reviews']);
                         queryClient.invalidateQueries(['admin-product-stats']);
                     } else {
-                        message.error(res?.message || 'Xóa thất bại');
+                        message.error(res?.message || 'Delete failed');
                     }
                 },
-                onError: () => message.error('Xóa thất bại')
+                onError: () => message.error('Delete failed')
             }
         );
     };
@@ -119,7 +123,7 @@ const AdminReview = () => {
     // ---- Columns: All Reviews ----
     const reviewColumns = [
         {
-            title: 'Sản phẩm',
+            title: 'Product',
             key: 'product',
             width: 220,
             render: (_, record) => (
@@ -135,7 +139,7 @@ const AdminReview = () => {
             )
         },
         {
-            title: 'Người đánh giá',
+            title: 'Reviewer',
             key: 'user',
             width: 160,
             render: (_, record) => (
@@ -165,14 +169,48 @@ const AdminReview = () => {
             )
         },
         {
-            title: 'Đánh giá',
+            title: 'Rating',
             dataIndex: 'rating',
             key: 'rating',
             width: 140,
             render: (rating) => <Rate disabled value={rating} style={{ fontSize: 14 }} />
         },
         {
-            title: 'Nội dung',
+            title: 'Moderation',
+            key: 'moderation',
+            width: 130,
+            render: (_, record) => {
+                const moderation = record?.moderation;
+                if (!moderation) {
+                    return <Tag color="default">Not scanned</Tag>;
+                }
+                const category = (moderation.category || (moderation.isFlagged ? 'toxic' : 'clean')).toLowerCase();
+                const score = Number.isFinite(moderation.score) ? moderation.score.toFixed(2) : '—';
+                const reason = moderation.reason ? ` • ${moderation.reason}` : '';
+
+                if (category === 'toxic') {
+                    return (
+                        <Tooltip title={`Score: ${score}${reason}`}>
+                            <Tag color="red" icon={<ExclamationCircleOutlined />}>
+                                Toxic
+                            </Tag>
+                        </Tooltip>
+                    );
+                }
+
+                if (category === 'negative') {
+                    return (
+                        <Tooltip title={`Score: ${score}${reason}`}>
+                            <Tag color="gold">Negative</Tag>
+                        </Tooltip>
+                    );
+                }
+
+                return <Tag color="green">Clean</Tag>;
+            }
+        },
+        {
+            title: 'Comment',
             dataIndex: 'comment',
             key: 'comment',
             render: (comment) => (
@@ -182,7 +220,7 @@ const AdminReview = () => {
             )
         },
         {
-            title: 'Hình ảnh',
+            title: 'Images',
             dataIndex: 'images',
             key: 'images',
             width: 100,
@@ -200,11 +238,11 @@ const AdminReview = () => {
                         )}
                     </Image.PreviewGroup>
                 ) : (
-                    <span style={{ color: '#d9d9d9', fontSize: 12 }}>Không có</span>
+                        <span style={{ color: '#d9d9d9', fontSize: 12 }}>None</span>
                 )
         },
         {
-            title: 'Ngày tạo',
+                    title: 'Created',
             dataIndex: 'createdAt',
             key: 'createdAt',
             width: 120,
@@ -218,16 +256,16 @@ const AdminReview = () => {
                     : ''
         },
         {
-            title: 'Thao tác',
+            title: 'Actions',
             key: 'action',
             width: 80,
             render: (_, record) => (
                 <Popconfirm
-                    title="Xóa đánh giá này?"
-                    description="Hành động này không thể hoàn tác."
+                    title="Delete this review?"
+                    description="This action cannot be undone."
                     onConfirm={() => handleDelete(record._id)}
-                    okText="Xóa"
-                    cancelText="Hủy"
+                    okText="Delete"
+                    cancelText="Cancel"
                     okButtonProps={{ danger: true }}
                 >
                     <Button type="text" danger icon={<DeleteOutlined />} size="small" />
@@ -251,7 +289,7 @@ const AdminReview = () => {
             }
         },
         {
-            title: 'Sản phẩm',
+            title: 'Product',
             key: 'product',
             render: (_, record) => (
                 <ProductAvatar>
@@ -275,7 +313,7 @@ const AdminReview = () => {
             )
         },
         {
-            title: 'Đánh giá TB',
+            title: 'Avg rating',
             dataIndex: 'averageRating',
             key: 'averageRating',
             width: 160,
@@ -292,18 +330,18 @@ const AdminReview = () => {
             )
         },
         {
-            title: 'Tổng đánh giá',
+            title: 'Total reviews',
             dataIndex: 'totalReviews',
             key: 'totalReviews',
             width: 120,
             render: (count) => (
                 <Tag color="green" icon={<CommentOutlined />}>
-                    {count} đánh giá
+                    {count} reviews
                 </Tag>
             )
         },
         {
-            title: 'Phân bố sao',
+            title: 'Rating breakdown',
             key: 'breakdown',
             width: 200,
             render: (_, record) => {
@@ -328,7 +366,7 @@ const AdminReview = () => {
             }
         },
         {
-            title: 'Giá',
+            title: 'Price',
             key: 'price',
             width: 110,
             render: (_, record) => (
@@ -336,7 +374,7 @@ const AdminReview = () => {
             )
         },
         {
-            title: 'Xem đánh giá',
+            title: 'Review details',
             key: 'view',
             width: 110,
             render: (_, record) => (
@@ -349,7 +387,7 @@ const AdminReview = () => {
                         setDetailVisible(true);
                     }}
                 >
-                    Chi tiết
+                    Details
                 </Button>
             )
         }
@@ -360,21 +398,21 @@ const AdminReview = () => {
             key: 'stats',
             label: (
                 <span>
-                    <TrophyOutlined /> Sản phẩm được yêu thích
+                    <TrophyOutlined /> Top rated products
                 </span>
             ),
             children: (
                 <div>
                     {/* Sort control */}
                     <div style={{ padding: '16px 16px 0', display: 'flex', gap: 12, alignItems: 'center' }}>
-                        <span style={{ fontSize: 13, color: '#595959' }}>Sắp xếp theo:</span>
+                        <span style={{ fontSize: 13, color: '#595959' }}>Sort by:</span>
                         <Select
                             value={statSort}
                             onChange={(v) => { setStatSort(v); setStatPage(1); }}
                             style={{ width: 180 }}
                         >
-                            <Option value="rating">Đánh giá trung bình</Option>
-                            <Option value="totalReviews">Tổng số đánh giá</Option>
+                            <Option value="rating">Average rating</Option>
+                            <Option value="totalReviews">Total reviews</Option>
                         </Select>
                     </div>
                     <Table
@@ -387,7 +425,7 @@ const AdminReview = () => {
                             pageSize: 10,
                             total: statsData?.pagination?.total || 0,
                             onChange: (page) => setStatPage(page),
-                            showTotal: (total) => `Tổng ${total} sản phẩm có đánh giá`
+                            showTotal: (total) => `${total} products with reviews`
                         }}
                         style={{ padding: 16 }}
                         scroll={{ x: 900 }}
@@ -399,7 +437,7 @@ const AdminReview = () => {
             key: 'all',
             label: (
                 <span>
-                    <CommentOutlined /> Tất cả đánh giá
+                    <CommentOutlined /> All reviews
                 </span>
             ),
             children: (
@@ -415,14 +453,14 @@ const AdminReview = () => {
                         }}
                     >
                         <Search
-                            placeholder="Tìm theo tên sản phẩm..."
+                            placeholder="Search by product name..."
                             allowClear
                             style={{ width: 260 }}
                             onSearch={(v) => { setReviewSearch(v); setReviewPage(1); }}
                             enterButton={<SearchOutlined />}
                         />
                         <Select
-                            placeholder="Lọc theo số sao"
+                            placeholder="Filter by rating"
                             allowClear
                             style={{ width: 160 }}
                             value={reviewRating || undefined}
@@ -430,22 +468,35 @@ const AdminReview = () => {
                         >
                             {[5, 4, 3, 2, 1].map((s) => (
                                 <Option key={s} value={String(s)}>
-                                    <Rate disabled value={s} style={{ fontSize: 12 }} /> {s} sao
+                                    <Rate disabled value={s} style={{ fontSize: 12 }} /> {s} stars
                                 </Option>
                             ))}
                         </Select>
+                        <Space size={8} style={{ paddingLeft: 6 }}>
+                            <Switch
+                                checked={reviewFlaggedOnly}
+                                onChange={(checked) => {
+                                    setReviewFlaggedOnly(checked);
+                                    setReviewPage(1);
+                                }}
+                            />
+                            <span style={{ fontSize: 13, color: '#595959' }}>Only toxic reviews</span>
+                        </Space>
                     </div>
                     <Table
                         columns={reviewColumns}
                         dataSource={reviewsData?.data || []}
                         loading={reviewsLoading}
                         rowKey="_id"
+                        rowClassName={(record) =>
+                            record?.moderation?.isFlagged ? 'review-flagged-row' : ''
+                        }
                         pagination={{
                             current: reviewPage,
                             pageSize: 10,
                             total: reviewsData?.pagination?.total || 0,
                             onChange: (page) => setReviewPage(page),
-                            showTotal: (total) => `Tổng ${total} đánh giá`
+                            showTotal: (total) => `${total} reviews`
                         }}
                         style={{ padding: 16 }}
                         scroll={{ x: 900 }}
@@ -457,7 +508,7 @@ const AdminReview = () => {
 
     return (
         <WrapperContainer>
-            <WrapperHeader>Quản lý đánh giá sản phẩm</WrapperHeader>
+            <WrapperHeader>Product Review Management</WrapperHeader>
 
             {/* Summary cards */}
             <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
@@ -471,7 +522,7 @@ const AdminReview = () => {
                         </div>
                         <div className="stat-content">
                             <div className="stat-value">{totalReviews}</div>
-                            <div className="stat-label">Tổng đánh giá</div>
+                            <div className="stat-label">Total reviews</div>
                         </div>
                     </StatCard>
                 </Col>
@@ -485,7 +536,7 @@ const AdminReview = () => {
                         </div>
                         <div className="stat-content">
                             <div className="stat-value">{avgRatingOverall}</div>
-                            <div className="stat-label">Điểm TB tất cả sản phẩm</div>
+                            <div className="stat-label">Average rating (all products)</div>
                         </div>
                     </StatCard>
                 </Col>
@@ -509,7 +560,7 @@ const AdminReview = () => {
                                     : '—'}
                             </div>
                             <div className="stat-label">
-                                Sản phẩm được yêu thích nhất{' '}
+                                Top rated product{' '}
                                 {topProduct ? `(${topProduct.averageRating}★)` : ''}
                             </div>
                         </div>
@@ -552,7 +603,7 @@ const AdminReview = () => {
                                 style={{ fontSize: 20 }}
                             />
                             <div style={{ color: '#8c8c8c', marginTop: 4 }}>
-                                {selectedProduct.totalReviews} đánh giá
+                                {selectedProduct.totalReviews} reviews
                             </div>
                         </div>
                         <div>
@@ -576,13 +627,13 @@ const AdminReview = () => {
                         <div style={{ marginTop: 16, borderTop: '1px solid #f0f0f0', paddingTop: 12 }}>
                             <Row gutter={16}>
                                 <Col span={12}>
-                                    <div style={{ fontSize: 12, color: '#8c8c8c' }}>Loại sản phẩm</div>
+                                    <div style={{ fontSize: 12, color: '#8c8c8c' }}>Category</div>
                                     <Tag color="blue" style={{ marginTop: 4 }}>
                                         {selectedProduct.productInfo?.type || '—'}
                                     </Tag>
                                 </Col>
                                 <Col span={12}>
-                                    <div style={{ fontSize: 12, color: '#8c8c8c' }}>Giá</div>
+                                    <div style={{ fontSize: 12, color: '#8c8c8c' }}>Price</div>
                                     <div style={{ fontWeight: 600, marginTop: 4 }}>
                                         {formatPrice(selectedProduct.productInfo?.price)}
                                     </div>

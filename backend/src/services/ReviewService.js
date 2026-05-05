@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Review = require('../models/ReviewModel');
 const Product = require('../models/ProductModel');
 const Order = require('../models/OrderProduct');
+const ReviewModerationService = require('./ReviewModerationService');
 
 const toObjectId = (id) => new mongoose.Types.ObjectId(id);
 
@@ -87,6 +88,7 @@ const createOrUpdateReview = async ({ productId, userId, rating, comment, images
         };
     }
 
+    const cleanedComment = comment.trim();
     const cleanedImages = Array.isArray(images)
         ? images
             .filter((url) => typeof url === 'string')
@@ -99,7 +101,7 @@ const createOrUpdateReview = async ({ productId, userId, rating, comment, images
         { product: productId, user: userId },
         {
             rating,
-            comment: comment.trim(),
+            comment: cleanedComment,
             images: cleanedImages
         },
         {
@@ -108,6 +110,20 @@ const createOrUpdateReview = async ({ productId, userId, rating, comment, images
             setDefaultsOnInsert: true
         }
     );
+
+    const moderation = await ReviewModerationService.moderateReview({
+        comment: cleanedComment,
+        rating,
+        productId,
+        productName: product.name,
+        userId,
+        reviewId: savedReview._id
+    });
+
+    if (moderation) {
+        savedReview.moderation = moderation;
+        await savedReview.save();
+    }
 
     const summary = await buildReviewSummary(productId);
 
@@ -219,7 +235,7 @@ const getReviewsByProduct = async ({
     };
 };
 
-const getAdminReviews = async ({ page = 1, limit = 10, search = '', rating = '' }) => {
+const getAdminReviews = async ({ page = 1, limit = 10, search = '', rating = '', flagged }) => {
     const safePage = Math.max(Number(page) || 1, 1);
     const safeLimit = Math.min(Math.max(Number(limit) || 10, 1), 50);
 
@@ -236,6 +252,12 @@ const getAdminReviews = async ({ page = 1, limit = 10, search = '', rating = '' 
 
     if (rating && Number(rating) >= 1 && Number(rating) <= 5) {
         query.rating = Number(rating);
+    }
+
+    if (flagged === true) {
+        query['moderation.isFlagged'] = true;
+    } else if (flagged === false) {
+        query['moderation.isFlagged'] = { $ne: true };
     }
 
     const [total, reviews] = await Promise.all([

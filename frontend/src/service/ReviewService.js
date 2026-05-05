@@ -1,10 +1,14 @@
 import axios from 'axios';
 import { axiosJWT } from './UserService';
 
-export const getAdminReviews = async (access_token, { page = 1, limit = 10, search = '', rating = '' } = {}) => {
+export const getAdminReviews = async (
+    access_token,
+    { page = 1, limit = 10, search = '', rating = '', flagged } = {}
+) => {
     const params = new URLSearchParams({ page, limit });
     if (search) params.append('search', search);
     if (rating) params.append('rating', rating);
+    if (flagged !== undefined) params.append('flagged', String(flagged));
     const res = await axiosJWT.get(`${process.env.REACT_APP_API_URL}/review/admin/all?${params.toString()}`, {
         headers: { Authorization: `Bearer ${access_token}` }
     });
