@@ -16,7 +16,7 @@ const ResetPasswordModal = ({ visible, onClose, onSuccess }) => {
         try {
             const response = await OTPService.sendResetPasswordOTP(values.email)
             if (response.status === 'OK') {
-                message.success('Mã OTP đã được gửi đến email của bạn!')
+                message.success('An OTP has been sent to your email!')
                 setEmail(values.email)
                 setStep(2)
             } else {
@@ -24,7 +24,7 @@ const ResetPasswordModal = ({ visible, onClose, onSuccess }) => {
             }
         } catch (error) {
             console.error('Send OTP error:', error)
-            message.error(error.response?.data?.message || 'Có lỗi xảy ra')
+            message.error(error.response?.data?.message || 'An error occurred')
         } finally {
             setLoading(false)
         }
@@ -39,7 +39,7 @@ const ResetPasswordModal = ({ visible, onClose, onSuccess }) => {
                 values.newPassword
             )
             if (response.status === 'OK') {
-                message.success('Đặt lại mật khẩu thành công!')
+                message.success('Password reset successfully!')
                 onSuccess && onSuccess()
                 handleClose()
             } else {
@@ -47,7 +47,7 @@ const ResetPasswordModal = ({ visible, onClose, onSuccess }) => {
             }
         } catch (error) {
             console.error('Reset password error:', error)
-            message.error(error.response?.data?.message || 'Có lỗi xảy ra')
+            message.error(error.response?.data?.message || 'An error occurred')
         } finally {
             setLoading(false)
         }
@@ -80,13 +80,13 @@ const ResetPasswordModal = ({ visible, onClose, onSuccess }) => {
                 </div>
 
                 <Title level={3} style={{ marginBottom: 8 }}>
-                    Khôi phục mật khẩu
+                    Restore password
                 </Title>
 
                 {step === 1 && (
                     <>
                         <Text type="secondary" style={{ display: 'block', marginBottom: 24 }}>
-                            Nhập email để nhận mã OTP khôi phục mật khẩu
+                            Enter your email to receive a password reset OTP
                         </Text>
 
                         <Form
@@ -97,13 +97,13 @@ const ResetPasswordModal = ({ visible, onClose, onSuccess }) => {
                             <Form.Item
                                 name="email"
                                 rules={[
-                                    { required: true, message: 'Vui lòng nhập email!' },
-                                    { type: 'email', message: 'Email không hợp lệ!' }
+                                    { required: true, message: 'Please enter your email!' },
+                                    { type: 'email', message: 'Invalid email!' }
                                 ]}
                             >
                                 <Input
                                     prefix={<MailOutlined />}
-                                    placeholder="Nhập email của bạn"
+                                    placeholder="Enter your email"
                                     size="large"
                                 />
                             </Form.Item>
@@ -115,8 +115,9 @@ const ResetPasswordModal = ({ visible, onClose, onSuccess }) => {
                                     loading={loading}
                                     size="large"
                                     block
+                                    style={{ backgroundColor: '#1890ff', color: '#fff' }}
                                 >
-                                    Gửi mã OTP
+                                    Send OTP
                                 </Button>
                             </Form.Item>
                         </Form>
@@ -126,7 +127,7 @@ const ResetPasswordModal = ({ visible, onClose, onSuccess }) => {
                 {step === 2 && (
                     <>
                         <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>
-                            Mã OTP đã được gửi đến
+                            An OTP has been sent to
                         </Text>
                         <Text strong style={{ color: '#1890ff', display: 'block', marginBottom: 24 }}>
                             {email}
@@ -139,14 +140,14 @@ const ResetPasswordModal = ({ visible, onClose, onSuccess }) => {
                         >
                             <Form.Item
                                 name="otp"
-                                label="Mã OTP"
+                                label="OTP Code"
                                 rules={[
-                                    { required: true, message: 'Vui lòng nhập mã OTP!' },
-                                    { len: 6, message: 'Mã OTP phải có 6 chữ số!' }
+                                    { required: true, message: 'Please enter the OTP!' },
+                                    { len: 6, message: 'OTP must be 6 digits!' }
                                 ]}
                             >
                                 <Input
-                                    placeholder="Nhập mã OTP (6 chữ số)"
+                                    placeholder="Enter OTP (6 digits)"
                                     maxLength={6}
                                     style={{
                                         fontSize: 16,
@@ -163,43 +164,43 @@ const ResetPasswordModal = ({ visible, onClose, onSuccess }) => {
 
                             <Form.Item
                                 name="newPassword"
-                                label="Mật khẩu mới"
+                                label="New Password"
                                 rules={[
-                                    { required: true, message: 'Vui lòng nhập mật khẩu mới!' },
-                                    { min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự!' }
+                                    { required: true, message: 'Please enter a new password!' },
+                                    { min: 6, message: 'Password must be at least 6 characters long!' }
                                 ]}
                             >
                                 <Input.Password
                                     prefix={<LockOutlined />}
-                                    placeholder="Nhập mật khẩu mới"
+                                    placeholder="Enter new password"
                                 />
                             </Form.Item>
 
                             <Form.Item
                                 name="confirmPassword"
-                                label="Xác nhận mật khẩu"
+                                label="Confirm password"
                                 dependencies={['newPassword']}
                                 rules={[
-                                    { required: true, message: 'Vui lòng xác nhận mật khẩu!' },
+                                    { required: true, message: 'Please confirm your password!' },
                                     ({ getFieldValue }) => ({
                                         validator(_, value) {
                                             if (!value || getFieldValue('newPassword') === value) {
                                                 return Promise.resolve()
                                             }
-                                            return Promise.reject(new Error('Mật khẩu không khớp!'))
+                                            return Promise.reject(new Error('Passwords do not match!'))
                                         },
                                     }),
                                 ]}
                             >
                                 <Input.Password
                                     prefix={<LockOutlined />}
-                                    placeholder="Xác nhận mật khẩu mới"
+                                    placeholder="Confirm new password"
                                 />
                             </Form.Item>
 
                             <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-                                <Button onClick={handleBack}>
-                                    Quay lại
+                                <Button type="primary" onClick={handleBack}>
+                                    Back
                                 </Button>
 
                                 <Button
@@ -207,8 +208,9 @@ const ResetPasswordModal = ({ visible, onClose, onSuccess }) => {
                                     htmlType="submit"
                                     loading={loading}
                                     icon={<CheckCircleOutlined />}
+                                    style={{ backgroundColor: '#1890ff', color: '#fff' }}
                                 >
-                                    Đặt lại mật khẩu
+                                    Reset Password
                                 </Button>
                             </Space>
                         </Form>

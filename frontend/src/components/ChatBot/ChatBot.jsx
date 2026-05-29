@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import './ChatBot.css';
 import { useLanguage } from '../../context/LanguageContext';
+import { formatPrice, toSlug } from '../../utils';
 
 const ChatBot = () => {
   const { language, t } = useLanguage();
@@ -48,7 +50,8 @@ const ChatBot = () => {
         const botMessage = { 
           text: data.reply, 
           sender: 'bot', 
-          timestamp: new Date() 
+          timestamp: new Date(),
+          products: Array.isArray(data.products) ? data.products : []
         };
         setMessages(prev => [...prev, botMessage]);
       } else {
@@ -91,6 +94,65 @@ const ChatBot = () => {
     });
 
     return { paragraphs, items };
+  };
+
+  const getProductLink = (product) => {
+    const id = product?.id || product?._id;
+    if (!id) return '';
+    const slug = toSlug(product?.name || 'product') || 'product';
+    return `/product-details/${id}/${slug}`;
+  };
+
+  const renderProductCards = (products = []) => {
+    if (!Array.isArray(products) || products.length === 0) return null;
+
+    return (
+      <div className="message-products">
+        {products.map((product, index) => {
+          const id = product?.id || product?._id;
+          const name = product?.name || 'Product';
+          const imageUrl = product?.image || (Array.isArray(product?.images) ? product.images[0] : '');
+          const link = getProductLink(product);
+          const priceLabel = typeof product?.price === 'number' ? formatPrice(product.price) : '';
+          const discount = typeof product?.discount === 'number' ? product.discount : null;
+          const stockLabel = typeof product?.countInStock === 'number'
+            ? `Stock: ${product.countInStock}`
+            : '';
+
+          const content = (
+            <>
+              <div className="message-product-image">
+                {imageUrl ? (
+                  <img src={imageUrl} alt={name} loading="lazy" />
+                ) : (
+                  <div className="message-product-image-placeholder" aria-label="No image" />
+                )}
+              </div>
+              <div className="message-product-content">
+                <div className="message-product-title">{name}</div>
+                <div className="message-product-meta">
+                  {priceLabel && <span className="message-product-chip">{priceLabel}</span>}
+                  {product?.type && <span className="message-product-chip">{product.type}</span>}
+                  {discount > 0 && <span className="message-product-chip">-{discount}%</span>}
+                  {stockLabel && <span className="message-product-chip">{stockLabel}</span>}
+                </div>
+                {id && <span className="message-product-link">View details</span>}
+              </div>
+            </>
+          );
+
+          return id ? (
+            <Link key={`${id}-${index}`} to={link} className="message-product-card">
+              {content}
+            </Link>
+          ) : (
+            <div key={`${name}-${index}`} className="message-product-card">
+              {content}
+            </div>
+          );
+        })}
+      </div>
+    );
   };
 
   const renderMessageContent = (msg) => {
@@ -136,6 +198,7 @@ const ChatBot = () => {
             })}
           </ul>
         )}
+        {renderProductCards(msg.products)}
       </>
     );
   };

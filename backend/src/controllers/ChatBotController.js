@@ -26,11 +26,14 @@ const ChatBotController = {
       }
 
       // Xử lý với OpenRouter
-      const botReply = await processWithOpenRouter(message);
+      const botResult = await processWithOpenRouter(message);
+      const reply = typeof botResult === 'string' ? botResult : botResult.reply;
+      const products = typeof botResult === 'string' ? [] : (botResult.products || []);
 
       return res.status(200).json({
         success: true,
-        reply: botReply,
+        reply,
+        products,
         timestamp: new Date()
       });
 
@@ -82,6 +85,7 @@ const BRAND_KEYWORDS = [
 ];
 
 const MIN_PRODUCT_LIST = 3;
+const PRODUCT_SELECT_FIELDS = 'name type price discount countInStock image';
 
 const FALLBACK_NAME_TOKENS_BY_TYPE = {
   Phone: ['iphone', 'samsung', 'xiaomi', 'oppo', 'pixel', 'galaxy', 'rog phone', 'oneplus', 'realme', 'vivo', 'nokia', 'sony'],
@@ -317,7 +321,7 @@ const buildProductQuery = (normalizedMessage) => {
 const buildProductContext = async (userMessage) => {
   const normalizedMessage = normalizeText(userMessage);
   if (!shouldSearchProducts(normalizedMessage)) {
-    return '';
+    return { text: '', products: [] };
   }
 
   const intent = detectIntent(normalizedMessage);
@@ -329,7 +333,7 @@ const buildProductContext = async (userMessage) => {
   }
 
   if (!query) {
-    return '';
+    return { text: '', products: [] };
   }
 
   const sortBy = intent.wantsTopSelling
@@ -342,7 +346,7 @@ const buildProductContext = async (userMessage) => {
     let products = await Product.find(query)
       .sort(sortBy)
       .limit(5)
-      .select('name type price discount countInStock');
+      .select(PRODUCT_SELECT_FIELDS);
 
     if (!products.length) {
       const fallbackTokens = getFallbackNameTokens(types);
@@ -356,7 +360,7 @@ const buildProductContext = async (userMessage) => {
         products = await Product.find(fallbackQuery)
           .sort(sortBy)
           .limit(5)
-          .select('name type price discount countInStock');
+          .select(PRODUCT_SELECT_FIELDS);
       }
     }
 
@@ -364,7 +368,7 @@ const buildProductContext = async (userMessage) => {
       const widerProducts = await Product.find({})
         .sort(sortBy)
         .limit(50)
-        .select('name type price discount countInStock');
+        .select(PRODUCT_SELECT_FIELDS);
 
       const filtered = widerProducts.filter((product) => matchesType(product.type, types));
       products = filtered.slice(0, 5);
@@ -374,7 +378,7 @@ const buildProductContext = async (userMessage) => {
       products = await Product.find({})
         .sort(sortBy)
         .limit(5)
-        .select('name type price discount countInStock');
+        .select(PRODUCT_SELECT_FIELDS);
     }
 
     if (intent.wantsGaming && types.length > 0) {
@@ -387,7 +391,7 @@ const buildProductContext = async (userMessage) => {
         const gamingProducts = await Product.find(gamingQuery)
           .sort(sortBy)
           .limit(5)
-          .select('name type price discount countInStock');
+          .select(PRODUCT_SELECT_FIELDS);
         products = mergeProducts(products, gamingProducts, 5);
       }
     }
@@ -396,14 +400,14 @@ const buildProductContext = async (userMessage) => {
       const widerProducts = await Product.find({})
         .sort(sortBy)
         .limit(80)
-        .select('name type price discount countInStock');
+        .select(PRODUCT_SELECT_FIELDS);
 
       const filtered = widerProducts.filter((product) => matchesType(product.type, types));
       products = mergeProducts(products, filtered, 5);
     }
 
     if (!products.length) {
-      return 'Khong tim thay san pham phu hop trong kho hien tai.';
+      return { text: 'Khong tim thay san pham phu hop trong kho hien tai.', products: [] };
     }
 
     const lines = products.map((product, index) => {
@@ -411,15 +415,27 @@ const buildProductContext = async (userMessage) => {
       return `- ${index + 1}. ${product.name} | Loai: ${product.type} | Gia: ${formatVnd(product.price)} VND${discountText} | Ton: ${product.countInStock}`;
     });
 
-    return lines.join('\n');
+    const mappedProducts = products.map((product) => ({
+      id: String(product._id),
+      name: product.name,
+      type: product.type,
+      price: product.price,
+      discount: product.discount,
+      countInStock: product.countInStock,
+      image: product.image
+    }));
+
+    return { text: lines.join('\n'), products: mappedProducts };
   } catch (error) {
     console.error('Chatbot product lookup failed:', error);
-    return '';
+    return { text: '', products: [] };
   }
 };
 
 // Hàm xử lý với OpenRouter API
 async function processWithOpenRouter(userMessage) {
+  let productContext = { text: '', products: [] };
+
   try {
     const modelNames = [
       process.env.OPENROUTER_MODEL,
@@ -430,7 +446,8 @@ async function processWithOpenRouter(userMessage) {
     
     let lastError = null;
     
-    const productContext = await buildProductContext(userMessage);
+    productContext = await buildProductContext(userMessage);
+    const productContextText = productContext.text || 'Khong tim thay san pham phu hop trong kho hien tai.';
 
     const systemPrompt = `Bạn là TechStore Chatbot - chatbot thông minh của một cửa hàng điện tử trực tuyến (E-Commerce).
 
@@ -453,7 +470,7 @@ Thông tin về cửa hàng:
 - Hỗ trợ 24/7
 
 Du lieu san pham hien co (cap nhat tu database, chi dung de tu van):
-${productContext || 'Khong tim thay san pham phu hop trong kho hien tai.'}
+${productContextText}
 
 Quy tac:
 - Chi tu van dua tren du lieu san pham ben tren
@@ -497,7 +514,7 @@ Mau tra loi goi y (neu co nhieu san pham):
 
         if (text) {
           console.log(`OpenRouter success with model: ${modelName}`);
-          return text;
+          return { reply: text, products: productContext.products };
         }
       } catch (err) {
         lastError = err;
@@ -514,7 +531,7 @@ Mau tra loi goi y (neu co nhieu san pham):
     console.error('Error:', error.message);
     
     // Fallback: Rule-based chatbot thông minh
-    return getRuleBasedResponse(userMessage);
+    return { reply: getRuleBasedResponse(userMessage), products: productContext.products };
   }
 }
 

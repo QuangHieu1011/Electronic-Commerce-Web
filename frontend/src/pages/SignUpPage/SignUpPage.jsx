@@ -71,7 +71,7 @@ const SignUpPage = () => {
 
   const handleSendOTP = async () => {
     if (!email) {
-      antdMessage.error('Vui lòng nhập email trước!');
+      antdMessage.error('Please enter email first!');
       return;
     }
 
@@ -79,13 +79,13 @@ const SignUpPage = () => {
     try {
       const response = await OTPService.sendSignupOTP(email);
       if (response.status === 'OK') {
-        antdMessage.success('Mã OTP đã được gửi đến email của bạn!');
+        antdMessage.success('An OTP has been sent to your email!');
         setShowOTPModal(true);
       } else {
         antdMessage.error(response.message);
       }
     } catch (error) {
-      antdMessage.error(error.response?.data?.message || 'Có lỗi xảy ra');
+      antdMessage.error(error.response?.data?.message || 'An error occurred');
     } finally {
       setSendingOTP(false);
     }
@@ -94,12 +94,12 @@ const SignUpPage = () => {
   const handleOTPSuccess = (data) => {
     setIsOTPVerified(true);
     setShowOTPModal(false);
-    antdMessage.success('Xác thực email thành công!');
+    antdMessage.success('Email verified successfully!');
   }
 
   const handleSignUp = () => {
     if (!isOTPVerified) {
-      antdMessage.error('Vui lòng xác thực email trước khi đăng ký!');
+      antdMessage.error('Please verify your email before signing up!');
       return;
     }
 
@@ -119,12 +119,12 @@ const SignUpPage = () => {
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.53)', height: '100vh' }}>
       <div style={{ width: '800px', height: '445px', borderRadius: '8px', background: '#fff', display: 'flex' }}>
         <WrapperContainerLeft>
-          <WrapperH1>Xin chào</WrapperH1>
-          <WrapperP>Đăng ký tài khoản mới</WrapperP>
+          <WrapperH1>Hello</WrapperH1>
+          <WrapperP>Register a new account</WrapperP>
 
           <InputForm
             style={{ marginBottom: '10px' }}
-            placeholder="Họ và tên"
+            placeholder="Full name"
             value={name}
             onChange={handleOnchangeName}
           />
@@ -151,11 +151,11 @@ const SignUpPage = () => {
             >
               {isOTPVerified ? (
                 <>
-                  <SafetyOutlined /> Đã xác thực
+                  <SafetyOutlined /> Verified
                 </>
               ) : (
                 <>
-                  <MailOutlined /> Gửi OTP
+                  <MailOutlined /> Send OTP
                 </>
               )}
             </Button>
@@ -163,14 +163,14 @@ const SignUpPage = () => {
 
           <InputForm
             style={{ marginBottom: '10px' }}
-            placeholder="Số điện thoại"
+            placeholder="Phone number"
             value={phone}
             onChange={handleOnchangePhone}
           />
 
           <div style={{ position: 'relative', marginBottom: '10px' }}>
             <InputForm
-              placeholder="Mật khẩu"
+              placeholder="Password"
               type={showPassword ? "text" : "password"}
               value={password} onChange={handleOnchangePassword}
             />
@@ -190,7 +190,7 @@ const SignUpPage = () => {
           </div>
           <div style={{ position: 'relative', marginBottom: '10px' }}>
             <InputForm
-              placeholder="Xác nhận mật khẩu"
+              placeholder="Confirm password"
               type={showConfirm ? "text" : "password"}
               value={confirmPassword} onChange={handleOnchangeConfirmPassword}
             />
@@ -229,14 +229,14 @@ const SignUpPage = () => {
                 margin: '26px 0 10px'
               }}
             >
-              Đăng ký
+              Sign up
             </Button>
           </Loading>
-          <WrapperP> Bạn đã có tài khoản? <WrapperTextLight onClick={handleNavigateSignin} style={{ cursor: 'pointer' }}> Đăng nhập </WrapperTextLight></WrapperP>
+          <WrapperP> Already have an account? <WrapperTextLight onClick={handleNavigateSignin} style={{ cursor: 'pointer' }}> Sign in </WrapperTextLight></WrapperP>
         </WrapperContainerLeft>
         <WrapperContainerRight>
           <Image src={imageLogo} preview={false} alt="image logo" height="203px" width="203px" />
-          <WrapperH4>Mua sắm tại TechStore</WrapperH4>
+          <WrapperH4>Shopping at TechStore</WrapperH4>
         </WrapperContainerRight>
       </div>
 
@@ -247,7 +247,7 @@ const SignUpPage = () => {
         onSuccess={handleOTPSuccess}
         email={email}
         type="signup"
-        title="Xác thực email đăng ký"
+        title="Verify registration email"
       />
     </div>
   )
