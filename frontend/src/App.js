@@ -123,8 +123,8 @@ function App() {
                 );
               })}
             </Routes>
+            <ChatBot />
           </Router>
-          <ChatBot />
         </>
       )}
     </div>

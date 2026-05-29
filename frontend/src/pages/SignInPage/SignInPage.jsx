@@ -95,8 +95,8 @@ const SignInPage = () => {
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.53)', height: '100vh' }}>
       <div style={{ width: '800px', height: '445px', borderRadius: '8px', background: '#fff', display: 'flex' }}>
         <WrapperContainerLeft>
-          <WrapperH1>Xin chào</WrapperH1>
-          <WrapperP>Đăng nhập hoặc tạo tài khoản </WrapperP>
+          <WrapperH1>Hello</WrapperH1>
+          <WrapperP>Sign in or create an account</WrapperP>
           <InputForm style={{ marginBottom: '10px' }} placeholder="abc@gmail.com" value={email} onChange={handleOnchangeEmail} />
           <div style={{ position: 'relative', marginBottom: '10px' }}>
             <InputForm
@@ -140,7 +140,7 @@ const SignInPage = () => {
                 margin: '26px 0 10px'
               }}
             >
-              Đăng nhập
+              Sign in
             </Button>
           </Loading>
 
@@ -148,13 +148,13 @@ const SignInPage = () => {
             onClick={() => setShowResetModal(true)}
             style={{ cursor: 'pointer', textDecoration: 'underline' }}
           >
-            Quên mật khẩu?
+            Forgot your password?
           </WrapperTextLight>
-          <WrapperP> Chưa có tài khoản? <WrapperTextLight onClick={handleNavigateSignup} style={{ cursor: 'pointer' }}> Tạo tài khoản </WrapperTextLight></WrapperP>
+          <WrapperP> Don't have an account? <WrapperTextLight onClick={handleNavigateSignup} style={{ cursor: 'pointer' }}> Create an account </WrapperTextLight></WrapperP>
         </WrapperContainerLeft>
         <WrapperContainerRight>
           <Image src={imageLogo} preview={false} alt="image logo" height="203px" width="203px" />
-          <WrapperH4>Mua sắm tại TechStore</WrapperH4>
+          <WrapperH4>Shopping at TechStore</WrapperH4>
         </WrapperContainerRight>
       </div>
 
