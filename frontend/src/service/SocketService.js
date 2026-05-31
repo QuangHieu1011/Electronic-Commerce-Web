@@ -8,8 +8,8 @@ class SocketService {
 
     connect() {
         if (!this.socket) {
-            this.socket = io('http://localhost:3001', {
-                transports: ['websocket', 'polling']
+            this.socket = io(process.env.REACT_APP_SOCKET_URL || 'http://localhost:3001', {
+                transports: ['polling', 'websocket']
             })
 
             this.socket.on('connect', () => {

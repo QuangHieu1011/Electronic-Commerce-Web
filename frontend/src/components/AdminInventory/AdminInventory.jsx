@@ -16,7 +16,7 @@ const AdminInventory = () => {
     const fetchInventory = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await axios.get('/api/product/inventory', {
+            const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/inventory`, {
                 headers: {
                     Authorization: `Bearer ${user.access_token}`
                 }
@@ -49,7 +49,7 @@ const AdminInventory = () => {
     const handleSave = async (id) => {
         setLoading(true);
         try {
-            await axios.put('/api/product/inventory', { productId: id, quantity: editValue }, {
+            await axios.put(`${process.env.REACT_APP_API_URL}/product/inventory`, { productId: id, quantity: editValue }, {
                 headers: {
                     Authorization: `Bearer ${user.access_token}`
                 }
