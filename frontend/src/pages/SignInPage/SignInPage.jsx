@@ -176,7 +176,7 @@ const SignInPage = () => {
           </WrapperTextLight>
           <div style={{ display: 'flex', alignItems: 'center', margin: '12px 0', gap: '8px' }}>
             <div style={{ flex: 1, height: '1px', background: '#e0e0e0' }} />
-            <span style={{ color: '#999', fontSize: '13px', whiteSpace: 'nowrap' }}>hoặc</span>
+            <span style={{ color: '#999', fontSize: '13px', whiteSpace: 'nowrap' }}>or</span>
             <div style={{ flex: 1, height: '1px', background: '#e0e0e0' }} />
           </div>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -186,7 +186,7 @@ const SignInPage = () => {
               width="300"
               text="signin_with"
               shape="rectangular"
-              locale="vi"
+              locale="en"
             />
           </div>
           <WrapperP> Don't have an account? <WrapperTextLight onClick={handleNavigateSignup} style={{ cursor: 'pointer' }}> Create an account </WrapperTextLight></WrapperP>
