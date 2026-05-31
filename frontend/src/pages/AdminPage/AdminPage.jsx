@@ -1,13 +1,14 @@
 import { Menu } from 'antd'
 import React, { useEffect, useMemo, useState } from 'react'
 import { getItem } from '../../utils';
-import { UserOutlined, AppstoreOutlined, ShoppingCartOutlined, StarOutlined } from '@ant-design/icons';
+import { UserOutlined, AppstoreOutlined, ShoppingCartOutlined, StarOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import HeaderComponent from '../../components/HeaderComponent/HeaderComponent';
 import AdminUser from '../../components/AdminUser/AdminUser';
 import AdminProduct from '../../components/AdminProduct/AdminProduct';
 import AdminInventory from '../../components/AdminInventory/AdminInventory';
 import AdminReview from '../../components/AdminReview/AdminReview';
 import AdminOrderManagement from '../AdminOrderManagement/AdminOrderManagement';
+import AdminPromotion from '../../components/AdminPromotion/AdminPromotion';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 
@@ -30,6 +31,7 @@ const AdminPage = () => {
         getItem('Orders', 'orders', <ShoppingCartOutlined />),
         getItem('Inventory', 'inventory', <AppstoreOutlined />),
         getItem('Reviews', 'reviews', <StarOutlined />),
+        getItem('Promotions', 'promotions', <ThunderboltOutlined />),
     ];
 
     const [keySelected, setKeySelected] = useState(getInitialTab());
@@ -57,6 +59,8 @@ const AdminPage = () => {
                 return (<AdminInventory />);
             case 'reviews':
                 return (<AdminReview />);
+            case 'promotions':
+                return (<AdminPromotion />);
             default:
                 return (<AdminUser />);
         }

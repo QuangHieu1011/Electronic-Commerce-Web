@@ -61,7 +61,7 @@ const loginUser = async (req, res) => {
             secure: isProduction,
             sameSite: isProduction ? 'none' : 'lax',
             path: '/',
-            maxAge: 365 * 24 * 60 * 60 * 1000 
+            maxAge: 365 * 24 * 60 * 60 * 1000
         })
         return res.status(200).json(newResponse);
     } catch (e) {
@@ -253,6 +253,28 @@ const createUserWithOTP = async (req, res) => {
     }
 };
 
+const googleLogin = async (req, res) => {
+    try {
+        const { credential } = req.body;
+        if (!credential) {
+            return res.status(400).json({ status: 'ERR', message: 'Google credential is required' });
+        }
+        const response = await UserService.googleLogin(credential);
+        const { refresh_token, ...newResponse } = response;
+        const isProduction = process.env.NODE_ENV === 'production';
+        res.cookie('refresh_token', refresh_token, {
+            httpOnly: true,
+            secure: isProduction,
+            sameSite: isProduction ? 'none' : 'lax',
+            path: '/',
+            maxAge: 365 * 24 * 60 * 60 * 1000,
+        });
+        return res.status(200).json(newResponse);
+    } catch (e) {
+        return res.status(500).json({ status: 'ERR', message: e.message || e });
+    }
+};
+
 module.exports = {
     createUser,
     createUserWithOTP,
@@ -264,5 +286,6 @@ module.exports = {
     refreshToken,
     logoutUser,
     deleteMany,
-    getChatbotToken
+    getChatbotToken,
+    googleLogin
 };

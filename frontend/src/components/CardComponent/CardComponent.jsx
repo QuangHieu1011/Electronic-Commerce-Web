@@ -180,7 +180,7 @@ const CardComponent = (props) => {
       </WrapperReporText>
       <WrapperPriceText>
         <span style={{ marginRight: '8px' }}>{formatPrice(price)}</span>
-        <WrapperDiscountText> - {discount || 10}% </WrapperDiscountText>
+        {discount > 0 && <WrapperDiscountText> - {discount}% </WrapperDiscountText>}
       </WrapperPriceText>
 
       {enableQuickAdd && (

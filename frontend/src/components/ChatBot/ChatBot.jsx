@@ -8,10 +8,10 @@ const ChatBot = () => {
   const { language, t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { 
-      text: t('chatbot.welcome'), 
-      sender: 'bot', 
-      timestamp: new Date() 
+    {
+      text: t('chatbot.welcome'),
+      sender: 'bot',
+      timestamp: new Date()
     }
   ]);
   const [input, setInput] = useState('');
@@ -45,11 +45,11 @@ const ChatBot = () => {
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
-        const botMessage = { 
-          text: data.reply, 
-          sender: 'bot', 
+        const botMessage = {
+          text: data.reply,
+          sender: 'bot',
           timestamp: new Date(),
           products: Array.isArray(data.products) ? data.products : []
         };
@@ -59,8 +59,8 @@ const ChatBot = () => {
       }
     } catch (error) {
       console.error('Error:', error);
-      setMessages(prev => [...prev, { 
-        text: t('chatbot.error'), 
+      setMessages(prev => [...prev, {
+        text: t('chatbot.error'),
         sender: 'bot',
         timestamp: new Date()
       }]);
@@ -206,7 +206,7 @@ const ChatBot = () => {
   return (
     <>
       {/* Chat Bubble Button */}
-      <div 
+      <div
         className={`chat-bubble ${isOpen ? 'open' : ''}`}
         onClick={() => setIsOpen(!isOpen)}
         title={t('chatbot.title')}
@@ -236,8 +236,8 @@ const ChatBot = () => {
                   {renderMessageContent(msg)}
                   <span className="message-time">
                     {msg.timestamp.toLocaleTimeString(language === 'vi' ? 'vi-VN' : 'en-US', {
-                      hour: '2-digit', 
-                      minute: '2-digit' 
+                      hour: '2-digit',
+                      minute: '2-digit'
                     })}
                   </span>
                 </div>

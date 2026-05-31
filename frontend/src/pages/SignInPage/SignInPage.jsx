@@ -12,6 +12,7 @@ import { jwtDecode } from 'jwt-decode';
 import { useDispatch } from 'react-redux'
 import { updateUser } from '../../redux/slides/userSlide'
 import ResetPasswordModal from '../../components/ResetPasswordModal/ResetPasswordModal'
+import { GoogleLogin } from '@react-oauth/google'
 
 
 
@@ -90,6 +91,29 @@ const SignInPage = () => {
     console.log('sign-in', email, password)
   }
 
+  const handleGoogleLogin = async (credentialResponse) => {
+    const res = await UserService.googleLoginUser(credentialResponse.credential);
+    if (res?.access_token) {
+      localStorage.setItem('access_token', JSON.stringify(res.access_token));
+      localStorage.setItem('auth_session', 'active');
+      const decoded = jwtDecode(res.access_token);
+      if (decoded?.id) {
+        dispatch(updateUser({ ...decoded, access_token: res.access_token }));
+        handleGetDetailsUser(decoded.id, res.access_token);
+      }
+      const redirectPath = location.state?.from;
+      if (redirectPath === '/checkout' && location.state?.selectedProducts) {
+        navigate('/checkout', { state: { selectedProducts: location.state.selectedProducts, totalAmount: location.state.totalAmount } });
+      } else if (redirectPath === '/order-tracking') {
+        navigate('/order-tracking');
+      } else if (redirectPath === '/profile') {
+        navigate('/profile');
+      } else {
+        navigate('/');
+      }
+    }
+  }
+
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.53)', height: '100vh' }}>
@@ -150,6 +174,21 @@ const SignInPage = () => {
           >
             Forgot your password?
           </WrapperTextLight>
+          <div style={{ display: 'flex', alignItems: 'center', margin: '12px 0', gap: '8px' }}>
+            <div style={{ flex: 1, height: '1px', background: '#e0e0e0' }} />
+            <span style={{ color: '#999', fontSize: '13px', whiteSpace: 'nowrap' }}>hoặc</span>
+            <div style={{ flex: 1, height: '1px', background: '#e0e0e0' }} />
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <GoogleLogin
+              onSuccess={handleGoogleLogin}
+              onError={() => console.log('Google Login Failed')}
+              width="300"
+              text="signin_with"
+              shape="rectangular"
+              locale="vi"
+            />
+          </div>
           <WrapperP> Don't have an account? <WrapperTextLight onClick={handleNavigateSignup} style={{ cursor: 'pointer' }}> Create an account </WrapperTextLight></WrapperP>
         </WrapperContainerLeft>
         <WrapperContainerRight>

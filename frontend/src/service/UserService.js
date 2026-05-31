@@ -12,6 +12,15 @@ export const loginUser = async (data) => {
     }
 }
 
+export const googleLoginUser = async (credential) => {
+    try {
+        const res = await axios.post(`${process.env.REACT_APP_API_URL}/user/google-login`, { credential }, { withCredentials: true });
+        return res.data;
+    } catch (error) {
+        return error.response?.data || { status: 'ERR', message: 'Lỗi không xác định' };
+    }
+}
+
 export const signupUser = async (data) => {
     try {
         const res = await axios.post(`${process.env.REACT_APP_API_URL}/user/sign-up`, data);

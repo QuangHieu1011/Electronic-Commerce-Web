@@ -403,7 +403,7 @@ const OrderTrackingPage = () => {
                                         </div>
 
                                         {/* Order Tracking Map */}
-                                        <OrderTrackMap 
+                                        <OrderTrackMap
                                             orderStatus={order.orderStatus}
                                             createdAt={order.createdAt}
                                         />

@@ -36,10 +36,10 @@ const ComparisonPage = () => {
         dispatch(clearComparison())
     }
 
-  const handleAddToCart = (product) => {
-    dispatch(addToCart({ product, quantity: 1 }))
-    navigate('/order')
-  }
+    const handleAddToCart = (product) => {
+        dispatch(addToCart({ product, quantity: 1 }))
+        navigate('/order')
+    }
 
     if (comparisonItems.length === 0) {
         return (

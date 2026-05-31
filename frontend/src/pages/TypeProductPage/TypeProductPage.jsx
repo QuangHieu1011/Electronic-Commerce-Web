@@ -41,12 +41,12 @@ const TypeProductPage = () => {
 
     let res = await ProductService.getAllProduct(search, limit, page, sort, filter);
 
-    
+
     if (currentFilters && res.data) {
       let filteredData = [...res.data];
       let hasClientFilter = false;
 
-      
+
       if (currentFilters.rating && currentFilters.rating.length > 0) {
         filteredData = filteredData.filter(product => {
           return currentFilters.rating.some(rating => product.rating >= rating);

@@ -3,13 +3,13 @@ const userSchema = new mongoose.Schema(
     {
         name: { type: String },
         email: { type: String, required: true, unique: true },
-        password: { type: String, required: true },
+        password: { type: String },
         isAdmin: { type: Boolean, default: false, required: true },
         phone: { type: String },
         address: { type: String },
         avatar: { type: String },
-        orderCount: { type: Number, default: 0 }, 
-        loyaltyDiscountEligible: { type: Boolean, default: false } 
+        orderCount: { type: Number, default: 0 },
+        loyaltyDiscountEligible: { type: Boolean, default: false }
     },
     {
 

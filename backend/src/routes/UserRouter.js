@@ -6,6 +6,7 @@ const { authMiddleware, authUserMiddleware } = require("../middleware/authMiddle
 router.post('/sign-up', userController.createUser)
 router.post('/sign-up-otp', userController.createUserWithOTP)
 router.post('/sign-in', userController.loginUser)
+router.post('/google-login', userController.googleLogin)
 router.post('/log-out', userController.logoutUser)
 router.put('/update-user/:id', authUserMiddleware, userController.updateUser)
 router.delete('/delete-user/:id', authMiddleware, userController.deleteUser)

@@ -339,7 +339,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
 
           <WrapperListImage>
             {allImages.map((img, index) => (
-              <WrapperStyleColImage 
+              <WrapperStyleColImage
                 key={index}
                 onClick={() => setSelectedImage(img)}
                 style={{
@@ -460,9 +460,9 @@ const ProductDetailsComponent = ({ idProduct }) => {
       {/* Mô tả sản phẩm */}
       <Row style={{ padding: '24px', background: '#fff', borderRadius: '8px', marginTop: '20px', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.06)' }}>
         <Col span={24}>
-          <h2 style={{ 
-            fontSize: '20px', 
-            fontWeight: '600', 
+          <h2 style={{
+            fontSize: '20px',
+            fontWeight: '600',
             marginBottom: '20px',
             color: '#262626',
             borderLeft: '4px solid #1a94ff',
@@ -470,8 +470,8 @@ const ProductDetailsComponent = ({ idProduct }) => {
           }}>
             Mô tả sản phẩm
           </h2>
-          <div style={{ 
-            fontSize: '15px', 
+          <div style={{
+            fontSize: '15px',
             lineHeight: '1.8',
             color: '#595959',
             whiteSpace: 'pre-wrap'
@@ -484,9 +484,9 @@ const ProductDetailsComponent = ({ idProduct }) => {
       {/* Đánh giá và bình luận */}
       <Row style={{ padding: '24px', background: '#fff', borderRadius: '8px', marginTop: '20px', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.06)' }}>
         <Col span={24}>
-          <h2 style={{ 
-            fontSize: '20px', 
-            fontWeight: '600', 
+          <h2 style={{
+            fontSize: '20px',
+            fontWeight: '600',
             marginBottom: '20px',
             color: '#262626',
             borderLeft: '4px solid #1a94ff',
@@ -496,9 +496,9 @@ const ProductDetailsComponent = ({ idProduct }) => {
           </h2>
 
           {/* Tổng quan đánh giá */}
-          <div style={{ 
-            display: 'flex', 
-            gap: '40px', 
+          <div style={{
+            display: 'flex',
+            gap: '40px',
             padding: '24px',
             background: '#fafafa',
             borderRadius: '8px',
@@ -508,11 +508,11 @@ const ProductDetailsComponent = ({ idProduct }) => {
               <div style={{ fontSize: '48px', fontWeight: '700', color: '#faad14' }}>
                 {reviewSummary.averageRating || 0}
               </div>
-              <Rate 
-                allowHalf 
-                value={reviewSummary.averageRating || 0} 
-                disabled 
-                style={{ fontSize: '20px', color: '#faad14' }} 
+              <Rate
+                allowHalf
+                value={reviewSummary.averageRating || 0}
+                disabled
+                style={{ fontSize: '20px', color: '#faad14' }}
               />
               <div style={{ marginTop: '8px', color: '#8c8c8c' }}>
                 {t('productReview.totalReviews', { count: reviewSummary.totalReviews || 0 })}
@@ -520,23 +520,23 @@ const ProductDetailsComponent = ({ idProduct }) => {
             </div>
             <div style={{ flex: 1 }}>
               {reviewSummary.ratingBreakdown.map((item) => (
-                <div key={item.star} style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
+                <div key={item.star} style={{
+                  display: 'flex',
+                  alignItems: 'center',
                   gap: '12px',
                   marginBottom: '8px'
                 }}>
                   <span style={{ width: '80px' }}>{item.star} <StarFilled style={{ color: '#faad14' }} /></span>
-                  <div style={{ 
-                    flex: 1, 
-                    height: '8px', 
-                    background: '#e8e8e8', 
+                  <div style={{
+                    flex: 1,
+                    height: '8px',
+                    background: '#e8e8e8',
                     borderRadius: '4px',
                     overflow: 'hidden'
                   }}>
-                    <div style={{ 
-                      width: `${item.percentage}%`, 
-                      height: '100%', 
+                    <div style={{
+                      width: `${item.percentage}%`,
+                      height: '100%',
                       background: '#faad14',
                       transition: 'width 0.3s ease'
                     }} />
@@ -692,7 +692,7 @@ const ProductDetailsComponent = ({ idProduct }) => {
             {isReviewLoading && <p>{t('productReview.loading')}</p>}
             {!isReviewLoading && reviewList.length === 0 && <Empty description={t('productReview.empty')} />}
             {reviewList.map((review) => (
-              <div key={review._id} style={{ 
+              <div key={review._id} style={{
                 padding: '20px',
                 borderBottom: '1px solid #f0f0f0',
                 transition: 'background 0.3s ease'
@@ -706,11 +706,11 @@ const ProductDetailsComponent = ({ idProduct }) => {
                       <span style={{ fontWeight: '600', fontSize: '15px' }}>
                         {review?.user?.name || t('productReview.guest')}
                       </span>
-                      <Rate 
-                        allowHalf 
-                        value={review?.rating || 0} 
-                        disabled 
-                        style={{ fontSize: '14px', color: '#faad14' }} 
+                      <Rate
+                        allowHalf
+                        value={review?.rating || 0}
+                        disabled
+                        style={{ fontSize: '14px', color: '#faad14' }}
                       />
                     </div>
                     <div style={{ color: '#8c8c8c', fontSize: '13px', marginBottom: '12px' }}>
@@ -761,9 +761,9 @@ const ProductDetailsComponent = ({ idProduct }) => {
       {similarProducts.length > 0 && (
         <Row style={{ padding: '24px', background: '#fff', borderRadius: '8px', marginTop: '20px', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.06)' }}>
           <Col span={24}>
-            <h2 style={{ 
-              fontSize: '20px', 
-              fontWeight: '600', 
+            <h2 style={{
+              fontSize: '20px',
+              fontWeight: '600',
               marginBottom: '24px',
               color: '#262626',
               borderLeft: '4px solid #1a94ff',
