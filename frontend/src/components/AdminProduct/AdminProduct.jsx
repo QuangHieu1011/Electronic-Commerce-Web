@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons'
+import { DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined, CloseCircleOutlined } from '@ant-design/icons'
 import { WrapperHeader, WrapperUploadFile, WrapperContainer } from './style'
 import { Button, Form, Select, Space } from 'antd'
 import TableComponent from '../TableComponent/TableComponent'
@@ -28,6 +28,8 @@ const AdminProduct = (props) => {
     const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
     const [isModalOpenDelete, setIsModalOpenDelete] = useState(false);
     const [typeSelect, setTypeSelect] = useState('');
+    const [newImageUrl, setNewImageUrl] = useState('');
+    const [newImageUrlDetails, setNewImageUrlDetails] = useState('');
 
 
     const searchInput = useRef(null);
@@ -40,7 +42,8 @@ const AdminProduct = (props) => {
         price: '',
         rating: '',
         description: '',
-        image: ''
+        image: '',
+        images: []
     })
 
     const [stateProductDetails, setStateProductDetails] = useState({
@@ -50,7 +53,8 @@ const AdminProduct = (props) => {
         price: '',
         rating: '',
         description: '',
-        image: ''
+        image: '',
+        images: []
     })
     const [form] = Form.useForm();
     const [formDetails] = Form.useForm();
@@ -58,8 +62,8 @@ const AdminProduct = (props) => {
 
     const mutation = useMutationHooks(
         (data) => {
-            const { name, type, countInStock, price, rating, description, image } = data;
-            const res = ProductService.createProduct({ name, type, countInStock, price, rating, description, image })
+            const { name, type, countInStock, price, rating, description, image, images } = data;
+            const res = ProductService.createProduct({ name, type, countInStock, price, rating, description, image, images })
             return res;
         }
     )
@@ -125,7 +129,8 @@ const AdminProduct = (props) => {
                 price: res?.data?.price,
                 rating: res?.data?.rating,
                 description: res?.data?.description,
-                image: res?.data?.image
+                image: res?.data?.image,
+                images: res?.data?.images || []
             })
         }
         setIsLoadingUpdate(false);
@@ -330,9 +335,11 @@ const AdminProduct = (props) => {
             price: '',
             rating: '',
             description: '',
-            image: ''
+            image: '',
+            images: []
         })
         setTypeSelect('');
+        setNewImageUrl('');
         form.resetFields();
     }, [form]);
 
@@ -368,8 +375,10 @@ const AdminProduct = (props) => {
             price: '',
             rating: '',
             description: '',
-            image: ''
+            image: '',
+            images: []
         });
+        setNewImageUrlDetails('');
         formDetails.resetFields();
     }, [formDetails]);
 
@@ -437,20 +446,20 @@ const AdminProduct = (props) => {
         if (!file.url && !file.preview) {
             file.preview = await getBase64(file.originFileObj);
         }
-        setStateProduct({
-            ...stateProduct,
+        setStateProduct(prev => ({
+            ...prev,
             image: file.preview
-        })
+        }))
     }
     const handleOnchangeAvatarDetails = async ({ fileList }) => {
         const file = fileList[0];
         if (!file.url && !file.preview) {
             file.preview = await getBase64(file.originFileObj);
         }
-        setStateProductDetails({
-            ...stateProductDetails,
+        setStateProductDetails(prev => ({
+            ...prev,
             image: file.preview
-        })
+        }))
     }
     const onUpdateProduct = async () => {
         let access_token = localStorage.getItem('access_token');
@@ -483,6 +492,36 @@ const AdminProduct = (props) => {
         }
     }
 
+    // --- Sub images handlers (create form) ---
+    const handleAddImageUrl = () => {
+        if (!newImageUrl.trim()) return;
+        setStateProduct({ ...stateProduct, images: [...stateProduct.images, newImageUrl.trim()] });
+        setNewImageUrl('');
+    }
+    const handleRemoveSubImage = (idx) => {
+        setStateProduct({ ...stateProduct, images: stateProduct.images.filter((_, i) => i !== idx) });
+    }
+    const handleUploadSubImage = async (file) => {
+        const preview = await getBase64(file);
+        setStateProduct(prev => ({ ...prev, images: [...prev.images, preview] }));
+        return false; // prevent actual upload
+    }
+
+    // --- Sub images handlers (edit drawer) ---
+    const handleAddImageUrlDetails = () => {
+        if (!newImageUrlDetails.trim()) return;
+        setStateProductDetails({ ...stateProductDetails, images: [...stateProductDetails.images, newImageUrlDetails.trim()] });
+        setNewImageUrlDetails('');
+    }
+    const handleRemoveSubImageDetails = (idx) => {
+        setStateProductDetails({ ...stateProductDetails, images: stateProductDetails.images.filter((_, i) => i !== idx) });
+    }
+    const handleUploadSubImageDetails = async (file) => {
+        const preview = await getBase64(file);
+        setStateProductDetails(prev => ({ ...prev, images: [...prev.images, preview] }));
+        return false; // prevent actual upload
+    }
+
 
     return (
         <WrapperContainer>
@@ -497,9 +536,11 @@ const AdminProduct = (props) => {
                         price: '',
                         rating: '',
                         description: '',
-                        image: ''
+                        image: '',
+                        images: []
                     });
                     setTypeSelect('');
+                    setNewImageUrl('');
                     form.resetFields();
                 }}> <PlusOutlined style={{ fontSize: '60px' }} /> </Button>
             </div>
@@ -611,6 +652,37 @@ const AdminProduct = (props) => {
                             </WrapperUploadFile>
                         </Form.Item>
 
+                        <Form.Item label="Sub Images">
+                            <div>
+                                {stateProduct.images.length > 0 && (
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 8 }}>
+                                        {stateProduct.images.map((img, idx) => (
+                                            <div key={idx} style={{ position: 'relative', display: 'inline-block' }}>
+                                                <img src={img} style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 4, border: '1px solid #d9d9d9' }} alt={`sub-${idx}`} />
+                                                <CloseCircleOutlined
+                                                    onClick={() => handleRemoveSubImage(idx)}
+                                                    style={{ position: 'absolute', top: -8, right: -8, color: 'red', cursor: 'pointer', fontSize: 16, background: '#fff', borderRadius: '50%' }}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                                <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+                                    <InputComponent
+                                        value={newImageUrl}
+                                        onChange={e => setNewImageUrl(e.target.value)}
+                                        placeholder="Paste image URL..."
+                                        style={{ flex: 1 }}
+                                        onPressEnter={handleAddImageUrl}
+                                    />
+                                    <Button onClick={handleAddImageUrl} type="dashed">Add URL</Button>
+                                </div>
+                                <WrapperUploadFile beforeUpload={handleUploadSubImage} showUploadList={false}>
+                                    <Button icon={<PlusOutlined />}>Upload file</Button>
+                                </WrapperUploadFile>
+                            </div>
+                        </Form.Item>
+
 
 
                         <Form.Item label={null} wrapperCol={{ offset: 20, span: 16 }}>
@@ -704,6 +776,36 @@ const AdminProduct = (props) => {
                             </WrapperUploadFile>
                         </Form.Item>
 
+                        <Form.Item label="Sub Images">
+                            <div>
+                                {stateProductDetails.images.length > 0 && (
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 8 }}>
+                                        {stateProductDetails.images.map((img, idx) => (
+                                            <div key={idx} style={{ position: 'relative', display: 'inline-block' }}>
+                                                <img src={img} style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 4, border: '1px solid #d9d9d9' }} alt={`sub-${idx}`} />
+                                                <CloseCircleOutlined
+                                                    onClick={() => handleRemoveSubImageDetails(idx)}
+                                                    style={{ position: 'absolute', top: -8, right: -8, color: 'red', cursor: 'pointer', fontSize: 16, background: '#fff', borderRadius: '50%' }}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                                <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+                                    <InputComponent
+                                        value={newImageUrlDetails}
+                                        onChange={e => setNewImageUrlDetails(e.target.value)}
+                                        placeholder="Paste image URL..."
+                                        style={{ flex: 1 }}
+                                        onPressEnter={handleAddImageUrlDetails}
+                                    />
+                                    <Button onClick={handleAddImageUrlDetails} type="dashed">Add URL</Button>
+                                </div>
+                                <WrapperUploadFile beforeUpload={handleUploadSubImageDetails} showUploadList={false}>
+                                    <Button icon={<PlusOutlined />}>Upload file</Button>
+                                </WrapperUploadFile>
+                            </div>
+                        </Form.Item>
 
 
                         <div

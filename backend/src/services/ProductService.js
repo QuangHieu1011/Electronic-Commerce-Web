@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 
 const createProduct = (newProduct = {}) => {
     return new Promise(async (resolve, reject) => {
-        const { name, image, type, price, countInStock, rating, description } = newProduct || {};
+        const { name, image, images, type, price, countInStock, rating, description } = newProduct || {};
         try {
             const CheckProduct = await Product.findOne({ name });
             if (CheckProduct != null) {
@@ -17,6 +17,7 @@ const createProduct = (newProduct = {}) => {
             const newProduct = await Product.create({
                 name,
                 image,
+                images: images || [],
                 type,
                 price,
                 countInStock,
@@ -140,8 +141,8 @@ const getAllProduct = (search, limit, page, sort, filter) => {
                 const filterValue = filter[1];
 
                 if (label === 'type') {
-                    // Type filter - quan trọng để scope search trong category
-                    query[label] = { '$regex': filterValue, '$options': 'i' };
+                    // Type filter - exact match để tránh "Phone" khớp "Headphone"
+                    query[label] = { '$regex': `^${filterValue}$`, '$options': 'i' };
                 } else {
                     // Các filter khác
                     query[label] = { '$regex': filterValue, '$options': 'i' };

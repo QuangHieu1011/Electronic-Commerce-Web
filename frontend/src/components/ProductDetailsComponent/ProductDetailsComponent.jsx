@@ -201,7 +201,8 @@ const ProductDetailsComponent = ({ idProduct }) => {
     if (!productDetails) return [];
     const images = [productDetails.image];
     if (productDetails.images && productDetails.images.length > 0) {
-      images.push(...productDetails.images.slice(0, 5));
+      const subImages = productDetails.images.filter(img => img !== productDetails.image);
+      images.push(...subImages.slice(0, 5));
     }
     return images.slice(0, 6);
   }, [productDetails]);
